@@ -95,11 +95,21 @@ local function UpdateArtifactData()
     char.Artifacts[artifactItemID].ArtifactRanksPurchased = artifactRanksPurchased
 end
 
+local function UpdateTimePlayed(total, thisLevel)
+    InitDB()
+    local char = CharData(charName, charRealm)
+    -- time played
+    char.PlayedTotal = total
+    char.PlayedLevel = thisLevel 
+end 
+
 local function UpdateCharacterData()
     InitDB()
     local char = CharData(charName, charRealm)
     -- timestamp 
     char.LastUpdated = time() -- returns local time, should we use server time instead?
+    -- request time played
+    RequestTimePlayed()
     -- gold
     char.Money = GetMoney()
     -- currency
@@ -165,6 +175,8 @@ local function UpdateCharacterData()
         v.Name, _, v.SkillLevel, v.MaxSkillLevel, _, _, v.SkillLine, 
         v.SkillModifier, v.SpecializationIndex, _ = GetProfessionInfo(v.Index)
     end
+    -- mage tower
+
     -- followers
     char.Followers = {}
     for _, f in pairs(C_Garrison.GetFollowers()) do
@@ -188,6 +200,11 @@ function events:ARTIFACT_UPDATE(...)
     UpdateArtifactData()
 end
 
+function events:TIME_PLAYED_MSG(...)
+    local total, thisLevel = ...
+    UpdateTimePlayed(total, thisLevel)
+end
+
 function AAM_Init()
     -- register events
     local eventFrame = CreateFrame("FRAME", "AAM_eventFrame")
@@ -203,6 +220,22 @@ AAM_Init()
 
 -----------------------------------------------
 
+local function ErrorColor()
+    return 0.85, 0.33, 0.25
+end
+
+local function ClassColor(className)
+    return RAID_CLASS_COLORS[className].r, RAID_CLASS_COLORS[className].g, RAID_CLASS_COLORS[className].b
+end
+
+local function FactionColor(factionName)
+    if factionName == "Alliance" then
+        return 0, 0.8, 1
+    elseif factionName == "Horde" then
+        return 0.85, 0, 0
+    end
+end
+
 local function NewLabel(parent, fontHeight, text)
     local str = parent:CreateFontString()
     str:SetParent(parent)
@@ -211,121 +244,418 @@ local function NewLabel(parent, fontHeight, text)
     return str
 end
 
+local function CharacterCol(char)
+    local n = char.Name:gsub("%s+", "")
+    local r = char.Realm:gsub("%s+", "")
+    return _G["AAM_colFrame_" .. n .. "_" .. r]
+end
+
+local function FormatPlayed(time)
+    local days = floor(time / 86400)
+    local hours = floor((time % 86400) / 3600)
+    local minutes = floor((time % 3600) / 60)
+    local seconds = floor(time % 60)
+    return format("%d:%02d:%02d:%02d", days, hours, minutes, seconds)
+end
+
+local function FormatBool(b)
+    if b then return "Yes" 
+    else return "No" end
+end
+
 function AAM_BuildGeneralFrame()
     -- dont remake the frame if it already exists
     if AAM_mainFrame ~= nil then return end
 
+    -- crate the main frame
     AAM_mainFrame = CreateFrame("Frame", "AAM_mainFrame", UIParent)
     AAM_mainFrame:SetFrameStrata("HIGH")
     AAM_mainFrame:SetWidth(850)
     AAM_mainFrame:SetHeight(600)
     AAM_mainFrame:SetPoint("CENTER",0,0)
-
     AAM_mainFrame.texture = AAM_mainFrame:CreateTexture(nil, "BACKGROUND")
     AAM_mainFrame.texture:SetColorTexture(0.1, 0.1, 0.1, 0.9)
     AAM_mainFrame.texture:SetAllPoints(AAM_mainFrame)
+    AAM_mainFrame:EnableMouse(true)
+    AAM_mainFrame:SetMovable(true)
+    AAM_mainFrame:RegisterForDrag("LeftButton")
+    AAM_mainFrame:SetScript("OnDragStart", function(self) self:StartMoving() end)
+    AAM_mainFrame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
 
-    local charCount = 0
-    local rowWidth = AAM_mainFrame:GetWidth()
+    local fontHeight = 15
+    local colWidth = 130
     local rowHeight = 20
-    local headerheight = 20
+    local titleBarHeight = 20
+    local colHeight = AAM_mainFrame:GetHeight() - titleBarHeight
+    local textOffset = 2
     
-    -- create the header
-    local headerCols = {
+    -- title bar
+    local titleBar = CreateFrame("FRAME", "AAM_titleBarFrame", AAM_mainFrame)
+    titleBar:SetWidth(AAM_mainFrame:GetWidth())
+    titleBar:SetHeight(titleBarHeight)
+    titleBar:SetPoint("TOPLEFT", 0, 0)
+    titleBar.texture = titleBar:CreateTexture(nil, "BACKGROUND")
+    titleBar.texture:SetColorTexture(0.15, 0.15, 0.3, 1.0)
+    titleBar.texture:SetAllPoints(titleBar)
+    
+    local closeButton = CreateFrame("BUTTON", "AAM_closeButton", AAM_titleBarFrame)
+    closeButton:SetWidth(titleBarHeight)
+    closeButton:SetHeight(titleBarHeight)
+    closeButton:SetPoint("TOPRIGHT", 0, 0)
+    closeButton.Click = function()
+        AAM_mainFrame:Hide()
+    end
+
+    -- row headers
+    local rowHeaders = {
         "Name",
-        "Class",
         "Realm",
         "Faction",
+        "Played",
         "Race",
         "Gender",
         "Level",
-        "Riding Speed",
+        "Riding",
+        "Resources",
+        "Class Campaign",
+        "Class Mount",
+        "Concordance",
+        "Mage Towers",
+        "Profession 1",
+        "Profession 2",
+        "Archaeology",
+        "Fishing",
+        "Cooking",
+        "First Aid",
     }
-    local headerRowFrame = CreateFrame("FRAME", "AAM_headerRowFrame", AAM_mainFrame)
-    headerRowFrame:SetWidth(rowWidth)
-    headerRowFrame:SetHeight(rowHeight)
-    headerRowFrame:SetPoint("TOPLEFT", 0, 0)
-    headerRowFrame.texture = headerRowFrame:CreateTexture(nil, "BACKGROUND")
-    headerRowFrame.texture:SetColorTexture(0.15, 0.15, 0.3, 1.0)
-    headerRowFrame.texture:SetAllPoints(headerRowFrame)
-    local widthSoFar = 0
-    local headerSep = 5
-    local colWidth = 90
-    local headerFontHeight = 20
-    for _, colName in pairs(headerCols) do
-        local str = headerRowFrame:CreateFontString()
-        str:SetParent(headerRowFrame)
-        str:SetFont("fonts/ARIALN.ttf", headerFontHeight)
-        str:SetText(colName)
-        str:SetPoint("LEFT", widthSoFar + headerSep, 0)
-        widthSoFar = widthSoFar + colWidth + headerSep
-    end
-
-    for k, v in pairs(ArwicAltManagerDB.Realms[charRealm]) do
+    local rowHeaderFrame = CreateFrame("FRAME", "AAM_rowHeaderFrame", AAM_mainFrame)
+    rowHeaderFrame:SetWidth(colWidth)
+    rowHeaderFrame:SetHeight(colHeight)
+    rowHeaderFrame:SetPoint("TOPLEFT", 0, -titleBarHeight)
+    local i = 0
+    for _, headerName in pairs(rowHeaders) do
+        local lbl = NewLabel(rowHeaderFrame, fontHeight, headerName)
+        lbl:SetPoint("TOPLEFT", textOffset, -rowHeight * i - textOffset)
         -- create the row frame
-        local charRowFrame = CreateFrame("FRAME", "AAM_charRowFrame_" .. v.Realm .. "_" .. v.Name, AAM_mainFrame)
-        charRowFrame:SetWidth(rowWidth)
-        charRowFrame:SetHeight(rowHeight)
-        charRowFrame:SetPoint("TOPLEFT", 0, -(rowHeight * charCount + headerheight))
-        -- give the row a texture
-        if charCount % 2 == 0 then
-            charRowFrame.texture = charRowFrame:CreateTexture(nil, "BACKGROUND")
-            charRowFrame.texture:SetColorTexture(0.15, 0.15, 0.15, 1.0)
-            charRowFrame.texture:SetAllPoints(charRowFrame)
+        local rowFrame = CreateFrame("FRAME", "AAM_rowFrame_" .. headerName:gsub("%s+", ""), AAM_mainFrame)
+        rowFrame:SetWidth(AAM_mainFrame:GetWidth())
+        rowFrame:SetHeight(rowHeight)
+        rowFrame:SetPoint("TOPLEFT", 0, -(rowHeight * i + titleBarHeight))
+        -- give the row a texture if required
+        if i % 2 == 0 then
+            rowFrame.texture = rowFrame:CreateTexture(nil, "BACKGROUND")
+            rowFrame.texture:SetColorTexture(0.15, 0.15, 0.15, 1.0)
+            rowFrame.texture:SetAllPoints(rowFrame)
         end
-        
-        local char = CharData(v.Name, v.Realm)
-        local classColorR, classColorG, classColorB = 
-            RAID_CLASS_COLORS[char.Class].r, 
-            RAID_CLASS_COLORS[char.Class].g, 
-            RAID_CLASS_COLORS[char.Class].b
-        local dataFontHeight = 15
-        local widthSoFar = 0
-
-        -- name
-        local str = NewLabel(charRowFrame, dataFontHeight, char.Name)
-        str:SetTextColor(classColorR, classColorG, classColorB)
-        str:SetPoint("LEFT", widthSoFar + headerSep, 0)
-        widthSoFar = widthSoFar + colWidth + headerSep
-        -- class 
-        local className = char.Class:sub(1,1):upper() .. char.Class:sub(2):lower()
-        if className == "Demonhunter" then className = "Demon Hunter" end
-        if className == "Deathknight" then className = "Death Knight" end
-        local str = NewLabel(charRowFrame, dataFontHeight, className)
-        str:SetTextColor(classColorR, classColorG, classColorB)
-        str:SetPoint("LEFT", widthSoFar + headerSep, 0)
-        widthSoFar = widthSoFar + colWidth + headerSep
-        -- realm
-        local str = NewLabel(charRowFrame, dataFontHeight, char.Realm)
-        str:SetPoint("LEFT", widthSoFar + headerSep, 0)
-        widthSoFar = widthSoFar + colWidth + headerSep
-        -- faction
-        local str = NewLabel(charRowFrame, dataFontHeight, char.Faction)
-        if char.Faction == "Alliance" then
-            str:SetTextColor(0, 0.8, 1)
-        elseif char.Faction == "Horde" then
-            str:SetTextColor(0.85, 0, 0)
-        end
-        str:SetPoint("LEFT", widthSoFar + headerSep, 0)
-        widthSoFar = widthSoFar + colWidth + headerSep
-        -- race
-        local str = NewLabel(charRowFrame, dataFontHeight, char.Race)
-        str:SetPoint("LEFT", widthSoFar + headerSep, 0)
-        widthSoFar = widthSoFar + colWidth + headerSep
-        -- gender 
-        local str = NewLabel(charRowFrame, dataFontHeight, genderMap[char.Gender])
-        str:SetPoint("LEFT", widthSoFar + headerSep, 0)
-        widthSoFar = widthSoFar + colWidth + headerSep
-        -- level
-        local str = NewLabel(charRowFrame, dataFontHeight, char.Level)
-        str:SetPoint("LEFT", widthSoFar + headerSep, 0)
-        widthSoFar = widthSoFar + colWidth + headerSep
-        -- mount Speed
-        local str = NewLabel(charRowFrame, dataFontHeight, char.MountSpeed .. "%")
-        str:SetPoint("LEFT", widthSoFar + headerSep, 0)
-        widthSoFar = widthSoFar + colWidth + headerSep
-
-        -- increment the counter
-        charCount = charCount + 1
+        i = i + 1
     end
+
+    -- create character cols
+    local i = 0
+    for _, char in pairs(ArwicAltManagerDB.Realms[charRealm]) do
+        local n = char.Name:gsub("%s+", "")
+        local r = char.Realm:gsub("%s+", "")
+        local col = CreateFrame("FRAME", "AAM_colFrame_" .. n .. "_" .. r, AAM_mainFrame)
+        col:SetWidth(colWidth)
+        col:SetHeight(AAM_mainFrame:GetHeight() - titleBarHeight)
+        col:SetPoint("TOPLEFT", rowHeaderFrame:GetWidth() + colWidth * i, -titleBarHeight)
+        i = i + 1
+    end
+
+    -- populate character columns
+    local rowCounter = 0
+    -- name
+    local i = 0
+    for _, char in pairs(ArwicAltManagerDB.Realms[charRealm]) do
+        local char = CharData(char.Name, char.Realm)
+        if char == nil then break end
+        if char.Name == nil then break end
+        if char.Class == nil then break end
+        local charCol = CharacterCol(char)
+        local str = NewLabel(charCol, fontHeight, char.Name)
+        str:SetTextColor(ClassColor(char.Class))
+        str:SetPoint("TOPLEFT", textOffset, -(rowCounter * rowHeight + textOffset))
+        i = i + 1
+    end
+    rowCounter = rowCounter + 1
+    -- realm
+    local i = 0
+    for _, char in pairs(ArwicAltManagerDB.Realms[charRealm]) do
+        local char = CharData(char.Name, char.Realm)
+        if char == nil then break end
+        if char.Realm == nil then break end
+        if char.Class == nil then break end
+        local charCol = CharacterCol(char)
+        local str = NewLabel(charCol, fontHeight, char.Realm)
+        str:SetTextColor(ClassColor(char.Class))
+        str:SetPoint("TOPLEFT", textOffset, -(rowCounter * rowHeight + textOffset))
+        i = i + 1
+    end
+    rowCounter = rowCounter + 1
+    -- faction
+    local i = 0
+    for _, char in pairs(ArwicAltManagerDB.Realms[charRealm]) do
+        local char = CharData(char.Name, char.Realm)
+        if char == nil then break end
+        if char.Faction == nil then break end
+        local charCol = CharacterCol(char)
+        local str = NewLabel(charCol, fontHeight, char.Faction)
+        str:SetTextColor(FactionColor(char.Faction))
+        str:SetPoint("TOPLEFT", textOffset, -(rowCounter * rowHeight + textOffset))
+        i = i + 1
+    end
+    rowCounter = rowCounter + 1
+    -- played
+    local i = 0
+    for _, char in pairs(ArwicAltManagerDB.Realms[charRealm]) do
+        local char = CharData(char.Name, char.Realm)
+        if char == nil then break end
+        if char.PlayedTotal == nil then break end
+        local charCol = CharacterCol(char)
+        local str = NewLabel(charCol, fontHeight, FormatPlayed(char.PlayedTotal))
+        str:SetPoint("TOPLEFT", textOffset, -(rowCounter * rowHeight + textOffset))
+        i = i + 1
+    end
+    rowCounter = rowCounter + 1
+    -- race
+    local i = 0
+    for _, char in pairs(ArwicAltManagerDB.Realms[charRealm]) do
+        local char = CharData(char.Name, char.Realm)
+        if char == nil then break end
+        if char.Race == nil then break end
+        local charCol = CharacterCol(char)
+        local str = NewLabel(charCol, fontHeight, char.Race)
+        str:SetPoint("TOPLEFT", textOffset, -(rowCounter * rowHeight + textOffset))
+        i = i + 1
+    end
+    rowCounter = rowCounter + 1
+    -- gender
+    local i = 0
+    for _, char in pairs(ArwicAltManagerDB.Realms[charRealm]) do
+        local char = CharData(char.Name, char.Realm)
+        if char == nil then break end
+        if char.Gender == nil then break end
+        local charCol = CharacterCol(char)
+        local str = NewLabel(charCol, fontHeight, genderMap[char.Gender])
+        str:SetPoint("TOPLEFT", textOffset, -(rowCounter * rowHeight + textOffset))
+        i = i + 1
+    end
+    rowCounter = rowCounter + 1
+    -- level
+    local i = 0
+    for _, char in pairs(ArwicAltManagerDB.Realms[charRealm]) do
+        local char = CharData(char.Name, char.Realm)
+        if char == nil then break end
+        if char.Level == nil then break end
+        local charCol = CharacterCol(char)
+        local str = NewLabel(charCol, fontHeight, char.Level)
+        if char.Level ~= 110 then
+            str:SetTextColor(ErrorColor())
+        end
+        str:SetPoint("TOPLEFT", textOffset, -(rowCounter * rowHeight + textOffset))
+        i = i + 1
+    end
+    rowCounter = rowCounter + 1
+    -- riding
+    local i = 0
+    for _, char in pairs(ArwicAltManagerDB.Realms[charRealm]) do
+        local char = CharData(char.Name, char.Realm)
+        if char == nil then break end
+        if char.MountSpeed == nil then break end
+        local charCol = CharacterCol(char)
+        local str = NewLabel(charCol, fontHeight, char.MountSpeed .. "%")
+        if char.MountSpeed ~= 310 then
+            str:SetTextColor(ErrorColor())
+        end
+        str:SetPoint("TOPLEFT", textOffset, -(rowCounter * rowHeight + textOffset))
+        i = i + 1
+    end
+    rowCounter = rowCounter + 1
+    -- order resources
+    local i = 0
+    for _, char in pairs(ArwicAltManagerDB.Realms[charRealm]) do
+        local char = CharData(char.Name, char.Realm)
+        if char == nil then break end
+        if char.Currencies == nil then break end
+        if char.Currencies[1220] == nil then break end
+        if char.Currencies[1220].CurrentAmount == nil then break end
+        local charCol = CharacterCol(char)
+        local str = NewLabel(charCol, fontHeight, char.Currencies[1220].CurrentAmount)
+        if char.Currencies[1220].CurrentAmount < 4000 then
+            str:SetTextColor(0.85, 0.33, 0.25)
+        end
+        str:SetPoint("TOPLEFT", textOffset, -(rowCounter * rowHeight + textOffset))
+        i = i + 1
+    end
+    rowCounter = rowCounter + 1
+    -- class campaign
+    local i = 0
+    for _, char in pairs(ArwicAltManagerDB.Realms[charRealm]) do
+        local char = CharData(char.Name, char.Realm)
+        if char == nil then break end
+        if char.ClassCampaignDone == nil then break end
+        local charCol = CharacterCol(char)
+        local str = NewLabel(charCol, fontHeight, FormatBool(char.ClassCampaignDone))
+        if not char.ClassCampaignDone then
+            str:SetTextColor(ErrorColor())
+        end
+        str:SetPoint("TOPLEFT", textOffset, -(rowCounter * rowHeight + textOffset))
+        i = i + 1
+    end
+    rowCounter = rowCounter + 1
+    -- class mount
+    local i = 0
+    for _, char in pairs(ArwicAltManagerDB.Realms[charRealm]) do
+        local char = CharData(char.Name, char.Realm)
+        if char == nil then break end
+        if char.ClassMountDone == nil then break end
+        local charCol = CharacterCol(char)
+        local str = NewLabel(charCol, fontHeight, FormatBool(char.ClassMountDone))
+        if not char.ClassMountDone then
+            str:SetTextColor(ErrorColor())
+        end
+        str:SetPoint("TOPLEFT", textOffset, -(rowCounter * rowHeight + textOffset))
+        i = i + 1
+    end
+    rowCounter = rowCounter + 1
+    -- concordance count
+    local i = 0
+    for _, char in pairs(ArwicAltManagerDB.Realms[charRealm]) do
+        local char = CharData(char.Name, char.Realm)
+        if char == nil then break end
+        if char.Class == nil then break end
+        if char.Artifacts == nil then break end
+        local concCount = 0
+        for k, v in pairs(char.Artifacts) do
+            if v.ArtifactRanksPurchased == nil then break end
+            if v.ArtifactRanksPurchased >= 52 then
+                concCount = concCount + 1
+            end
+        end
+        local maxConcCount = 3
+        if char.Class == "DEMONHUNTER" then maxConcCount = 2
+        elseif char.Class == "DRUID" then maxConcCount = 4 end
+        local charCol = CharacterCol(char)
+        local str = NewLabel(charCol, fontHeight, concCount .. "/" .. maxConcCount)
+        if concCount ~= maxConcCount then
+            str:SetTextColor(ErrorColor())
+        end
+        str:SetPoint("TOPLEFT", textOffset, -(rowCounter * rowHeight + textOffset))
+        i = i + 1
+    end
+    rowCounter = rowCounter + 1
+    -- mage towers
+    local i = 0
+    for _, char in pairs(ArwicAltManagerDB.Realms[charRealm]) do
+        local char = CharData(char.Name, char.Realm)
+        if char == nil then break end
+        local charCol = CharacterCol(char)
+        local str = NewLabel(charCol, fontHeight, "NYI")
+        str:SetPoint("TOPLEFT", textOffset, -(rowCounter * rowHeight + textOffset))
+        i = i + 1
+    end
+    rowCounter = rowCounter + 1
+    -- profession 1
+    local i = 0
+    for _, char in pairs(ArwicAltManagerDB.Realms[charRealm]) do
+        local char = CharData(char.Name, char.Realm)
+        if char == nil then break end
+        if char.Professions == nil then break end
+        if char.Professions.Prof1 == nil then break end
+        if char.Professions.Prof1.SkillLevel == nil then break end
+        if char.Professions.Prof1.MaxSkillLevel == nil then break end
+        if char.Professions.Prof1.Name == nil then break end
+        local charCol = CharacterCol(char)
+        local s = char.Professions.Prof1.SkillLevel .. "/" .. char.Professions.Prof1.MaxSkillLevel .. " (" .. char.Professions.Prof1.Name .. ")"
+        local str = NewLabel(charCol, fontHeight, s)
+        str:SetPoint("TOPLEFT", textOffset, -(rowCounter * rowHeight + textOffset))
+        i = i + 1
+    end
+    rowCounter = rowCounter + 1
+    -- profession 2
+    local i = 0
+    for _, char in pairs(ArwicAltManagerDB.Realms[charRealm]) do
+        local char = CharData(char.Name, char.Realm)
+        if char == nil then break end
+        if char.Professions == nil then break end
+        if char.Professions.Prof2 == nil then break end
+        if char.Professions.Prof2.SkillLevel == nil then break end
+        if char.Professions.Prof2.MaxSkillLevel == nil then break end
+        if char.Professions.Prof2.Name == nil then break end
+        local charCol = CharacterCol(char)
+        local s = char.Professions.Prof2.SkillLevel .. "/" .. char.Professions.Prof2.MaxSkillLevel .. " (" .. char.Professions.Prof2.Name .. ")"
+        local str = NewLabel(charCol, fontHeight, s)
+        str:SetPoint("TOPLEFT", textOffset, -(rowCounter * rowHeight + textOffset))
+        i = i + 1
+    end
+    rowCounter = rowCounter + 1
+    -- archeology
+    local i = 0
+    for _, char in pairs(ArwicAltManagerDB.Realms[charRealm]) do
+        local char = CharData(char.Name, char.Realm)
+        if char == nil then break end
+        if char.Professions == nil then break end
+        if char.Professions.Archaeology == nil then break end
+        if char.Professions.Archaeology.SkillLevel == nil then break end
+        if char.Professions.Archaeology.MaxSkillLevel == nil then break end
+        if char.Professions.Archaeology.Name == nil then break end
+        local charCol = CharacterCol(char)
+        local s = char.Professions.Archaeology.SkillLevel .. "/" .. char.Professions.Archaeology.MaxSkillLevel
+        local str = NewLabel(charCol, fontHeight, s)
+        str:SetPoint("TOPLEFT", textOffset, -(rowCounter * rowHeight + textOffset))
+        i = i + 1
+    end
+    rowCounter = rowCounter + 1
+    -- fishing
+    local i = 0
+    for _, char in pairs(ArwicAltManagerDB.Realms[charRealm]) do
+        local char = CharData(char.Name, char.Realm)
+        if char == nil then break end
+        if char.Professions == nil then break end
+        if char.Professions.Fishing == nil then break end
+        if char.Professions.Fishing.SkillLevel == nil then break end
+        if char.Professions.Fishing.MaxSkillLevel == nil then break end
+        if char.Professions.Fishing.Name == nil then break end
+        local charCol = CharacterCol(char)
+        local s = char.Professions.Fishing.SkillLevel .. "/" .. char.Professions.Fishing.MaxSkillLevel
+        local str = NewLabel(charCol, fontHeight, s)
+        str:SetPoint("TOPLEFT", textOffset, -(rowCounter * rowHeight + textOffset))
+        i = i + 1
+    end
+    rowCounter = rowCounter + 1
+    -- cooking
+    local i = 0
+    for _, char in pairs(ArwicAltManagerDB.Realms[charRealm]) do
+        local char = CharData(char.Name, char.Realm)
+        if char == nil then break end
+        if char.Professions == nil then break end
+        if char.Professions.Cooking == nil then break end
+        if char.Professions.Cooking.SkillLevel == nil then break end
+        if char.Professions.Cooking.MaxSkillLevel == nil then break end
+        if char.Professions.Cooking.Name == nil then break end
+        local charCol = CharacterCol(char)
+        local s = char.Professions.Cooking.SkillLevel .. "/" .. char.Professions.Cooking.MaxSkillLevel
+        local str = NewLabel(charCol, fontHeight, s)
+        str:SetPoint("TOPLEFT", textOffset, -(rowCounter * rowHeight + textOffset))
+        i = i + 1
+    end
+    rowCounter = rowCounter + 1
+    -- first aid
+    local i = 0
+    for _, char in pairs(ArwicAltManagerDB.Realms[charRealm]) do
+        local char = CharData(char.Name, char.Realm)
+        if char == nil then break end
+        if char.Professions == nil then break end
+        if char.Professions.FirstAid == nil then break end
+        if char.Professions.FirstAid.SkillLevel == nil then break end
+        if char.Professions.FirstAid.MaxSkillLevel == nil then break end
+        if char.Professions.FirstAid.Name == nil then break end
+        local charCol = CharacterCol(char)
+        local s = char.Professions.FirstAid.SkillLevel .. "/" .. char.Professions.FirstAid.MaxSkillLevel
+        local str = NewLabel(charCol, fontHeight, s)
+        str:SetPoint("TOPLEFT", textOffset, -(rowCounter * rowHeight + textOffset))
+        i = i + 1
+    end
+    rowCounter = rowCounter + 1
+    
 end
