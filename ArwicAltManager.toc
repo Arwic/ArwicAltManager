@@ -1,0 +1,8 @@
+## Interface: 70300
+## Title: Arwic Alt Manager
+## Version: v1.0.0
+## Author: Arwic@Frostmourne-US
+## Notes: Simple alt manager for completionists
+## SavedVariables: ArwicAltManagerDB
+
+ArwicAltManager.lua
