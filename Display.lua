@@ -141,6 +141,9 @@ local fieldFormatters = {
         Order = 1,
         Display = true,
         Value = function(char)
+            if not char["Timestamp"] then
+                return "?"
+            end
             local dt = time() - char["Timestamp"]
             local days, hours, minutes, seconds = FormatTime(dt)
             if days > 0 then
@@ -183,7 +186,7 @@ local fieldFormatters = {
             return FormatBool(char["ClassCampaign"])
         end,
         Color = function(char)
-            if (char["Money"] / 100 / 100) < Config().GoldThreshold then
+            if not char["ClassCampaign"] then
                 return ErrorColor()
             end
             return DefaultColor()
@@ -302,13 +305,15 @@ local fieldFormatters = {
         Value = function(char)
             local str = ""
             for k, v in pairs(char["Artifacts"]) do
-                str = format("%s, %d", str, v["Ranks"]) 
+                if k ~= 133755 then -- ignore fishing artifact
+                    str = format("%s, %d", str, v["Ranks"]) 
+                end
             end
             return str:sub(3) -- remove the first 2 characters ", "
         end,
         Color = function(char)
             for k, v in pairs(char["Artifacts"]) do
-                if v["Ranks"] < Config().ArtifactRankThreshold then
+                if v["Ranks"] < Config().ArtifactRankThreshold and k ~= 133755 then
                     return ErrorColor()
                 end
             end
@@ -320,9 +325,15 @@ local fieldFormatters = {
         Order = 1,
         Display = true,
         Value = function(char)
+            if not char["Currencies"] then
+                return "?"
+            end
             return char["Currencies"][1220]["CurrentAmount"]
         end,
         Color = function(char)
+            if not char["Currencies"] then
+                return "?"
+            end
             local cur = char["Currencies"][1220]["CurrentAmount"]
             if cur < Config().OrderHallResourcesThreshold then
                 return ErrorColor()
@@ -387,7 +398,7 @@ local function BuildGrid()
     closeButton:SetWidth(titleBarHeight)
     closeButton:SetHeight(titleBarHeight)
     closeButton.texture = closeButton:CreateTexture(nil, "BACKGROUND")
-    closeButton.texture:SetColorTexture(1.0, 0.0, 0.0, 1.0)
+    closeButton.texture:SetColorTexture(0.7, 0.0, 0.0, 1.0)
     closeButton.texture:SetAllPoints(closeButton)
     closeButton:SetScript("OnClick", function()
         mainFrame:Hide()

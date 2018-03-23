@@ -197,8 +197,10 @@ local fields = {
             char["Professions"]["Cooking"]["Index"], 
             char["Professions"]["FirstAid"]["Index"] = GetProfessions()
             for k, v in pairs(char["Professions"]) do
-                v["Name"], _, v["SkillLevel"], v["MaxSkillLevel"], _, _, v["SkillLine"], 
-                v["SkillModifier"], v["SpecializationIndex"], _ = GetProfessionInfo(v["Index"])
+                if v["Index"] then
+                    v["Name"], _, v["SkillLevel"], v["MaxSkillLevel"], _, _, v["SkillLine"], 
+                    v["SkillModifier"], v["SpecializationIndex"], _ = GetProfessionInfo(v["Index"])
+                end
             end
         end
     },
