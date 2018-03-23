@@ -80,7 +80,7 @@ local fieldFormatters = {
             elseif char["Class"] == "DEATHKNIGHT" then
                 return "Death Knight"
             else
-                return char["Class"]:sub(1,1):upper() .. char["Class"]:sub(2)
+                return char["Class"]:sub(1,1):upper() .. char["Class"]:sub(2):lower()
             end
         end,
         Color = function(char)
