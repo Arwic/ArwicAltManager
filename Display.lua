@@ -42,6 +42,10 @@ local function FormatBool(b)
     end
 end
 
+local function FormatInt(i)
+    return tostring(i):reverse():gsub("%d%d%d", "%1,"):reverse():gsub("^,", "")
+end
+
 local function FormatTime(timeSeconds)
     local days = floor(timeSeconds / 86400)
     local hours = floor((timeSeconds % 86400) / 3600)
@@ -61,7 +65,7 @@ end
 local fieldFormatters = {
     ["Name"] = {
         Label = "Name",
-        Order = 1,
+        Order = 10,
         Display = true,
         Value = function(char)
             return char["Name"]
@@ -72,8 +76,8 @@ local fieldFormatters = {
     },
     ["Class"] = {
         Label = "Class",
-        Order = 1,
-        Display = true,
+        Order = 20,
+        Display = false,
         Value = function(char)
             if char["Class"] == "DEMONHUNTER" then
                 return "Demon Hunter"
@@ -89,8 +93,8 @@ local fieldFormatters = {
     },
     ["Realm"] = {
         Label = "Realm",
-        Order = 1,
-        Display = true,
+        Order = 40,
+        Display = false,
         Value = function(char)
             return char["Realm"]
         end,
@@ -100,8 +104,8 @@ local fieldFormatters = {
     },
     ["Faction"] = {
         Label = "Faction",
-        Order = 1,
-        Display = true,
+        Order = 30,
+        Display = false,
         Value = function(char)
             return char["Faction"]
         end,
@@ -111,8 +115,8 @@ local fieldFormatters = {
     },
     ["Race"] = {
         Label = "Race",
-        Order = 1,
-        Display = true,
+        Order = 60,
+        Display = false,
         Value = function(char)
             return char["Race"]
         end,
@@ -122,8 +126,8 @@ local fieldFormatters = {
     },
     ["Gender"] = {
         Label = "Gender",
-        Order = 1,
-        Display = true,
+        Order = 70,
+        Display = false,
         Value = function(char)
             local map = {
                 [1] = "Unknown",
@@ -138,7 +142,7 @@ local fieldFormatters = {
     },
     ["Timestamp"] = {
         Label = "Updated",
-        Order = 1,
+        Order = 1000,
         Display = true,
         Value = function(char)
             if not char["Timestamp"] then
@@ -162,13 +166,14 @@ local fieldFormatters = {
     },
     ["Money"] = {
         Label = "Gold",
-        Order = 1,
+        Order = 80,
         Display = true,
         Value = function(char)
-            local g = char["Money"] / 100 / 100
-            local s = (char["Money"] / 100) % 100
-            local c = char["Money"] % 100
-            local str = format("%dg %ds %dc", g, s, c)
+            local g = floor(char["Money"] / 100 / 100)
+            --local s = (char["Money"] / 100) % 100
+            --local c = char["Money"] % 100
+            --local str = format("%sg %ds %dc", FormatInt(g), s, c)
+            local str = format("%sg", FormatInt(g))
             return str
         end,
         Color = function(char)
@@ -180,7 +185,7 @@ local fieldFormatters = {
     },
     ["ClassCampaign"] = {
         Label = "Class Campaign",
-        Order = 1,
+        Order = 110,
         Display = true,
         Value = function(char)
             return FormatBool(char["ClassCampaign"])
@@ -194,40 +199,49 @@ local fieldFormatters = {
     },
     ["ClassMount"] = {
         Label = "Class Mount",
-        Order = 1,
+        Order = 120,
         Display = true,
         Value = function(char)
             return FormatBool(char["ClassMount"])
         end,
         Color = function(char)
+            if not char["ClassMount"] then
+                return ErrorColor()
+            end
             return DefaultColor()
         end,
     },
     ["Level"] = {
         Label = "Level",
-        Order = 1,
+        Order = 50,
         Display = true,
         Value = function(char)
             return char["Level"]
         end,
         Color = function(char)
+            if char["Level"] < Config().LevelThreshold then
+                return ErrorColor()
+            end
             return DefaultColor()
         end,
     },
     ["MountSpeed"] = {
         Label = "Riding",
-        Order = 1,
+        Order = 160,
         Display = true,
         Value = function(char)
             return format("%s%%", char["MountSpeed"])
         end,
         Color = function(char)
+            if char["MountSpeed"] < Config().MountSpeedThreshold then
+                return ErrorColor()
+            end
             return DefaultColor()
         end,
     },
     ["OrderHallUpgrades"] = {
-        Label = "Order Hall Upgrades",
-        Order = 1,
+        Label = "All Order Hall Upgrades",
+        Order = 130,
         Display = true,
         Value = function(char)
             return FormatBool(char["OrderHallUpgrades"])
@@ -241,7 +255,7 @@ local fieldFormatters = {
     },
     ["BalanceOfPower"] = {
         Label = "Balance of Power",
-        Order = 1,
+        Order = 150,
         Display = true,
         Value = function(char)
             return FormatBool(char["BalanceOfPower"])
@@ -255,7 +269,7 @@ local fieldFormatters = {
     },
     ["MageTower"] = {
         Label = "Mage Tower",
-        Order = 1,
+        Order = 140,
         Display = true,
         Value = function(char)
             local count = 0
@@ -288,7 +302,7 @@ local fieldFormatters = {
     },
     ["TimePlayed"] = {
         Label = "Time Played",
-        Order = 1,
+        Order = 170,
         Display = true,
         Value = function(char)
             local days, hours, mintues, seconds = FormatTime(char["TimePlayed"]["Total"])
@@ -300,7 +314,7 @@ local fieldFormatters = {
     },
     ["Artifacts"] = {
         Label = "Artifact Levels",
-        Order = 1,
+        Order = 100,
         Display = true,
         Value = function(char)
             local str = ""
@@ -313,6 +327,7 @@ local fieldFormatters = {
         end,
         Color = function(char)
             for k, v in pairs(char["Artifacts"]) do
+                -- ignore fishing artifact
                 if v["Ranks"] < Config().ArtifactRankThreshold and k ~= 133755 then
                     return ErrorColor()
                 end
@@ -322,7 +337,7 @@ local fieldFormatters = {
     },
     ["OrderHallResouces"] = {
         Label = "Order Hall Resouces",
-        Order = 1,
+        Order = 90,
         Display = true,
         Value = function(char)
             if not char["Currencies"] then
@@ -343,18 +358,36 @@ local fieldFormatters = {
     }
 }
 
+function spairs(t, order) -- https://stackoverflow.com/a/15706820/3105105
+    -- collect the keys
+    local keys = {}
+    for k in pairs(t) do keys[#keys+1] = k end
+
+    -- if order function given, sort by it by passing the table and keys a, b,
+    -- otherwise just sort the keys 
+    if order then
+        table.sort(keys, function(a,b) return order(t, a, b) end)
+    else
+        table.sort(keys)
+    end
+
+    -- return the iterator function
+    local i = 0
+    return function()
+        i = i + 1
+        if keys[i] then
+            return keys[i], t[keys[i]]
+        end
+    end
+end
+
+
 local function NewLabel(parent, fontHeight, text)
     local str = parent:CreateFontString()
     str:SetParent(parent)
     str:SetFont("fonts/ARIALN.ttf", fontHeight)
     str:SetText(text)
     return str
-end
-
-local function CharacterColumn(char)
-    local n = char.Name:gsub("%s+", "")
-    local r = char.Realm:gsub("%s+", "")
-    return _G["AAM_colFrame_" .. n .. "_" .. r]
 end
 
 local function BuildGrid()
@@ -366,7 +399,7 @@ local function BuildGrid()
     local fontHeight = 13
     local rowHeight = 20
     local titleBarHeight = 20
-    local textOffset = 2
+    local textOffset = 15
 
     -- main frame
     local mainFrame = CreateFrame("Frame", "AAM_mainFrame", UIParent)
@@ -411,35 +444,40 @@ local function BuildGrid()
     local maxLabelWidth = 0
     local lastCellFrame = titleBar
     local i = 0
-    for formatterKey, formatter in pairs(fieldFormatters) do
-        -- make a cell
-        local cellFrame = CreateFrame("FRAME", "AAM_charCell_" .. formatterKey, headerCol)
-        cellFrame:SetHeight(rowHeight)
-        cellFrame:SetPoint("LEFT", headerCol, "LEFT")
-        cellFrame:SetPoint("RIGHT", headerCol, "RIGHT")
-        cellFrame:SetPoint("TOP", lastCellFrame, "BOTTOM")
-        -- make the label and put it in the cell
-        local lbl = NewLabel(cellFrame, fontHeight, formatter.Label)
-        local lblWidth = lbl:GetStringWidth()
-        if lblWidth > maxLabelWidth then
-            maxLabelWidth = lblWidth
+    for formatterKey, formatter in spairs(fieldFormatters, function(t, a, b)
+        return t[a].Order < t[b].Order
+    end) do
+        if formatter.Display then
+            -- make a cell
+            local cellFrame = CreateFrame("FRAME", "AAM_charCell_" .. formatterKey, headerCol)
+            cellFrame:SetHeight(rowHeight)
+            cellFrame:SetPoint("LEFT", headerCol, "LEFT")
+            cellFrame:SetPoint("RIGHT", headerCol, "RIGHT")
+            cellFrame:SetPoint("TOP", lastCellFrame, "BOTTOM")
+            -- make the label and put it in the cell
+            local lbl = NewLabel(cellFrame, fontHeight, formatter.Label)
+            local lblWidth = lbl:GetStringWidth()
+            if lblWidth > maxLabelWidth then
+                maxLabelWidth = lblWidth
+            end
+            --lbl:SetAllPoints(cellFrame)
+            lbl:SetPoint("LEFT", cellFrame, "LEFT", 5, 0)
+            -- create the row frame
+            local rowFrame = CreateFrame("FRAME", "AAM_rowFrame_" .. formatterKey, mainFrame)
+            rowFrame:SetHeight(rowHeight)
+            rowFrame:SetPoint("TOP", cellFrame, "TOP")
+            rowFrame:SetPoint("LEFT", mainFrame, "LEFT")
+            rowFrame:SetPoint("RIGHT", mainFrame, "RIGHT")
+            -- give the row a texture if required
+            if i % 2 == 0 then
+                rowFrame.texture = rowFrame:CreateTexture(nil, "BACKGROUND")
+                rowFrame.texture:SetColorTexture(0.15, 0.15, 0.15, 1.0)
+                rowFrame.texture:SetAllPoints(rowFrame)
+            end
+            -- keep track of the last itteration
+            lastCellFrame = cellFrame
+            i = i + 1
         end
-        lbl:SetAllPoints(cellFrame)
-        -- create the row frame
-        local rowFrame = CreateFrame("FRAME", "AAM_rowFrame_" .. formatterKey, mainFrame)
-        rowFrame:SetHeight(rowHeight)
-        rowFrame:SetPoint("TOP", cellFrame, "TOP")
-        rowFrame:SetPoint("LEFT", mainFrame, "LEFT")
-        rowFrame:SetPoint("RIGHT", mainFrame, "RIGHT")
-        -- give the row a texture if required
-        if i % 2 == 0 then
-            rowFrame.texture = rowFrame:CreateTexture(nil, "BACKGROUND")
-            rowFrame.texture:SetColorTexture(0.15, 0.15, 0.15, 1.0)
-            rowFrame.texture:SetAllPoints(rowFrame)
-        end
-        -- keep track of the last itteration
-        lastCellFrame = cellFrame
-        i = i + 1
     end
     mainFrame:SetHeight(titleBarHeight + i * rowHeight)
     headerCol:SetWidth(maxLabelWidth + textOffset * 2)
@@ -447,7 +485,9 @@ local function BuildGrid()
     -- populate the grid with character data
     local lastCharCol = headerCol
     local widthSoFar = 0
-    for charKey, char in pairs(AllRealmChars(GetRealmName())) do
+    for charKey, char in spairs(AllRealmChars(GetRealmName()), function(t, a, b)
+        return t[a].Name < t[b].Name
+    end) do
         -- make the character coloumn
         local charCol = CreateFrame("FRAME", "AAM_charCol_" .. charKey, mainFrame)
         charCol:SetPoint("LEFT", lastCharCol, "RIGHT")
@@ -456,31 +496,32 @@ local function BuildGrid()
         -- make the cells for each field in the character column
         local maxLabelWidth = 0
         local lastCellFrame = titleBar
-        local i = 0
-        for formatterKey, formatter in pairs(fieldFormatters) do
-            -- make the cell
-            local cellFrame = CreateFrame("FRAME", "AAM_charCell_" .. charKey .. "_" .. formatterKey, charCol)
-            cellFrame:SetHeight(rowHeight)
-            cellFrame:SetPoint("LEFT", charCol, "LEFT")
-            cellFrame:SetPoint("RIGHT", charCol, "RIGHT")
-            cellFrame:SetPoint("TOP", lastCellFrame, "BOTTOM")
-            -- make the label and put it in the cell
-            local lbl = NewLabel(cellFrame, fontHeight, formatter.Value(char))
-            local container = {
-                ["lbl"] = lbl,
-                ["formatter"] = formatter,
-                ["char"] = char
-            }
-            table.insert(dataLabels, container)
-            local lblWidth = lbl:GetStringWidth()
-            if lblWidth > maxLabelWidth then
-                maxLabelWidth = lblWidth
+        for formatterKey, formatter in spairs(fieldFormatters, function(t, a, b)
+            return t[a].Order < t[b].Order
+        end) do
+            if formatter.Display then
+                -- make the cell
+                local cellFrame = CreateFrame("FRAME", "AAM_charCell_" .. charKey .. "_" .. formatterKey, charCol)
+                cellFrame:SetHeight(rowHeight)
+                cellFrame:SetPoint("LEFT", charCol, "LEFT")
+                cellFrame:SetPoint("RIGHT", charCol, "RIGHT")
+                cellFrame:SetPoint("TOP", lastCellFrame, "BOTTOM")
+                -- make the label and put it in the cell
+                local lbl = NewLabel(cellFrame, fontHeight, formatter.Value(char))
+                table.insert(dataLabels, {
+                    ["lbl"] = lbl,
+                    ["formatter"] = formatter,
+                    ["char"] = char
+                })
+                local lblWidth = lbl:GetStringWidth()
+                if lblWidth > maxLabelWidth then
+                    maxLabelWidth = lblWidth
+                end
+                lbl:SetAllPoints(cellFrame)
+                lbl:SetTextColor(formatter.Color(char))
+                -- keep track of the last itteration
+                lastCellFrame = cellFrame
             end
-            lbl:SetAllPoints(cellFrame)
-            lbl:SetTextColor(formatter.Color(char))
-            -- keep track of the last itteration
-            lastCellFrame = cellFrame
-            i = i + 1
         end
         -- set the column width to the widest labels width
         charCol:SetWidth(maxLabelWidth + textOffset * 2)
@@ -492,13 +533,18 @@ end
 
 local function UpdateGrid()
     if AAM_mainFrame then
-        for _, c in pairs(dataLabels) do
-            c.lbl:SetText(c.formatter.Value(c.char))
-            c.lbl:SetTextColor(c.formatter.Color(c.char))
+        for _, v in pairs(dataLabels) do
+            v.lbl:SetText(v.formatter.Value(v.char))
+            v.lbl:SetTextColor(v.formatter.Color(v.char))
         end
     else
         BuildGrid()
     end
+end
+
+function AAMToggle()
+    UpdateGrid()
+    AAM_mainFrame:SetShown(not AAM_mainFrame:IsVisible())
 end
 
 function AAMShow()
@@ -508,4 +554,14 @@ end
 
 function AAMHide()
     AAM_mainFrame:Hide()
+end
+
+SLASH_AAM1 = "/aam"
+SLASH_AAM2 = "/arwicaltmanager"
+SlashCmdList["AAM"] = function(msg)
+    if AAM_mainFrame then
+        AAMToggle()
+    else
+        BuildGrid()
+    end
 end
