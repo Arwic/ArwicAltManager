@@ -261,7 +261,7 @@ local fields = {
     }
 }
 
-local function UpdateData()
+function ARWIC_AAM_UpdateData()
     for k, v in pairs(fields) do
         v.Update()
     end

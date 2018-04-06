@@ -392,7 +392,7 @@ end
 
 local function BuildGrid()
     -- dont remake the frame if it already exists
-    if AAM_mainFrame ~= nil then return end
+    if ARWIC_AAM_mainFrame ~= nil then return end
     dataLabels = {}
 
     -- frame properties
@@ -402,7 +402,7 @@ local function BuildGrid()
     local textOffset = 15
 
     -- main frame
-    local mainFrame = CreateFrame("Frame", "AAM_mainFrame", UIParent)
+    local mainFrame = CreateFrame("Frame", "ARWIC_AAM_mainFrame", UIParent)
     mainFrame:SetFrameStrata("HIGH")
     mainFrame:SetPoint("CENTER",0,0)
     mainFrame.texture = mainFrame:CreateTexture(nil, "BACKGROUND")
@@ -532,7 +532,7 @@ local function BuildGrid()
 end
 
 local function UpdateGrid()
-    if AAM_mainFrame then
+    if ARWIC_AAM_mainFrame then
         for _, v in pairs(dataLabels) do
             v.lbl:SetText(v.formatter.Value(v.char))
             v.lbl:SetTextColor(v.formatter.Color(v.char))
@@ -542,26 +542,34 @@ local function UpdateGrid()
     end
 end
 
-function AAMToggle()
+function ARWIC_AAM_Toggle()
     UpdateGrid()
-    AAM_mainFrame:SetShown(not AAM_mainFrame:IsVisible())
+    ARWIC_AAM_mainFrame:SetShown(not ARWIC_AAM_mainFrame:IsVisible())
 end
 
-function AAMShow()
+function ARWIC_AAM_Show()
     UpdateGrid()
-    AAM_mainFrame:Show()
+    ARWIC_AAM_mainFrame:Show()
 end
 
-function AAMHide()
-    AAM_mainFrame:Hide()
+function ARWIC_AAM_Hide()
+    ARWIC_AAM_mainFrame:Hide()
 end
 
 SLASH_AAM1 = "/aam"
 SLASH_AAM2 = "/arwicaltmanager"
 SlashCmdList["AAM"] = function(msg)
-    if AAM_mainFrame then
-        AAMToggle()
+    if msg == "update" then
+        ARWIC_AAM_UpdateData()
+        print("AAM: Updated data for " .. UnitName("player") .. "-" .. GetRealmName())
+        if ARWIC_AAM_mainFrame then
+            ARWIC_AAM_Show()
+        end
     else
-        BuildGrid()
+        if ARWIC_AAM_mainFrame then
+            ARWIC_AAM_Toggle()
+        else
+            BuildGrid()
+        end
     end
 end
