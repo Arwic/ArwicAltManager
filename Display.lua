@@ -34,6 +34,10 @@ local function DefaultColor()
     return 1.0, 1.0, 1.0
 end
 
+local function SuccessColor()
+    return 0.0, 1.0, 0.0
+end
+
 local function FormatBool(b)
     if b then 
         return "Yes" 
@@ -60,6 +64,10 @@ end
 
 local function AllRealmChars(realm)
     return ArwicAltManagerDB.Realms[realm]
+end
+
+local function CurrentAccount()
+    return ArwicAltManagerDB.Account
 end
 
 local fieldFormatters = {
@@ -267,8 +275,61 @@ local fieldFormatters = {
             return DefaultColor()
         end,
     },
+    ["KeystoneMaster"] = {
+        Label = "Keystone Master",
+        Order = 135,
+        Display = true,
+        Value = function(char)
+            return FormatBool(char["KeystoneMaster"])
+        end,
+        Color = function(char)
+            if not char["KeystoneMaster"] then
+                return ErrorColor()
+            end
+            return DefaultColor()
+        end,
+    },
+    ["MageTowerPrereq"] = {
+        Label = "Mage Tower Unlocked",
+        Order = 139,
+        Display = true,
+        Value = function(char)
+            if char["MageTowerPrereq"] then
+                local count = 0
+                for k, v in pairs(char["MageTowerPrereq"]) do
+                    if v then
+                        count = count + 1
+                    end
+                end
+                local maxCount = 3
+                if char["Class"] == "DEMONHUNTER" then maxCount = 2 end
+                if char["Class"] == "DRUID" then maxCount = 4 end
+                local str = format("%d/%d", count, maxCount)
+                return str
+            end
+            return ""
+        end,
+        Color = function(char)
+            if char["MageTowerPrereq"] then
+                local count = 0
+                for k, v in pairs(char["MageTowerPrereq"]) do
+                    if v then
+                        count = count + 1
+                    end
+                end
+                local maxCount = 3
+                if char["Class"] == "DEMONHUNTER" then maxCount = 2 end
+                if char["Class"] == "DRUID" then maxCount = 4 end
+                if count ~= maxCount then
+                    return ErrorColor()
+                end
+                return DefaultColor()
+            end
+            return ErrorColor()
+        end,
+    },
     ["MageTower"] = {
-        Label = "Mage Tower",
+        Label = "Mage Tower Completed",
         Order = 140,
         Display = true,
         Value = function(char)
@@ -341,13 +402,13 @@ local fieldFormatters = {
         Display = true,
         Value = function(char)
             if not char["Currencies"] then
-                return "?"
+                return ""
             end
             return char["Currencies"][1220]["CurrentAmount"]
         end,
         Color = function(char)
             if not char["Currencies"] then
-                return "?"
+                return ErrorColor()
             end
             local cur = char["Currencies"][1220]["CurrentAmount"]
             if cur < Config().OrderHallResourcesThreshold then
@@ -355,7 +416,254 @@ local fieldFormatters = {
             end
             return DefaultColor()
         end,
-    }
+    },
+    ["WakeningEssence"] = {
+        Label = "Wakening Essence",
+        Order = 91,
+        Display = true,
+        Value = function(char)
+            if not char["Currencies"] or not char["Currencies"][1533] then
+                return ""
+            end
+            return char["Currencies"][1533]["CurrentAmount"]
+        end,
+        Color = function(char)
+            if not char["Currencies"] or not char["Currencies"][1533] then
+                return ErrorColor()
+            end
+            local cur = char["Currencies"][1533]["CurrentAmount"]
+            if cur > 1000 then
+                return SuccessColor()
+            end
+            return DefaultColor()
+        end,
+    },
+
+    --------------------------------------------------------------------
+    --------------------------------------------------------------------
+    --------------------------------------------------------------------
+    --------------------------------------------------------------------
+    --------------------- TEMP ACCOUNT WIDE DATA -----------------------
+    --------------------------------------------------------------------
+    --------------------------------------------------------------------
+    --------------------------------------------------------------------
+    --------------------------------------------------------------------
+    ["Mount_VioletSpellwing"] = {
+        Label = "Violet Spellwing",
+        Order = 500,
+        Display = true,
+        Value = function()
+            local account = ArwicAltManagerDB.Account
+            if not account["Mounts"] then
+                return "?"
+            end
+            return FormatBool(account["Mounts"][253639]["IsCollected"])
+        end,
+        Color = function()
+            local account = ArwicAltManagerDB.Account
+            if not account["Mounts"] then
+                return ErrorColor()
+            end
+            if not account["Mounts"][253639]["IsCollected"] then
+                return ErrorColor()
+            end
+            return DefaultColor()
+        end,
+    },
+    ["Mount_ShackledUrzul"] = {
+        Label = "Shackled Urzul",
+        Order = 510,
+        Display = true,
+        Value = function()
+            local account = ArwicAltManagerDB.Account
+            if not account["Mounts"] then
+                return "?"
+            end
+            return FormatBool(account["Mounts"][243651]["IsCollected"])
+        end,
+        Color = function()
+            local account = ArwicAltManagerDB.Account
+            if not account["Mounts"] then
+                return ErrorColor()
+            end
+            if not account["Mounts"][243651]["IsCollected"] then
+                return ErrorColor()
+            end
+            return DefaultColor()
+        end,
+    },
+    ["Mount_HellfireInfernal"] = {
+        Label = "Hellfire Infernal",
+        Order = 520,
+        Display = true,
+        Value = function()
+            local account = ArwicAltManagerDB.Account
+            if not account["Mounts"] then
+                return "?"
+            end
+            return FormatBool(account["Mounts"][171827]["IsCollected"])
+        end,
+        Color = function()
+            local account = ArwicAltManagerDB.Account
+            if not account["Mounts"] then
+                return ErrorColor()
+            end
+            if not account["Mounts"][171827]["IsCollected"] then
+                return ErrorColor()
+            end
+            return DefaultColor()
+        end,
+    },
+    ["Mount_FelblazeInfernal"] = {
+        Label = "Felblaze Infernal",
+        Order = 520,
+        Display = true,
+        Value = function()
+            local account = ArwicAltManagerDB.Account
+            if not account["Mounts"] then
+                return "?"
+            end
+            return FormatBool(account["Mounts"][213134]["IsCollected"])
+        end,
+        Color = function()
+            local account = ArwicAltManagerDB.Account
+            if not account["Mounts"] then
+                return ErrorColor()
+            end
+            if not account["Mounts"][213134]["IsCollected"] then
+                return ErrorColor()
+            end
+            return DefaultColor()
+        end,
+    },
+    ["Mount_AbyssWorm"] = {
+        Label = "Abyss Worm",
+        Order = 520,
+        Display = true,
+        Value = function()
+            local account = ArwicAltManagerDB.Account
+            if not account["Mounts"] then
+                return "?"
+            end
+            return FormatBool(account["Mounts"][232519]["IsCollected"])
+        end,
+        Color = function()
+            local account = ArwicAltManagerDB.Account
+            if not account["Mounts"] then
+                return ErrorColor()
+            end
+            if not account["Mounts"][232519]["IsCollected"] then
+                return ErrorColor()
+            end
+            return DefaultColor()
+        end,
+    },
+    ["Mount_AntoranCharhound"] = {
+        Label = "Antoran Charhound",
+        Order = 520,
+        Display = true,
+        Value = function()
+            local account = ArwicAltManagerDB.Account
+            if not account["Mounts"] then
+                return "?"
+            end
+            return FormatBool(account["Mounts"][253088]["IsCollected"])
+        end,
+        Color = function()
+            local account = ArwicAltManagerDB.Account
+            if not account["Mounts"] then
+                return ErrorColor()
+            end
+            if not account["Mounts"][253088]["IsCollected"] then
+                return ErrorColor()
+            end
+            return DefaultColor()
+        end,
+    },
+    ["FieldMedic"] = {
+        Label = "Field Medic",
+        Order = 600,
+        Display = true,
+        Value = function()
+            return FormatBool(CurrentAccount()["FieldMedic"])
+        end,
+        Color = function()
+            if not CurrentAccount()["FieldMedic"] then
+                return ErrorColor()
+            end
+            return DefaultColor()
+        end,
+    },
+    ["ChosenTransmogs_Cloth"] = {
+        Label = "Chosen Cloth",
+        Order = 701,
+        Display = true,
+        Value = function()
+            return FormatBool(CurrentAccount()["ChosenTransmogs"][1])
+        end,
+        Color = function()
+            if not CurrentAccount()["ChosenTransmogs"][1] then
+                return ErrorColor()
+            end
+            return DefaultColor()
+        end,
+    },
+    ["ChosenTransmogs_Leather"] = {
+        Label = "Chosen leather",
+        Order = 702,
+        Display = true,
+        Value = function()
+            return FormatBool(CurrentAccount()["ChosenTransmogs"][2])
+        end,
+        Color = function()
+            if not CurrentAccount()["ChosenTransmogs"][2] then
+                return ErrorColor()
+            end
+            return DefaultColor()
+        end,
+    },
+    ["ChosenTransmogs_Mail"] = {
+        Label = "Chosen Mail",
+        Order = 703,
+        Display = true,
+        Value = function()
+            return FormatBool(CurrentAccount()["ChosenTransmogs"][3])
+        end,
+        Color = function()
+            if not CurrentAccount()["ChosenTransmogs"][3] then
+                return ErrorColor()
+            end
+            return DefaultColor()
+        end,
+    },
+    ["ChosenTransmogs_Plate"] = {
+        Label = "Chosen Plate",
+        Order = 704,
+        Display = true,
+        Value = function()
+            return FormatBool(CurrentAccount()["ChosenTransmogs"][4])
+        end,
+        Color = function()
+            if not CurrentAccount()["ChosenTransmogs"][4] then
+                return ErrorColor()
+            end
+            return DefaultColor()
+        end,
+    },
+    ["FisherfriendOfTheIsles"] = {
+        Label = "Fisherfriend of the Isles",
+        Order = 710,
+        Display = true,
+        Value = function()
+            return FormatBool(CurrentAccount()["FisherfriendOfTheIsles"])
+        end,
+        Color = function()
+            if not CurrentAccount()["FisherfriendOfTheIsles"] then
+                return ErrorColor()
+            end
+            return DefaultColor()
+        end,
+    },
 }
 
 function spairs(t, order) -- https://stackoverflow.com/a/15706820/3105105

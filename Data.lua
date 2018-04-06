@@ -13,11 +13,37 @@ local function InitDB()
     if not ArwicAltManagerDB.Realms[GetRealmName()][UnitName("player")] then 
         ArwicAltManagerDB.Realms[GetRealmName()][UnitName("player")] = {} 
     end
+    if not ArwicAltManagerDB.Account then
+        ArwicAltManagerDB.Account = {}
+    end
 end
 
 local function CurrentChar()
     InitDB()
     return ArwicAltManagerDB.Realms[GetRealmName()][UnitName("player")]
+end
+
+local function CurrentAccount()
+    InitDB()
+    return ArwicAltManagerDB.Account
+end
+
+local function GetArmorClass(className)
+    local armorClasses = {
+        ["WARRIOR"] = 4,
+        ["PALADIN"] = 4,
+        ["HUNTER"] = 3,
+        ["ROGUE"] = 2,
+        ["PRIEST"] = 1,
+        ["DEATHKNIGHT"] = 4,
+        ["SHAMAN"] = 3,
+        ["MAGE"] = 1,
+        ["WARLOCK"] = 1,
+        ["MONK"] = 2,
+        ["DRUID"] = 2,
+        ["DEMONHUNTER"] = 2,
+    }
+    return armorClasses[className]
 end
 
 local fields = {
@@ -118,6 +144,7 @@ local fields = {
                 1220, -- Order Resources
                 1508, -- Veiled Argunite
                 1273, -- Seal of Broken Fate
+                1533, -- Wakening Essence
             }
             local char = CurrentChar()
             char["Currencies"] = {}
@@ -204,6 +231,24 @@ local fields = {
             end
         end
     },
+    ["MageTowerPrereq"] = {
+        Update = function()
+            local quests = {
+                45864,
+                45842,
+                45861,
+                45862,
+                45865,
+                45866,
+                45863,
+            }
+            local char = CurrentChar()
+            char["MageTowerPrereq"] = {}
+            for k, v in pairs(quests) do
+                char["MageTowerPrereq"][v] = IsQuestFlaggedCompleted(v)
+            end
+        end
+    },
     ["MageTower"] = {
         Update = function()
             local quests = {
@@ -258,7 +303,71 @@ local fields = {
             char["Artifacts"][id]["Power"] = power
             char["Artifacts"][id]["Ranks"] = ranks
         end
-    }
+    },
+    ["Mounts"] = {
+        Update = function()
+            local account = CurrentAccount()
+            account["Mounts"] = {}
+            local mountSpellIDs = {
+                253639, -- violet spellwing
+                243651, -- shackled urzul
+                171827, -- hellfire infernal
+                213134, -- felblaze infernal
+                232519, -- abyss worm
+                253088, -- antoran charhound
+            }
+            -- get collected mounts
+            local mountIDs = C_MountJournal.GetMountIDs()
+            for _, mid in pairs(mountIDs) do
+                for _, sid in pairs(mountSpellIDs) do
+                    local creatureName, spellID, _, _, _, _, _, _, _, _, isCollected = C_MountJournal.GetMountInfoByID(mid)
+                    if sid == spellID then
+                        account["Mounts"][sid] = {}
+                        account["Mounts"][sid]["Name"] = creatureName
+                        account["Mounts"][sid]["IsCollected"] = isCollected
+                    end
+                end
+            end
+            -- populate data for mounts we cannot see
+            for _, sid in pairs(mountSpellIDs) do
+                if account["Mounts"][sid] == nil then
+                    account["Mounts"][sid] = {}
+                    account["Mounts"][sid]["Name"] = "Unknown"
+                    account["Mounts"][sid]["IsCollected"] = isCollected
+                    account["Mounts"][sid]["IsCollected"] = false
+                end
+            end
+        end,
+    },
+    ["FieldMedic"] = {
+        Update = function()
+            _, _, _, CurrentAccount()["FieldMedic"] = GetAchievementInfo(11139)
+        end,
+    },
+    ["KeystoneMaster"] = {
+        Update = function()
+            _, _, _, _, _, _, _, _, _, _, _, _, 
+            CurrentChar()["KeystoneMaster"], _ = GetAchievementInfo(11162)
+        end,
+    },
+    ["ChosenTransmogs"] = {
+        Update = function()
+            local _, _, _, _, _, _, _, _, _, _, _, _, 
+            wasEarnedByMe, _ = GetAchievementInfo(11387)
+            local _, englishClass, _ = UnitClass("player")
+            local armorClass = GetArmorClass(englishClass)
+            local account = CurrentAccount()
+            if not account["ChosenTransmogs"] then
+                account["ChosenTransmogs"] = {}
+            end
+            account["ChosenTransmogs"][armorClass] = wasEarnedByMe or account["ChosenTransmogs"][armorClass]
+        end,
+    },
+    ["FisherfriendOfTheIsles"] = {
+        Update = function()
+            _, _, _, CurrentAccount()["FisherfriendOfTheIsles"] = GetAchievementInfo(11725)
+        end,
+    },
 }
 
 function ARWIC_AAM_UpdateData()
@@ -268,7 +377,7 @@ function ARWIC_AAM_UpdateData()
 end
 
 function events:PLAYER_ENTERING_WORLD(...)
-    UpdateData()
+    ARWIC_AAM_UpdateData()
 end
 
 function events:ARTIFACT_UPDATE(...)
