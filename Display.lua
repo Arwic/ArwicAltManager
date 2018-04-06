@@ -151,13 +151,13 @@ local fieldFormatters = {
             local dt = time() - char["Timestamp"]
             local days, hours, minutes, seconds = FormatTime(dt)
             if days > 0 then
-                return format("%d days a go", days)
+                return format("%d days ago", days)
             elseif hours > 0 then
-                return format("%d hrs a go", hours)
+                return format("%d hrs ago", hours)
             elseif minutes > 0 then
-                return format("%d mins a go", minutes)
+                return format("%d mins ago", minutes)
             else
-                return format("%d secs a go", seconds)
+                return format("%d secs ago", seconds)
             end
         end,
         Color = function(char)
