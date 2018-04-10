@@ -43,7 +43,7 @@ local function BuildConfig()
     NewLabel(titleBar, 20, "Arwic Alt Manager: Config"):SetAllPoints(titleBar)
     
     -- close button
-    local closeButton = CreateFrame("BUTTON", "AAM_configCloseButton", AAM_titleBarFrame)
+    local closeButton = CreateFrame("BUTTON", "AAM_configCloseButton", titleBar)
     closeButton:SetPoint("TOPRIGHT", 0, 0)
     closeButton:SetWidth(titleBarHeight)
     closeButton:SetHeight(titleBarHeight)
@@ -54,18 +54,41 @@ local function BuildConfig()
         configFrame:Hide()
     end)
 
+    -- realm display
     local realmFrame = CreateFrame("FRAME", "AAM_configRealmDisplayFrame", configFrame)
-    realmFrame:SetPoint("TOPLEFT")
-    realmFrame:SetWidth(150)
+    realmFrame:SetPoint("TOPLEFT", titleBar, "BOTTOMLEFT")
     realmFrame:SetPoint("BOTTOM", configFrame, "BOTTOM")
+    realmFrame:SetWidth(200)
     local realmFrameLabel = NewLabel(realmFrame, fontHeight, "Realm Display:")
-    local lastRealmCheckBox = realmFrameLabel
+    realmFrameLabel:SetPoint("TOPLEFT", realmFrame, "TOPLEFT")
+    local lastCheckBox = realmFrameLabel
     for realmKey, realmValue in pairs(ArwicAltManagerDB.Realms) do
-        local realmCheckBox = CreateFrame("CheckButton", "AAM_config_realm_display_" .. realmKey, realmFrame, "ChatConfigCheckButtonTemplate")
-        _G["AAM_config_realm_display_" .. realmKey .. "Text"]:SetText("Realm: " .. realmKey)
-        realmCheckBox:SetPoint("TOPLEFT", lastRealmCheckBox, "TOPLEFT")
-        realmCheckBox.tooltip = "Requires Reload"
-        lastRealmCheckBox = realmCheckBox
+        local globalName = format("AAM_config_RealmDisplay_%s", realmKey)
+        local realmCheckBox = CreateFrame("CheckButton", globalName, realmFrame, "ChatConfigCheckButtonTemplate")
+        _G[globalName .. "Text"]:SetText(realmKey)
+        realmCheckBox:SetChecked(realmValue.Display)
+        realmCheckBox:SetPoint("TOP", lastCheckBox, "BOTTOM")
+        realmCheckBox:SetPoint("LEFT", realmFrameLabel, "LEFT")
+        realmCheckBox.tooltip = "Realm"
+        realmCheckBox:SetScript("OnClick", function(sender)
+            realmValue.Display = sender:GetChecked()
+        end)
+        lastCheckBox = realmCheckBox
+        -- character display
+        for charKey, charValue in pairs(realmValue.Characters) do
+            local globalName = format("AAM_config_RealmCharDisplay_%s_%s", realmKey, charKey)
+            local cb = CreateFrame("CheckButton", globalName, realmFrame, "ChatConfigCheckButtonTemplate")
+            _G[globalName .. "Text"]:SetText(charValue.Name)
+            cb:SetChecked(charValue.Display)
+            cb:SetPoint("TOP", lastCheckBox, "BOTTOM")
+            cb:SetPoint("LEFT", realmCheckBox, "LEFT", 20, 0)
+            cb.tooltip = format("Level %d %s %s", charValue.Level, charValue.Race, charValue.Class)
+            cb:SetScript("OnClick", function(sender)
+                charValue.Display = sender:GetChecked()
+            end)
+            lastCheckBox = cb
+        end
+        
     end
 end
 
