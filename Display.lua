@@ -1,4 +1,8 @@
 local dataLabels = {}
+local events = {}
+local ElvUI_E, ElvUI_L, ElvUI_V, ElvUI_P, ElvUI_G, ElvUI_S
+local allRealmGroups = {}
+local allCharCols = {}
 
 function table.len(t)
     local count = 0
@@ -6,6 +10,26 @@ function table.len(t)
         count = count + 1
     end
     return count
+end
+
+function table.containskey(t, k)
+    for tk, _ in pairs(t) do
+        if tk == k then
+            return true
+        end
+    end
+end
+
+function table.containsval(t, v)
+    for _, tv in pairs(t) do
+        if tv == v then
+            return true
+        end
+    end
+end
+
+function string.starts(s, v)
+   return string.sub(s, 1, string.len(v)) == v
 end
 
 local function Config()
@@ -102,7 +126,7 @@ local fieldFormatters = {
     ["Realm"] = {
         Label = "Realm",
         Order = 40,
-        Display = false,
+        Display = true,
         Value = function(char)
             return char["Realm"]
         end,
@@ -609,7 +633,7 @@ local fieldFormatters = {
         end,
     },
     ["ChosenTransmogs_Leather"] = {
-        Label = "Chosen leather",
+        Label = "Chosen Leather",
         Order = 702,
         Display = true,
         Value = function()
@@ -689,7 +713,6 @@ function spairs(t, order) -- https://stackoverflow.com/a/15706820/3105105
     end
 end
 
-
 local function NewLabel(parent, fontHeight, text)
     local str = parent:CreateFontString()
     str:SetParent(parent)
@@ -745,6 +768,46 @@ local function BuildGrid()
         mainFrame:Hide()
     end)
 
+    -- realm dropdown
+    dropdown = CreateFrame("Button", "AAM_realmDropdown", AAM_titleBarFrame, "UIDropDownMenuTemplate")
+    dropdown:SetPoint("TOPLEFT", AAM_titleBarFrame, "TOPLEFT", 0, 0)
+    -- skin the dropdown if elvui is enabled
+    if ElvIU_S then
+        ElvUI_S:HandleDropDownBox(dropdown)
+        -- elvui dropdown skinning is bugged and makes the arrow button far too wide so make it the correct size
+        dropdown:SetWidth(dropdown:GetHeight())
+    end
+    -- and allow the user to open the dropdown by clicking anywhere on the control
+    dropdown:SetScript("OnClick", function(...) dropdown:Click() end)
+    -- make the dropdown the same height as the buttons
+    dropdown:SetHeight(AAM_titleBarFrame:GetHeight())
+    -- Populate the dropdown
+    UIDropDownMenu_Initialize(dropdown, function(sender, level)
+        -- add all realms option
+        local info = UIDropDownMenu_CreateInfo()
+        info.text = "All Realms"
+        info.value = "ALL"
+        info.func = function(sender)
+            UIDropDownMenu_SetSelectedID(dropdown, sender:GetID())
+            ArwicAltManagerDB.Config.RealmsToDisplay = {}
+        end
+        UIDropDownMenu_AddButton(info, level)
+        -- add individual realms
+        for k, v in pairs(ArwicAltManagerDB.Realms) do
+            local info = UIDropDownMenu_CreateInfo()
+            info.text = k
+            info.value = k
+            info.func = function(sender)
+                UIDropDownMenu_SetSelectedID(dropdown, sender:GetID())
+                ArwicAltManagerDB.Config.RealmsToDisplay = { k }
+            end
+            UIDropDownMenu_AddButton(info, level)
+        end
+    end)
+    UIDropDownMenu_SetSelectedID(dropdown, 1)
+    UIDropDownMenu_JustifyText(dropdown, "LEFT")
+    dropdown:Show()
+
     -- row headers
     local headerCol = CreateFrame("FRAME", "AAM_headerCol", mainFrame)
     headerCol:SetPoint("TOP", titleBar, "BOTTOM")
@@ -791,62 +854,110 @@ local function BuildGrid()
     headerCol:SetWidth(maxLabelWidth + textOffset * 2)
 
     -- populate the grid with character data
-    local lastCharCol = headerCol
-    local widthSoFar = 0
-    for charKey, char in spairs(AllRealmChars(GetRealmName()), function(t, a, b)
-        return t[a].Name < t[b].Name
-    end) do
-        -- make the character coloumn
-        local charCol = CreateFrame("FRAME", "AAM_charCol_" .. charKey, mainFrame)
-        charCol:SetPoint("LEFT", lastCharCol, "RIGHT")
-        charCol:SetPoint("BOTTOM", mainFrame, "BOTTOM")
-        charCol:SetPoint("TOP", titleBar, "BOTTOM")
-        -- make the cells for each field in the character column
-        local maxLabelWidth = 0
-        local lastCellFrame = titleBar
-        for formatterKey, formatter in spairs(fieldFormatters, function(t, a, b)
-            return t[a].Order < t[b].Order
-        end) do
-            if formatter.Display then
-                -- make the cell
-                local cellFrame = CreateFrame("FRAME", "AAM_charCell_" .. charKey .. "_" .. formatterKey, charCol)
-                cellFrame:SetHeight(rowHeight)
-                cellFrame:SetPoint("LEFT", charCol, "LEFT")
-                cellFrame:SetPoint("RIGHT", charCol, "RIGHT")
-                cellFrame:SetPoint("TOP", lastCellFrame, "BOTTOM")
-                -- make the label and put it in the cell
-                local lbl = NewLabel(cellFrame, fontHeight, formatter.Value(char))
-                table.insert(dataLabels, {
-                    ["lbl"] = lbl,
-                    ["formatter"] = formatter,
-                    ["char"] = char
-                })
-                local lblWidth = lbl:GetStringWidth()
-                if lblWidth > maxLabelWidth then
-                    maxLabelWidth = lblWidth
-                end
-                lbl:SetAllPoints(cellFrame)
-                lbl:SetTextColor(formatter.Color(char))
-                -- keep track of the last itteration
-                lastCellFrame = cellFrame
+    local totalWidthSoFar = 0
+    local lastRealmGroup = headerCol
+    for realmKey, realmChars in pairs(ArwicAltManagerDB.Realms) do
+        -- make the realm group
+        local realmGroup = CreateFrame("FRAME", "AAM_realmGroup_" .. realmKey, mainFrame)
+        realmGroup:SetPoint("LEFT", lastRealmGroup, "RIGHT")
+        realmGroup:SetPoint("BOTTOM", mainFrame, "BOTTOM")
+        realmGroup:SetPoint("TOP", titleBar, "BOTTOM")
+        local lastCharCol
+        local realmGroupWidthSoFar = 0
+        for charKey, char in spairs(realmChars, function(t, a, b)
+                return t[a].Name < t[b].Name
+            end) do
+            -- make the character coloumn
+            local charCol = CreateFrame("FRAME", "AAM_charCol_" .. realmKey .. "_" .. charKey, realmGroup)
+            if lastCharCol == nil then
+                charCol:SetPoint("LEFT", realmGroup, "LEFT")
+            else
+                charCol:SetPoint("LEFT", lastCharCol, "RIGHT")
             end
+            charCol:SetPoint("BOTTOM", realmGroup, "BOTTOM")
+            charCol:SetPoint("TOP", titleBar, "BOTTOM")
+            -- make the cells for each field in the character column
+            local maxLabelWidth = 0
+            local lastCellFrame = titleBar
+            for formatterKey, formatter in spairs(fieldFormatters, function(t, a, b)
+                return t[a].Order < t[b].Order
+            end) do
+                if formatter.Display then
+                    -- make the cell
+                    local cellFrame = CreateFrame("FRAME", "AAM_charCell_" .. realmKey .. "_" .. charKey .. "_" .. formatterKey, charCol)
+                    cellFrame:SetHeight(rowHeight)
+                    cellFrame:SetPoint("LEFT", charCol, "LEFT")
+                    cellFrame:SetPoint("RIGHT", charCol, "RIGHT")
+                    cellFrame:SetPoint("TOP", lastCellFrame, "BOTTOM")
+                    -- make the label and put it in the cell
+                    local lbl = NewLabel(cellFrame, fontHeight, formatter.Value(char))
+                    table.insert(dataLabels, {
+                        ["lbl"] = lbl,
+                        ["formatter"] = formatter,
+                        ["char"] = char
+                    })
+                    local lblWidth = lbl:GetStringWidth()
+                    if lblWidth > maxLabelWidth then
+                        maxLabelWidth = lblWidth
+                    end
+                    lbl:SetAllPoints(cellFrame)
+                    lbl:SetTextColor(formatter.Color(char))
+                    -- keep track of the last itteration
+                    lastCellFrame = cellFrame
+                end
+            end
+            -- set the column width to the widest labels width
+            charCol:SetWidth(maxLabelWidth + textOffset * 2)
+            lastCharCol = charCol
+            realmGroupWidthSoFar = realmGroupWidthSoFar + charCol:GetWidth()
         end
-        -- set the column width to the widest labels width
-        charCol:SetWidth(maxLabelWidth + textOffset * 2)
-        lastCharCol = charCol
-        widthSoFar = widthSoFar + charCol:GetWidth()
+        realmGroup:SetWidth(realmGroupWidthSoFar)
+        totalWidthSoFar = totalWidthSoFar + realmGroup:GetWidth()
+        lastRealmGroup = realmGroup
     end
-    mainFrame:SetWidth(headerCol:GetWidth() + widthSoFar)
+    mainFrame:SetWidth(headerCol:GetWidth() + totalWidthSoFar)
 end
 
 local function UpdateGrid()
-    if ARWIC_AAM_mainFrame then
-        for _, v in pairs(dataLabels) do
-            v.lbl:SetText(v.formatter.Value(v.char))
-            v.lbl:SetTextColor(v.formatter.Color(v.char))
-        end
+    -- make sure we have a grid
+    BuildGrid()
+    -- update the values in the grid
+    for _, v in pairs(dataLabels) do
+        v.lbl:SetText(v.formatter.Value(v.char))
+        v.lbl:SetTextColor(v.formatter.Color(v.char))
+    end
+    -- update the visibility of parts of the grid
+    local realms
+    if not ArwicAltManagerDB.Config.RealmsToDisplay or table.len(ArwicAltManagerDB.Config.RealmsToDisplay) == 0 then
+        print("added all realms to display")
+        realms = ArwicAltManagerDB.Realms
     else
-        BuildGrid()
+        realms = {}
+        for _, realmName in pairs(ArwicAltManagerDB.Config.RealmsToDisplay) do
+            realms[realmName] = ArwicAltManagerDB.Realms[realmName]
+            print("added " .. realmName .. " to display")
+        end
+    end
+end
+
+-- loads display and order of field formatters from file
+function ARWIC_AAM_LoadFormatterConfig()
+    if ArwicAltManagerDB and ArwicAltManagerDB.Config and ArwicAltManagerDB.Config.fieldFormatters then
+        local configFF = ArwicAltManagerDB.Config.FieldFormatters
+        for k, v in pairs(configFF) do
+            fieldFormatters[k].Display = v.Display
+            fieldFormatters[k].Order = v.Order
+        end
+    end
+end
+
+-- saves display and order of field formatters to file
+function ARWIC_AAM_SaveFormatterConfig()
+    ArwicAltManagerDB.Config.FieldFormatters = {}
+    local configFF = ArwicAltManagerDB.Config.FieldFormatters
+    for k, v in pairs(fieldFormatters) do
+        configFF[k].Display = v.Display
+        configFF[k].Order = v.Order
     end
 end
 
@@ -864,6 +975,26 @@ function ARWIC_AAM_Hide()
     ARWIC_AAM_mainFrame:Hide()
 end
 
+function events:PLAYER_ENTERING_WORLD(...)
+    -- Get ElvIU
+    if ElvIU then
+        ElvUI_E, ElvUI_L, ElvUI_V, ElvUI_P, ElvUI_G = unpack(ElvUI)
+        ElvUI_S = ElvUI_E:GetModule("Skins")
+    end
+end
+
+local function RegisterEvents()
+    local eventFrame = CreateFrame("FRAME", "AAM_eventFrame")
+    eventFrame:SetScript("OnEvent", function(self, event, ...)
+        events[event](self, ...)
+    end)
+    for k, v in pairs(events) do
+        eventFrame:RegisterEvent(k)
+    end
+end
+
+RegisterEvents()
+
 SLASH_AAM1 = "/aam"
 SLASH_AAM2 = "/arwicaltmanager"
 SlashCmdList["AAM"] = function(msg)
@@ -873,6 +1004,16 @@ SlashCmdList["AAM"] = function(msg)
         if ARWIC_AAM_mainFrame then
             ARWIC_AAM_Show()
         end
+    elseif msg == "config" then
+        ARWIC_AAM_ToggleConfig()
+    elseif string.starts(msg, "char hide") then
+
+    elseif string.starts(msg, "char show") then
+    
+    elseif string.starts(msg, "realm hide") then
+
+    elseif string.starts(msg, "realm show") then
+    
     else
         if ARWIC_AAM_mainFrame then
             ARWIC_AAM_Toggle()
