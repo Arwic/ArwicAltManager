@@ -1,5 +1,19 @@
 local events = {}
 
+function ARWIC_AAM_MIGRATE_DATA()
+    print("Migrating character data...")
+    for realmKey, realmVal in pairs(ArwicAltManagerDB.Realms) do
+        local chars = {}
+        for charKey, charVal in pairs(realmVal) do
+            print("Found " .. charKey .. "-" .. realmKey)
+            chars[charKey] = charVal
+            realmVal[charKey] = nil
+        end
+        realmVal.Characters = chars
+        realmVal.Display = true
+    end
+end
+
 local function InitDB()
     if not ArwicAltManagerDB then 
         ArwicAltManagerDB = {} 
@@ -11,6 +25,15 @@ local function InitDB()
         ArwicAltManagerDB.Realms[GetRealmName()] = {} 
         ArwicAltManagerDB.Realms[GetRealmName()].Display = true 
         ArwicAltManagerDB.Realms[GetRealmName()].Characters = {} 
+    end
+    if not ArwicAltManagerDB.Realms[GetRealmName()].Characters then
+        local keyCount = 0
+        for _, _ in pairs(ArwicAltManagerDB.Realms[GetRealmName()]) do
+            keyCount = keyCount + 1
+        end
+        if keyCount > 0 then
+            ARWIC_AAM_MIGRATE_DATA()
+        end
     end
     if not ArwicAltManagerDB.Realms[GetRealmName()].Characters[UnitName("player")] then 
         ArwicAltManagerDB.Realms[GetRealmName()].Characters[UnitName("player")] = {} 

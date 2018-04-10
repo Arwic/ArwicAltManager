@@ -726,6 +726,8 @@ end
 local function BuildGrid()
     -- dont remake the frame if it already exists
     if ARWIC_AAM_mainFrame ~= nil then return end
+    -- load config
+    ARWIC_AAM_LoadFormatterConfig()
     dataLabels = {}
 
     -- frame properties
@@ -896,7 +898,7 @@ end
 
 -- loads display and order of field formatters from file
 function ARWIC_AAM_LoadFormatterConfig()
-    if ArwicAltManagerDB and ArwicAltManagerDB.Config and ArwicAltManagerDB.Config.fieldFormatters then
+    if ArwicAltManagerDB and ArwicAltManagerDB.Config and ArwicAltManagerDB.Config.FieldFormatters then
         local configFF = ArwicAltManagerDB.Config.FieldFormatters
         for k, v in pairs(configFF) do
             fieldFormatters[k].Display = v.Display
