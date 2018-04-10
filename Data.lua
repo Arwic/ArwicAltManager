@@ -7,6 +7,7 @@ function ARWIC_AAM_MIGRATE_DATA()
         for charKey, charVal in pairs(realmVal) do
             print("Found " .. charKey .. "-" .. realmKey)
             chars[charKey] = charVal
+            chars[charKey].Display = true
             realmVal[charKey] = nil
         end
         realmVal.Characters = chars

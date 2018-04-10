@@ -834,49 +834,51 @@ local function BuildGrid()
             for charKey, char in spairs(realmChars, function(t, a, b)
                     return t[a].Name < t[b].Name
                 end) do
-                -- make the character coloumn
-                local charCol = CreateFrame("FRAME", "AAM_charCol_" .. realmKey .. "_" .. charKey, realmGroup)
-                if lastCharCol == nil then
-                    charCol:SetPoint("LEFT", realmGroup, "LEFT")
-                else
-                    charCol:SetPoint("LEFT", lastCharCol, "RIGHT")
-                end
-                charCol:SetPoint("BOTTOM", realmGroup, "BOTTOM")
-                charCol:SetPoint("TOP", titleBar, "BOTTOM")
-                -- make the cells for each field in the character column
-                local maxLabelWidth = 0
-                local lastCellFrame = titleBar
-                for formatterKey, formatter in spairs(fieldFormatters, function(t, a, b)
-                    return t[a].Order < t[b].Order
-                end) do
-                    if formatter.Display then
-                        -- make the cell
-                        local cellFrame = CreateFrame("FRAME", "AAM_charCell_" .. realmKey .. "_" .. charKey .. "_" .. formatterKey, charCol)
-                        cellFrame:SetHeight(rowHeight)
-                        cellFrame:SetPoint("LEFT", charCol, "LEFT")
-                        cellFrame:SetPoint("RIGHT", charCol, "RIGHT")
-                        cellFrame:SetPoint("TOP", lastCellFrame, "BOTTOM")
-                        -- make the label and put it in the cell
-                        local lbl = NewLabel(cellFrame, fontHeight, formatter.Value(char))
-                        table.insert(dataLabels, {
-                            ["lbl"] = lbl,
-                            ["formatter"] = formatter,
-                            ["char"] = char
-                        })
-                        local lblWidth = lbl:GetStringWidth()
-                        if lblWidth > maxLabelWidth then
-                            maxLabelWidth = lblWidth
-                        end
-                        lbl:SetAllPoints(cellFrame)
-                        lbl:SetTextColor(formatter.Color(char))
-                        -- keep track of the last itteration
-                        lastCellFrame = cellFrame
+                if char.Display then
+                    -- make the character coloumn
+                    local charCol = CreateFrame("FRAME", "AAM_charCol_" .. realmKey .. "_" .. charKey, realmGroup)
+                    if lastCharCol == nil then
+                        charCol:SetPoint("LEFT", realmGroup, "LEFT")
+                    else
+                        charCol:SetPoint("LEFT", lastCharCol, "RIGHT")
                     end
+                    charCol:SetPoint("BOTTOM", realmGroup, "BOTTOM")
+                    charCol:SetPoint("TOP", titleBar, "BOTTOM")
+                    -- make the cells for each field in the character column
+                    local maxLabelWidth = 0
+                    local lastCellFrame = titleBar
+                    for formatterKey, formatter in spairs(fieldFormatters, function(t, a, b)
+                        return t[a].Order < t[b].Order
+                    end) do
+                        if formatter.Display then
+                            -- make the cell
+                            local cellFrame = CreateFrame("FRAME", "AAM_charCell_" .. realmKey .. "_" .. charKey .. "_" .. formatterKey, charCol)
+                            cellFrame:SetHeight(rowHeight)
+                            cellFrame:SetPoint("LEFT", charCol, "LEFT")
+                            cellFrame:SetPoint("RIGHT", charCol, "RIGHT")
+                            cellFrame:SetPoint("TOP", lastCellFrame, "BOTTOM")
+                            -- make the label and put it in the cell
+                            local lbl = NewLabel(cellFrame, fontHeight, formatter.Value(char))
+                            table.insert(dataLabels, {
+                                ["lbl"] = lbl,
+                                ["formatter"] = formatter,
+                                ["char"] = char
+                            })
+                            local lblWidth = lbl:GetStringWidth()
+                            if lblWidth > maxLabelWidth then
+                                maxLabelWidth = lblWidth
+                            end
+                            lbl:SetAllPoints(cellFrame)
+                            lbl:SetTextColor(formatter.Color(char))
+                            -- keep track of the last itteration
+                            lastCellFrame = cellFrame
+                        end
+                    end
+                    -- set the column width to the widest labels width
+                    charCol:SetWidth(maxLabelWidth + textOffset * 2)
+                    lastCharCol = charCol
+                    realmGroupWidthSoFar = realmGroupWidthSoFar + charCol:GetWidth()
                 end
-                -- set the column width to the widest labels width
-                charCol:SetWidth(maxLabelWidth + textOffset * 2)
-                lastCharCol = charCol
-                realmGroupWidthSoFar = realmGroupWidthSoFar + charCol:GetWidth()
             end
             realmGroup:SetWidth(realmGroupWidthSoFar)
             totalWidthSoFar = totalWidthSoFar + realmGroup:GetWidth()
@@ -965,23 +967,53 @@ SlashCmdList["AAM"] = function(msg)
             ARWIC_AAM_Show()
         end
     elseif args[1] == "config" then
-        -- /aam config
         ARWIC_AAM_ToggleConfig()
     elseif args[1] == "char" and args[2] == "hide" then
-        -- /aam char hide frostmourne arwic
-        CharData(args[4], args[3]).Display = false
-        print("You will need to '/reload' for changes to take effect")
+        local charName = args[3]:gsub("^%l", string.upper)
+        local realmName = args[4]:gsub("^%l", string.upper)
+        if ArwicAltManagerDB.Realms[realmName] then
+            if ArwicAltManagerDB.Realms[realmName].Characters[charName] then
+                CharData(charName, realmName).Display = false
+                print(format("AAM: Character '%s-%s' will now be hidden.", charName, realmName))
+                print("AAM: You will need to '/reload' for changes to take effect")
+            else
+                print("AAM: Unable to find character name: " .. charName)
+            end
+        else
+            print("AAM: Unable to find realm: %s" .. realmName)
+        end
     elseif args[1] == "char" and args[2] == "show" then
-        -- /aam char show frostmourne arwic
-        CharData(args[4], args[3]).Display = true
-        print("You will need to '/reload' for changes to take effect")
+        local charName = args[3]:gsub("^%l", string.upper)
+        local realmName = args[4]:gsub("^%l", string.upper)
+        if ArwicAltManagerDB.Realms[realmName] then
+            if ArwicAltManagerDB.Realms[realmName].Characters[charName] then
+                CharData(charName, realmName).Display = true
+                print(format("AAM: Character '%s-%s' will now be displayed.", charName, realmName))
+                print("AAM: You will need to '/reload' for changes to take effect")
+            else
+                print("AAM: Unable to find character name: " .. charName)
+            end
+        else
+            print("AAM: Unable to find realm: %s" .. realmName)
+        end
     elseif args[1] == "realm" and args[2] == "hide" then
-        ArwicAltManagerDB.Realms[args[3]].Display = false
-        print("You will need to '/reload' for changes to take effect")
+        local realmName = args[3]:gsub("^%l", string.upper)
+        if ArwicAltManagerDB.Realms[realmName] then
+            ArwicAltManagerDB.Realms[realmName].Display = false
+            print(format("AAM: Realm '%s' will now be hidden.", realmName))
+            print("AAM: You will need to '/reload' for changes to take effect")
+        else
+            print("AAM: Unable to find realm: " .. realmName)
+        end
     elseif args[1] == "realm" and args[2] == "show" then
-        -- /aam realm show frostmourne
-        ArwicAltManagerDB.Realms[args[3]].Display = true
-        print("You will need to '/reload' for changes to take effect")
+        local realmName = args[3]:gsub("^%l", string.upper)
+        if ArwicAltManagerDB.Realms[realmName] then
+            ArwicAltManagerDB.Realms[realmName].Display = true
+            print(format("AAM: Realm '%s' will now be displayed.", realmName))
+            print("AAM: You will need to '/reload' for changes to take effect")
+        else
+            print("AAM: Unable to find realm: " .. realmName)
+        end
     else
         if ARWIC_AAM_mainFrame then
             ARWIC_AAM_Toggle()
