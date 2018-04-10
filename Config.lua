@@ -1,3 +1,11 @@
+local function NewLabel(parent, fontHeight, text)
+    local str = parent:CreateFontString()
+    str:SetParent(parent)
+    str:SetFont("fonts/ARIALN.ttf", fontHeight)
+    str:SetText(text)
+    return str
+end
+
 local function BuildConfig()
     -- dont remake the frame if it already exists
     if ARWIC_AAM_configFrame ~= nil then return end
@@ -20,6 +28,8 @@ local function BuildConfig()
     configFrame:RegisterForDrag("LeftButton")
     configFrame:SetScript("OnDragStart", function(self) self:StartMoving() end)
     configFrame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
+    configFrame:SetWidth(600)
+    configFrame:SetHeight(800)
 
     -- title bar
     local titleBar = CreateFrame("FRAME", "AAM_configTitleBarFrame", configFrame)
@@ -44,11 +54,30 @@ local function BuildConfig()
         configFrame:Hide()
     end)
 
+    local realmFrame = CreateFrame("FRAME", "AAM_configRealmDisplayFrame", configFrame)
+    realmFrame:SetPoint("TOPLEFT")
+    realmFrame:SetWidth(150)
+    realmFrame:SetPoint("BOTTOM", configFrame, "BOTTOM")
+    local realmFrameLabel = NewLabel(realmFrame, fontHeight, "Realm Display:")
+    local lastRealmCheckBox = realmFrameLabel
+    for realmKey, realmValue in pairs(ArwicAltManagerDB.Realms) do
+        local realmCheckBox = CreateFrame("CheckButton", "AAM_config_realm_display_" .. realmKey, realmFrame, "ChatConfigCheckButtonTemplate")
+        _G["AAM_config_realm_display_" .. realmKey .. "Text"]:SetText("Realm: " .. realmKey)
+        realmCheckBox:SetPoint("TOPLEFT", lastRealmCheckBox, "TOPLEFT")
+        realmCheckBox.tooltip = "Requires Reload"
+        lastRealmCheckBox = realmCheckBox
+    end
 end
 
 function ARWIC_AAM_ToggleConfig()
+    local firstTime = false
+    if not ARWIC_AAM_configFrame then
+        firstTime = true
+    end
     BuildConfig()
-    ARWIC_AAM_configFrame:SetShown(not ARWIC_AAM_configFrame:IsVisible())
+    if not firstTime then
+        ARWIC_AAM_configFrame:SetShown(not ARWIC_AAM_configFrame:IsVisible())
+    end
 end
 
 function ARWIC_AAM_ShowConfig()
@@ -70,143 +99,6 @@ function AAM_InitConfigDB()
     if not config.ArtifactRankThreshold then config.ArtifactRankThreshold = 52 end
     if not config.OrderHallResourcesThreshold then config.OrderHallResourcesThreshold = 4000 end
     if not config.LevelThreshold then config.LevelThreshold = 110 end
-    if not config.RealmsToDisplay then config.RealmsToDisplay = {} end
-
-    local fields = {
-        ["Name"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["Class"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["Realm"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["Faction"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["Race"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["Gender"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["Timestamp"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["Money"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["ClassCampaign"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["ClassMount"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["Level"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["MountSpeed"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["OrderHallUpgrades"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["BalanceOfPower"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["KeystoneMaster"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["MageTowerPrereq"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["MageTower"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["TimePlayed"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["Artifacts"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["OrderHallResouces"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["WakeningEssence"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["Mount_VioletSpellwing"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["Mount_ShackledUrzul"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["Mount_HellfireInfernal"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["Mount_FelblazeInfernal"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["Mount_AbyssWorm"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["Mount_AntoranCharhound"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["FieldMedic"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["ChosenTransmogs_Cloth"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["ChosenTransmogs_Leather"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["ChosenTransmogs_Mail"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["ChosenTransmogs_Plate"] = {
-            Display = true,
-            Order = 0,
-        },
-        ["FisherfriendOfTheIsles"] = {
-            Display = true,
-            Order = 0,
-        },
-        
-    }
 
 end
 

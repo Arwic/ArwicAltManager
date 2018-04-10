@@ -9,9 +9,12 @@ local function InitDB()
     end
     if not ArwicAltManagerDB.Realms[GetRealmName()] then 
         ArwicAltManagerDB.Realms[GetRealmName()] = {} 
+        ArwicAltManagerDB.Realms[GetRealmName()].Display = true 
+        ArwicAltManagerDB.Realms[GetRealmName()].Characters = {} 
     end
-    if not ArwicAltManagerDB.Realms[GetRealmName()][UnitName("player")] then 
-        ArwicAltManagerDB.Realms[GetRealmName()][UnitName("player")] = {} 
+    if not ArwicAltManagerDB.Realms[GetRealmName()].Characters[UnitName("player")] then 
+        ArwicAltManagerDB.Realms[GetRealmName()].Characters[UnitName("player")] = {} 
+        ArwicAltManagerDB.Realms[GetRealmName()].Characters[UnitName("player")].Display = true 
     end
     if not ArwicAltManagerDB.Account then
         ArwicAltManagerDB.Account = {}
@@ -20,7 +23,7 @@ end
 
 local function CurrentChar()
     InitDB()
-    return ArwicAltManagerDB.Realms[GetRealmName()][UnitName("player")]
+    return ArwicAltManagerDB.Realms[GetRealmName()].Characters[UnitName("player")]
 end
 
 local function CurrentAccount()

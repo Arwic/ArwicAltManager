@@ -1,4 +1,6 @@
 local dataLabels = {}
+local realmFrames = {}
+local charFrames = {}
 local events = {}
 local ElvUI_E, ElvUI_L, ElvUI_V, ElvUI_P, ElvUI_G, ElvUI_S
 local allRealmGroups = {}
@@ -83,7 +85,7 @@ local function FormatTime(timeSeconds)
 end
 
 local function CharData(name, realm)
-    return ArwicAltManagerDB.Realms[realm][name]
+    return ArwicAltManagerDB.Realms[realm].Characters[name]
 end
 
 local function AllRealmChars(realm)
@@ -768,46 +770,6 @@ local function BuildGrid()
         mainFrame:Hide()
     end)
 
-    -- realm dropdown
-    dropdown = CreateFrame("Button", "AAM_realmDropdown", AAM_titleBarFrame, "UIDropDownMenuTemplate")
-    dropdown:SetPoint("TOPLEFT", AAM_titleBarFrame, "TOPLEFT", 0, 0)
-    -- skin the dropdown if elvui is enabled
-    if ElvIU_S then
-        ElvUI_S:HandleDropDownBox(dropdown)
-        -- elvui dropdown skinning is bugged and makes the arrow button far too wide so make it the correct size
-        dropdown:SetWidth(dropdown:GetHeight())
-    end
-    -- and allow the user to open the dropdown by clicking anywhere on the control
-    dropdown:SetScript("OnClick", function(...) dropdown:Click() end)
-    -- make the dropdown the same height as the buttons
-    dropdown:SetHeight(AAM_titleBarFrame:GetHeight())
-    -- Populate the dropdown
-    UIDropDownMenu_Initialize(dropdown, function(sender, level)
-        -- add all realms option
-        local info = UIDropDownMenu_CreateInfo()
-        info.text = "All Realms"
-        info.value = "ALL"
-        info.func = function(sender)
-            UIDropDownMenu_SetSelectedID(dropdown, sender:GetID())
-            ArwicAltManagerDB.Config.RealmsToDisplay = {}
-        end
-        UIDropDownMenu_AddButton(info, level)
-        -- add individual realms
-        for k, v in pairs(ArwicAltManagerDB.Realms) do
-            local info = UIDropDownMenu_CreateInfo()
-            info.text = k
-            info.value = k
-            info.func = function(sender)
-                UIDropDownMenu_SetSelectedID(dropdown, sender:GetID())
-                ArwicAltManagerDB.Config.RealmsToDisplay = { k }
-            end
-            UIDropDownMenu_AddButton(info, level)
-        end
-    end)
-    UIDropDownMenu_SetSelectedID(dropdown, 1)
-    UIDropDownMenu_JustifyText(dropdown, "LEFT")
-    dropdown:Show()
-
     -- row headers
     local headerCol = CreateFrame("FRAME", "AAM_headerCol", mainFrame)
     headerCol:SetPoint("TOP", titleBar, "BOTTOM")
@@ -856,64 +818,68 @@ local function BuildGrid()
     -- populate the grid with character data
     local totalWidthSoFar = 0
     local lastRealmGroup = headerCol
-    for realmKey, realmChars in pairs(ArwicAltManagerDB.Realms) do
-        -- make the realm group
-        local realmGroup = CreateFrame("FRAME", "AAM_realmGroup_" .. realmKey, mainFrame)
-        realmGroup:SetPoint("LEFT", lastRealmGroup, "RIGHT")
-        realmGroup:SetPoint("BOTTOM", mainFrame, "BOTTOM")
-        realmGroup:SetPoint("TOP", titleBar, "BOTTOM")
-        local lastCharCol
-        local realmGroupWidthSoFar = 0
-        for charKey, char in spairs(realmChars, function(t, a, b)
-                return t[a].Name < t[b].Name
-            end) do
-            -- make the character coloumn
-            local charCol = CreateFrame("FRAME", "AAM_charCol_" .. realmKey .. "_" .. charKey, realmGroup)
-            if lastCharCol == nil then
-                charCol:SetPoint("LEFT", realmGroup, "LEFT")
-            else
-                charCol:SetPoint("LEFT", lastCharCol, "RIGHT")
-            end
-            charCol:SetPoint("BOTTOM", realmGroup, "BOTTOM")
-            charCol:SetPoint("TOP", titleBar, "BOTTOM")
-            -- make the cells for each field in the character column
-            local maxLabelWidth = 0
-            local lastCellFrame = titleBar
-            for formatterKey, formatter in spairs(fieldFormatters, function(t, a, b)
-                return t[a].Order < t[b].Order
-            end) do
-                if formatter.Display then
-                    -- make the cell
-                    local cellFrame = CreateFrame("FRAME", "AAM_charCell_" .. realmKey .. "_" .. charKey .. "_" .. formatterKey, charCol)
-                    cellFrame:SetHeight(rowHeight)
-                    cellFrame:SetPoint("LEFT", charCol, "LEFT")
-                    cellFrame:SetPoint("RIGHT", charCol, "RIGHT")
-                    cellFrame:SetPoint("TOP", lastCellFrame, "BOTTOM")
-                    -- make the label and put it in the cell
-                    local lbl = NewLabel(cellFrame, fontHeight, formatter.Value(char))
-                    table.insert(dataLabels, {
-                        ["lbl"] = lbl,
-                        ["formatter"] = formatter,
-                        ["char"] = char
-                    })
-                    local lblWidth = lbl:GetStringWidth()
-                    if lblWidth > maxLabelWidth then
-                        maxLabelWidth = lblWidth
-                    end
-                    lbl:SetAllPoints(cellFrame)
-                    lbl:SetTextColor(formatter.Color(char))
-                    -- keep track of the last itteration
-                    lastCellFrame = cellFrame
+    for realmKey, realmData in pairs(ArwicAltManagerDB.Realms) do
+        -- only build the realm and its chars if Display is true
+        if realmData.Display then
+            local realmChars = realmData.Characters
+            -- make the realm group
+            local realmGroup = CreateFrame("FRAME", "AAM_realmGroup_" .. realmKey, mainFrame)
+            realmGroup:SetPoint("LEFT", lastRealmGroup, "RIGHT")
+            realmGroup:SetPoint("BOTTOM", mainFrame, "BOTTOM")
+            realmGroup:SetPoint("TOP", titleBar, "BOTTOM")
+            local lastCharCol
+            local realmGroupWidthSoFar = 0
+            for charKey, char in spairs(realmChars, function(t, a, b)
+                    return t[a].Name < t[b].Name
+                end) do
+                -- make the character coloumn
+                local charCol = CreateFrame("FRAME", "AAM_charCol_" .. realmKey .. "_" .. charKey, realmGroup)
+                if lastCharCol == nil then
+                    charCol:SetPoint("LEFT", realmGroup, "LEFT")
+                else
+                    charCol:SetPoint("LEFT", lastCharCol, "RIGHT")
                 end
+                charCol:SetPoint("BOTTOM", realmGroup, "BOTTOM")
+                charCol:SetPoint("TOP", titleBar, "BOTTOM")
+                -- make the cells for each field in the character column
+                local maxLabelWidth = 0
+                local lastCellFrame = titleBar
+                for formatterKey, formatter in spairs(fieldFormatters, function(t, a, b)
+                    return t[a].Order < t[b].Order
+                end) do
+                    if formatter.Display then
+                        -- make the cell
+                        local cellFrame = CreateFrame("FRAME", "AAM_charCell_" .. realmKey .. "_" .. charKey .. "_" .. formatterKey, charCol)
+                        cellFrame:SetHeight(rowHeight)
+                        cellFrame:SetPoint("LEFT", charCol, "LEFT")
+                        cellFrame:SetPoint("RIGHT", charCol, "RIGHT")
+                        cellFrame:SetPoint("TOP", lastCellFrame, "BOTTOM")
+                        -- make the label and put it in the cell
+                        local lbl = NewLabel(cellFrame, fontHeight, formatter.Value(char))
+                        table.insert(dataLabels, {
+                            ["lbl"] = lbl,
+                            ["formatter"] = formatter,
+                            ["char"] = char
+                        })
+                        local lblWidth = lbl:GetStringWidth()
+                        if lblWidth > maxLabelWidth then
+                            maxLabelWidth = lblWidth
+                        end
+                        lbl:SetAllPoints(cellFrame)
+                        lbl:SetTextColor(formatter.Color(char))
+                        -- keep track of the last itteration
+                        lastCellFrame = cellFrame
+                    end
+                end
+                -- set the column width to the widest labels width
+                charCol:SetWidth(maxLabelWidth + textOffset * 2)
+                lastCharCol = charCol
+                realmGroupWidthSoFar = realmGroupWidthSoFar + charCol:GetWidth()
             end
-            -- set the column width to the widest labels width
-            charCol:SetWidth(maxLabelWidth + textOffset * 2)
-            lastCharCol = charCol
-            realmGroupWidthSoFar = realmGroupWidthSoFar + charCol:GetWidth()
+            realmGroup:SetWidth(realmGroupWidthSoFar)
+            totalWidthSoFar = totalWidthSoFar + realmGroup:GetWidth()
+            lastRealmGroup = realmGroup
         end
-        realmGroup:SetWidth(realmGroupWidthSoFar)
-        totalWidthSoFar = totalWidthSoFar + realmGroup:GetWidth()
-        lastRealmGroup = realmGroup
     end
     mainFrame:SetWidth(headerCol:GetWidth() + totalWidthSoFar)
 end
@@ -925,18 +891,6 @@ local function UpdateGrid()
     for _, v in pairs(dataLabels) do
         v.lbl:SetText(v.formatter.Value(v.char))
         v.lbl:SetTextColor(v.formatter.Color(v.char))
-    end
-    -- update the visibility of parts of the grid
-    local realms
-    if not ArwicAltManagerDB.Config.RealmsToDisplay or table.len(ArwicAltManagerDB.Config.RealmsToDisplay) == 0 then
-        print("added all realms to display")
-        realms = ArwicAltManagerDB.Realms
-    else
-        realms = {}
-        for _, realmName in pairs(ArwicAltManagerDB.Config.RealmsToDisplay) do
-            realms[realmName] = ArwicAltManagerDB.Realms[realmName]
-            print("added " .. realmName .. " to display")
-        end
     end
 end
 
@@ -998,22 +952,34 @@ RegisterEvents()
 SLASH_AAM1 = "/aam"
 SLASH_AAM2 = "/arwicaltmanager"
 SlashCmdList["AAM"] = function(msg)
-    if msg == "update" then
+    local args = {}
+    for a in string.gmatch(msg, "%S+") do
+        table.insert(args, a)
+    end
+    if args[1] == "update" then
         ARWIC_AAM_UpdateData()
         print("AAM: Updated data for " .. UnitName("player") .. "-" .. GetRealmName())
         if ARWIC_AAM_mainFrame then
             ARWIC_AAM_Show()
         end
-    elseif msg == "config" then
+    elseif args[1] == "config" then
+        -- /aam config
         ARWIC_AAM_ToggleConfig()
-    elseif string.starts(msg, "char hide") then
-
-    elseif string.starts(msg, "char show") then
-    
-    elseif string.starts(msg, "realm hide") then
-
-    elseif string.starts(msg, "realm show") then
-    
+    elseif args[1] == "char" and args[2] == "hide" then
+        -- /aam char hide frostmourne arwic
+        CharData(args[4], args[3]).Display = false
+        print("You will need to '/reload' for changes to take effect")
+    elseif args[1] == "char" and args[2] == "show" then
+        -- /aam char show frostmourne arwic
+        CharData(args[4], args[3]).Display = true
+        print("You will need to '/reload' for changes to take effect")
+    elseif args[1] == "realm" and args[2] == "hide" then
+        ArwicAltManagerDB.Realms[args[3]].Display = false
+        print("You will need to '/reload' for changes to take effect")
+    elseif args[1] == "realm" and args[2] == "show" then
+        -- /aam realm show frostmourne
+        ArwicAltManagerDB.Realms[args[3]].Display = true
+        print("You will need to '/reload' for changes to take effect")
     else
         if ARWIC_AAM_mainFrame then
             ARWIC_AAM_Toggle()
