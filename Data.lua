@@ -403,6 +403,7 @@ function ARWIC_AAM_UpdateData()
 end
 
 function events:PLAYER_ENTERING_WORLD(...)
+    RequestTimePlayed()
     ARWIC_AAM_UpdateData()
 end
 
@@ -413,6 +414,10 @@ end
 function events:TIME_PLAYED_MSG(...)
     local total, thisLevel = ...
     fields["TimePlayed"].SpecialUpdate(total, thisLevel)
+end
+
+function events:PLAYER_STARTED_MOVING(...)
+    ARWIC_AAM_UpdateData()
 end
 
 local function RegisterEvents()
