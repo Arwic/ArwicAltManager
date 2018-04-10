@@ -726,8 +726,6 @@ end
 local function BuildGrid()
     -- dont remake the frame if it already exists
     if ARWIC_AAM_mainFrame ~= nil then return end
-    -- load config
-    ARWIC_AAM_LoadFormatterConfig()
     dataLabels = {}
 
     -- frame properties
@@ -761,15 +759,22 @@ local function BuildGrid()
     NewLabel(titleBar, 20, "Arwic Alt Manager"):SetAllPoints(titleBar)
     
     -- close button
-    local closeButton = CreateFrame("BUTTON", "AAM_closeButton", AAM_titleBarFrame)
+    local closeButton = CreateFrame("BUTTON", "AAM_closeButton", AAM_titleBarFrame, "UIPanelCloseButton")
     closeButton:SetPoint("TOPRIGHT", 0, 0)
     closeButton:SetWidth(titleBarHeight)
     closeButton:SetHeight(titleBarHeight)
-    closeButton.texture = closeButton:CreateTexture(nil, "BACKGROUND")
-    closeButton.texture:SetColorTexture(0.7, 0.0, 0.0, 1.0)
-    closeButton.texture:SetAllPoints(closeButton)
     closeButton:SetScript("OnClick", function()
         mainFrame:Hide()
+    end)
+
+    -- config button
+    local configButton = CreateFrame("BUTTON", "AAM_closeButton", AAM_titleBarFrame, "OptionsBoxTemplate")
+    configButton:SetPoint("TOPRIGHT", closeButton, "TOPLEFT")
+    configButton:SetWidth(titleBarHeight)
+    configButton:SetHeight(titleBarHeight)
+    configButton:SetScript("OnClick", function()
+        mainFrame:Hide()
+        ARWIC_AAM_ShowConfig()
     end)
 
     -- row headers
@@ -822,7 +827,13 @@ local function BuildGrid()
     local lastRealmGroup = headerCol
     for realmKey, realmData in pairs(ArwicAltManagerDB.Realms) do
         -- only build the realm and its chars if Display is true
-        if realmData.Display then
+        local charDisplayCount = 0
+        for k, v in pairs(realmData.Characters) do
+            if v.Display then
+                charDisplayCount = charDisplayCount + 1
+            end
+        end
+        if realmData.Display and charDisplayCount > 0 then
             local realmChars = realmData.Characters
             -- make the realm group
             local realmGroup = CreateFrame("FRAME", "AAM_realmGroup_" .. realmKey, mainFrame)
@@ -899,23 +910,21 @@ local function UpdateGrid()
 end
 
 -- loads display and order of field formatters from file
-function ARWIC_AAM_LoadFormatterConfig()
-    if ArwicAltManagerDB and ArwicAltManagerDB.Config and ArwicAltManagerDB.Config.FieldFormatters then
+local function InitFormatters()
+    if ArwicAltManagerDB.Config.FieldFormatters then
         local configFF = ArwicAltManagerDB.Config.FieldFormatters
         for k, v in pairs(configFF) do
             fieldFormatters[k].Display = v.Display
-            fieldFormatters[k].Order = v.Order
+            fieldFormatters[k].Order = tonumber(v.Order)
         end
-    end
-end
-
--- saves display and order of field formatters to file
-function ARWIC_AAM_SaveFormatterConfig()
-    ArwicAltManagerDB.Config.FieldFormatters = {}
-    local configFF = ArwicAltManagerDB.Config.FieldFormatters
-    for k, v in pairs(fieldFormatters) do
-        configFF[k].Display = v.Display
-        configFF[k].Order = v.Order
+    else
+        ArwicAltManagerDB.Config.FieldFormatters = {}
+        local configFF = ArwicAltManagerDB.Config.FieldFormatters
+        for k, v in pairs(fieldFormatters) do
+            configFF[k] = {}
+            configFF[k].Display = v.Display
+            configFF[k].Order = tonumber(v.Order)
+        end
     end
 end
 
@@ -934,7 +943,9 @@ function ARWIC_AAM_Hide()
 end
 
 function events:PLAYER_ENTERING_WORLD(...)
-    -- Get ElvIU
+    -- init formatters
+    InitFormatters()
+    -- get elvui
     if ElvIU then
         ElvUI_E, ElvUI_L, ElvUI_V, ElvUI_P, ElvUI_G = unpack(ElvUI)
         ElvUI_S = ElvUI_E:GetModule("Skins")
