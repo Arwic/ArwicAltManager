@@ -224,14 +224,50 @@ local fields = {
     ["Gear"] = {
         Update = function()
             local slotIDs = {
-                1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
+                1, -- head
+                2, -- neck
+                3, -- shoulders
+                15, -- back
+                5, -- chest
+                4, -- shirt
+                19, -- tabard
+                9, -- wrist
+
+                10, -- hands
+                6, -- waist
+                7, -- legs
+                8, -- feet
+                11, -- finger 1
+                12, -- finger 2
+                13, -- trinket 1
+                14, -- trinket 2
+                16, -- main hand
+                17, -- off hand
             }
             local char = CurrentChar()
-            char["Gear"] = {}
-            for _, sid in pairs(slotIDs) do 
-                -- GetItemInfo(link) this value to get ilvl, etc. later
-                char["Gear"][sid] = GetInventoryItemLink("player", sid)
+            char.Gear = {}
+            char.Gear.Items = {}
+            for _, sid in pairs(slotIDs) do
+                local itemLink = GetInventoryItemLink("player", sid)
+                if itemLink ~= nil then
+                    local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType,
+                        itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice  = GetItemInfo(itemLink)
+                    local item = {}
+                    item.Name = itemName
+                    item.Link = itemLink
+                    item.Rarity = itemRarity
+                    item.ItemLevel = itemLevel
+                    item.MinLevel = itemMinLevel
+                    item.Type = itemType
+                    item.SubType = itemSubType
+                    item.StackCount = itemStackCount
+                    item.EquipLoc = itemEquipLoc
+                    item.Texture = itemTexture
+                    item.SellPrice  = itemSellPrice
+                    table.insert(char.Gear.Items, item)
+                end
             end
+            char.Gear.AvgItemLevelBags, char.Gear.AvgItemLevelEquipped = GetAverageItemLevel()
         end
     },
     ["Professions"] = {
@@ -325,8 +361,9 @@ local fields = {
             if not char["Artifacts"] then 
                 char["Artifacts"] = {} 
             end
-            local id, _, _, _, power, ranks, _, _, _, _, _, _ = C_ArtifactUI.GetArtifactInfo()
+            local id, _, name, _, power, ranks, _, _, _, _, _, _ = C_ArtifactUI.GetArtifactInfo()
             char["Artifacts"][id] = {}
+            char["Artifacts"][id]["Name"] = name
             char["Artifacts"][id]["Power"] = power
             char["Artifacts"][id]["Ranks"] = ranks
         end

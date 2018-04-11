@@ -44,6 +44,158 @@ local function ClassColor(className)
         RAID_CLASS_COLORS[className].b
 end
 
+local function GetMageTowerPrereqIDs(class)
+    if class == "DEATHKNIGHT" then
+        return {
+            ["Frost"] = 45865, -- Closing the Eye
+            ["Unholy"] = 46065, -- An Impossible Foe
+            ["Blood"] = 45863, -- The Highlord's Return
+        }
+    elseif class == "DEMONHUNTER" then
+        return {
+            ["Havoc"] = 45865, -- Closing the Eye
+            ["Vengeance"] = 45863, -- The Highlord's Return
+        }
+    elseif class == "DRUID" then
+        return {
+            ["Balance"] = 45866, -- Thwarting the Twins
+            ["Guardian"] = 45863, -- The Highlord's Return
+            ["Feral"] = 46065, -- An Impossible Foe
+            ["Restoration"] = 46035, -- End of the Risen Threat
+        }
+    elseif class == "HUNTER" then
+        return {
+            ["Marksmanship"] = 45866, -- Thwarting the Twins
+            ["Beast Mastery"] = 45842, -- Feltotem's Fall
+            ["Survival"] = 45865, -- Closing the Eye
+        }
+    elseif class == "MAGE" then
+        return {
+            ["Fire"] = 46065, -- An Impossible Foe
+            ["Frost"] = 45866, -- Thwarting the Twins
+            ["Arcane"] = 45862, -- The God-Queen's Fury
+        }
+    elseif class == "MONK" then
+        return {
+            ["Windwalker"] = 45842, -- Feltotem's Fall
+            ["Mistweaver"] = 46035, -- End of the Risen Threat
+            ["Brewmaster"] = 45863, -- The Highlord's Return
+        }
+    elseif class == "PALADIN" then
+        return {
+            ["Retribution"] = 45862, -- The God-Queen's Fury
+            ["Holy"] = 46035, -- End of the Risen Threat
+            ["Protection"] = 45863, -- The Highlord's Return
+        }
+    elseif class == "PRIEST" then
+        return {
+            ["Shadow"] = 45866, -- Thwarting the Twins
+            ["Holy"] = 46035, -- End of the Risen Threat
+            ["Discipline"] = 45842, -- Feltotem's Fall
+        }
+    elseif class == "ROGUE" then
+        return {
+            ["Assassination"] = 45862, -- The God-Queen's Fury
+            ["Outlaw"] = 46065, -- An Impossible Foe
+            ["Subtlety"] = 45865, -- Closing the Eye
+        }
+    elseif class == "SHAMAN" then
+        return {
+            ["Enhancement"] = 45862, -- The God-Queen's Fury
+            ["Elemental"] = 46065, -- An Impossible Foe
+            ["Restoration"] = 46035, -- End of the Risen Threat
+        }
+    elseif class == "WARLOCK" then
+        return {
+            ["Affliction"] = 45866, -- Thwarting the Twins
+            ["Destruction"] = 45842, -- Feltotem's Fall
+            ["Demonology"] = 45862, -- The God-Queen's Fury
+        }
+    elseif class == "WARRIOR" then
+        return {
+            ["Arms"] = 45865, -- Closing the Eye
+            ["Fury"] = 46065, -- An Impossible Foe
+            ["Protection"] = 45863, -- The Highlord's Return
+        }
+    end
+end
+
+local function GetMageTowerIDs(class)
+    if class == "DEATHKNIGHT" then
+        return {
+            ["Frost"] = 44925, -- Closing the Eye
+            ["Unholy"] = 46065, -- An Impossible Foe
+            ["Blood"] = 45416, -- The Highlord's Return
+        }
+    elseif class == "DEMONHUNTER" then
+        return {
+            ["Havoc"] = 44925, -- Closing the Eye
+            ["Vengeance"] = 45416, -- The Highlord's Return
+        }
+    elseif class == "DRUID" then
+        return {
+            ["Balance"] = 46127, -- Thwarting the Twins
+            ["Guardian"] = 45416, -- The Highlord's Return
+            ["Feral"] = 46065, -- An Impossible Foe
+            ["Restoration"] = 46035, -- End of the Risen Threat
+        }
+    elseif class == "HUNTER" then
+        return {
+            ["Marksmanship"] = 46127, -- Thwarting the Twins
+            ["Beast Mastery"] = 45627, -- Feltotem's Fall
+            ["Survival"] = 44925, -- Closing the Eye
+        }
+    elseif class == "MAGE" then
+        return {
+            ["Fire"] = 46065, -- An Impossible Foe
+            ["Frost"] = 46127, -- Thwarting the Twins
+            ["Arcane"] = 45526, -- The God-Queen's Fury
+        }
+    elseif class == "MONK" then
+        return {
+            ["Windwalker"] = 45627, -- Feltotem's Fall
+            ["Mistweaver"] = 46035, -- End of the Risen Threat
+            ["Brewmaster"] = 45416, -- The Highlord's Return
+        }
+    elseif class == "PALADIN" then
+        return {
+            ["Retribution"] = 45526, -- The God-Queen's Fury
+            ["Holy"] = 46035, -- End of the Risen Threat
+            ["Protection"] = 45416, -- The Highlord's Return
+        }
+    elseif class == "PRIEST" then
+        return {
+            ["Shadow"] = 46127, -- Thwarting the Twins
+            ["Holy"] = 46035, -- End of the Risen Threat
+            ["Discipline"] = 45627, -- Feltotem's Fall
+        }
+    elseif class == "ROGUE" then
+        return {
+            ["Assassination"] = 45526, -- The God-Queen's Fury
+            ["Outlaw"] = 46065, -- An Impossible Foe
+            ["Subtlety"] = 44925, -- Closing the Eye
+        }
+    elseif class == "SHAMAN" then
+        return {
+            ["Enhancement"] = 45526, -- The God-Queen's Fury
+            ["Elemental"] = 46065, -- An Impossible Foe
+            ["Restoration"] = 46035, -- End of the Risen Threat
+        }
+    elseif class == "WARLOCK" then
+        return {
+            ["Affliction"] = 46127, -- Thwarting the Twins
+            ["Destruction"] = 45627, -- Feltotem's Fall
+            ["Demonology"] = 45526, -- The God-Queen's Fury
+        }
+    elseif class == "WARRIOR" then
+        return {
+            ["Arms"] = 44925, -- Closing the Eye
+            ["Fury"] = 46065, -- An Impossible Foe
+            ["Protection"] = 45416, -- The Highlord's Return
+        }
+    end
+end
+
 local function FactionColor(factionName)
     if factionName == "Alliance" then
         return 0, 0.8, 1
@@ -52,12 +204,25 @@ local function FactionColor(factionName)
     end
 end
 
+local function ClassName(classID)
+    if classID == "DEMONHUNTER" then
+        return "Demon Hunter"
+    elseif classID == "DEATHKNIGHT" then
+        return "Death Knight"
+    end
+    return classID:sub(1,1):upper() .. classID:sub(2):lower()
+end
+
 local function ErrorColor()
     return 0.85, 0.33, 0.25
 end
 
 local function DefaultColor()
     return 1.0, 1.0, 1.0
+end
+
+local function TooltipHeaderColor()
+    return 1, 1, 1
 end
 
 local function SuccessColor()
@@ -92,7 +257,7 @@ local function AllRealmChars(realm)
     return ArwicAltManagerDB.Realms[realm]
 end
 
-local function CurrentAccount()
+local function Account()
     return ArwicAltManagerDB.Account
 end
 
@@ -101,11 +266,17 @@ local fieldFormatters = {
         Label = "Name",
         Order = 10,
         Display = true,
+        Tooltip = function(char)
+            GameTooltip:AddLine("Character Name", TooltipHeaderColor())
+            GameTooltip:AddLine(format("%s - %s", char.Name, char.Realm), ClassColor(char.Class))
+            GameTooltip:AddLine(format("Level %d %s %s", char.Level, char.Race, ClassName(char.Class)), ClassColor(char.Class))
+            GameTooltip:Show()
+        end,
         Value = function(char)
-            return char["Name"]
+            return char.Name
         end,
         Color = function(char)
-            return ClassColor(char["Class"])
+            return ClassColor(char.Class)
         end,
     },
     ["Class"] = {
@@ -113,16 +284,10 @@ local fieldFormatters = {
         Order = 20,
         Display = false,
         Value = function(char)
-            if char["Class"] == "DEMONHUNTER" then
-                return "Demon Hunter"
-            elseif char["Class"] == "DEATHKNIGHT" then
-                return "Death Knight"
-            else
-                return char["Class"]:sub(1,1):upper() .. char["Class"]:sub(2):lower()
-            end
+            return ClassName(char.Class)
         end,
         Color = function(char)
-            return ClassColor(char["Class"])
+            return ClassColor(char.Class)
         end,
     },
     ["Realm"] = {
@@ -130,7 +295,7 @@ local fieldFormatters = {
         Order = 40,
         Display = true,
         Value = function(char)
-            return char["Realm"]
+            return char.Realm
         end,
         Color = function(char)
             return DefaultColor()
@@ -141,10 +306,10 @@ local fieldFormatters = {
         Order = 30,
         Display = false,
         Value = function(char)
-            return char["Faction"]
+            return char.Faction
         end,
         Color = function(char)
-            return FactionColor(char["Faction"])
+            return FactionColor(char.Faction)
         end,
     },
     ["Race"] = {
@@ -152,7 +317,7 @@ local fieldFormatters = {
         Order = 60,
         Display = false,
         Value = function(char)
-            return char["Race"]
+            return char.Race
         end,
         Color = function(char)
             return DefaultColor()
@@ -168,7 +333,7 @@ local fieldFormatters = {
                 [2] = "Male",
                 [3] = "Female",
             }
-            return map[char["Gender"]]
+            return map[char.Gender]
         end,
         Color = function(char)
             return DefaultColor()
@@ -178,11 +343,17 @@ local fieldFormatters = {
         Label = "Updated",
         Order = 1000,
         Display = true,
+        Tooltip = function(char)
+            local days, hours, minutes, seconds = FormatTime(time() - char.Timestamp)
+            GameTooltip:AddLine("Time since character data updated", TooltipHeaderColor())
+            GameTooltip:AddLine(format("%d days %d hrs %d mins %d secs", days, hours, minutes, seconds))
+            GameTooltip:Show()
+        end,
         Value = function(char)
-            if not char["Timestamp"] then
+            if not char.Timestamp then
                 return "?"
             end
-            local dt = time() - char["Timestamp"]
+            local dt = time() - char.Timestamp
             local days, hours, minutes, seconds = FormatTime(dt)
             if days > 0 then
                 return format("%d days ago", days)
@@ -199,19 +370,24 @@ local fieldFormatters = {
         end,
     },
     ["Money"] = {
-        Label = "Gold",
+        Label = "|T133784:0|t Gold",
         Order = 80,
         Display = true,
+        Tooltip = function(char)
+            local g = floor(char.Money / 100 / 100)
+            local s = (char.Money / 100) % 100
+            local c = char.Money % 100
+            GameTooltip:AddLine("Character Wealth", TooltipHeaderColor())
+            GameTooltip:AddLine(format("%sg %ds %dc", FormatInt(g), s, c))
+            GameTooltip:Show()
+        end,
         Value = function(char)
-            local g = floor(char["Money"] / 100 / 100)
-            --local s = (char["Money"] / 100) % 100
-            --local c = char["Money"] % 100
-            --local str = format("%sg %ds %dc", FormatInt(g), s, c)
+            local g = floor(char.Money / 100 / 100)
             local str = format("%sg", FormatInt(g))
             return str
         end,
         Color = function(char)
-            if (char["Money"] / 100 / 100) < Config().GoldThreshold then
+            if (char.Money / 100 / 100) < Config().GoldThreshold then
                 return ErrorColor()
             end
             return DefaultColor()
@@ -222,10 +398,10 @@ local fieldFormatters = {
         Order = 110,
         Display = true,
         Value = function(char)
-            return FormatBool(char["ClassCampaign"])
+            return FormatBool(char.ClassCampaign)
         end,
         Color = function(char)
-            if not char["ClassCampaign"] then
+            if not char.ClassCampaign then
                 return ErrorColor()
             end
             return DefaultColor()
@@ -236,10 +412,10 @@ local fieldFormatters = {
         Order = 120,
         Display = true,
         Value = function(char)
-            return FormatBool(char["ClassMount"])
+            return FormatBool(char.ClassMount)
         end,
         Color = function(char)
-            if not char["ClassMount"] then
+            if not char.ClassMount then
                 return ErrorColor()
             end
             return DefaultColor()
@@ -250,10 +426,10 @@ local fieldFormatters = {
         Order = 50,
         Display = true,
         Value = function(char)
-            return char["Level"]
+            return char.Level
         end,
         Color = function(char)
-            if char["Level"] < Config().LevelThreshold then
+            if char.Level < Config().LevelThreshold then
                 return ErrorColor()
             end
             return DefaultColor()
@@ -264,10 +440,10 @@ local fieldFormatters = {
         Order = 160,
         Display = true,
         Value = function(char)
-            return format("%s%%", char["MountSpeed"])
+            return format("%s%%", char.MountSpeed)
         end,
         Color = function(char)
-            if char["MountSpeed"] < Config().MountSpeedThreshold then
+            if char.MountSpeed < Config().MountSpeedThreshold then
                 return ErrorColor()
             end
             return DefaultColor()
@@ -278,10 +454,10 @@ local fieldFormatters = {
         Order = 130,
         Display = true,
         Value = function(char)
-            return FormatBool(char["OrderHallUpgrades"])
+            return FormatBool(char.OrderHallUpgrades)
         end,
         Color = function(char)
-            if not char["OrderHallUpgrades"] then
+            if not char.OrderHallUpgrades then
                 return ErrorColor()
             end
             return DefaultColor()
@@ -292,10 +468,10 @@ local fieldFormatters = {
         Order = 150,
         Display = true,
         Value = function(char)
-            return FormatBool(char["BalanceOfPower"])
+            return FormatBool(char.BalanceOfPower)
         end,
         Color = function(char)
-            if not char["BalanceOfPower"] then
+            if not char.BalanceOfPower then
                 return ErrorColor()
             end
             return DefaultColor()
@@ -306,10 +482,10 @@ local fieldFormatters = {
         Order = 135,
         Display = true,
         Value = function(char)
-            return FormatBool(char["KeystoneMaster"])
+            return FormatBool(char.KeystoneMaster)
         end,
         Color = function(char)
-            if not char["KeystoneMaster"] then
+            if not char.KeystoneMaster then
                 return ErrorColor()
             end
             return DefaultColor()
@@ -319,33 +495,40 @@ local fieldFormatters = {
         Label = "Mage Tower Unlocked",
         Order = 139,
         Display = true,
+        Tooltip = function(char)
+            GameTooltip:AddLine("Mage Tower Unlocked", TooltipHeaderColor())
+            for k, v in pairs(GetMageTowerPrereqIDs(char.Class)) do
+                GameTooltip:AddDoubleLine(k, FormatBool(char.MageTowerPrereq[v]))
+            end
+            GameTooltip:Show()
+        end,
         Value = function(char)
-            if char["MageTowerPrereq"] then
+            if char.MageTowerPrereq then
                 local count = 0
-                for k, v in pairs(char["MageTowerPrereq"]) do
+                for k, v in pairs(char.MageTowerPrereq) do
                     if v then
                         count = count + 1
                     end
                 end
                 local maxCount = 3
-                if char["Class"] == "DEMONHUNTER" then maxCount = 2 end
-                if char["Class"] == "DRUID" then maxCount = 4 end
+                if char.Class == "DEMONHUNTER" then maxCount = 2 end
+                if char.Class == "DRUID" then maxCount = 4 end
                 local str = format("%d/%d", count, maxCount)
                 return str
             end
             return ""
         end,
         Color = function(char)
-            if char["MageTowerPrereq"] then
+            if char.MageTowerPrereq then
                 local count = 0
-                for k, v in pairs(char["MageTowerPrereq"]) do
+                for k, v in pairs(char.MageTowerPrereq) do
                     if v then
                         count = count + 1
                     end
                 end
                 local maxCount = 3
-                if char["Class"] == "DEMONHUNTER" then maxCount = 2 end
-                if char["Class"] == "DRUID" then maxCount = 4 end
+                if char.Class == "DEMONHUNTER" then maxCount = 2 end
+                if char.Class == "DRUID" then maxCount = 4 end
                 if count ~= maxCount then
                     return ErrorColor()
                 end
@@ -358,29 +541,36 @@ local fieldFormatters = {
         Label = "Mage Tower Completed",
         Order = 140,
         Display = true,
+        Tooltip = function(char)
+            GameTooltip:AddLine("Mage Tower Completed", TooltipHeaderColor())
+            for k, v in pairs(GetMageTowerIDs(char.Class)) do
+                GameTooltip:AddDoubleLine(k, FormatBool(char.MageTower[v]))
+            end
+            GameTooltip:Show()
+        end,
         Value = function(char)
             local count = 0
-            for k, v in pairs(char["MageTower"]) do
+            for k, v in pairs(char.MageTower) do
                 if v then
                     count = count + 1
                 end
             end
             local maxCount = 3
-            if char["Class"] == "DEMONHUNTER" then maxCount = 2 end
-            if char["Class"] == "DRUID" then maxCount = 4 end
+            if char.Class == "DEMONHUNTER" then maxCount = 2 end
+            if char.Class == "DRUID" then maxCount = 4 end
             local str = format("%d/%d", count, maxCount)
             return str
         end,
         Color = function(char)
             local count = 0
-            for k, v in pairs(char["MageTower"]) do
+            for k, v in pairs(char.MageTower) do
                 if v then
                     count = count + 1
                 end
             end
             local maxCount = 3
-            if char["Class"] == "DEMONHUNTER" then maxCount = 2 end
-            if char["Class"] == "DRUID" then maxCount = 4 end
+            if char.Class == "DEMONHUNTER" then maxCount = 2 end
+            if char.Class == "DRUID" then maxCount = 4 end
             if count ~= maxCount then
                 return ErrorColor()
             end
@@ -391,9 +581,14 @@ local fieldFormatters = {
         Label = "Time Played",
         Order = 170,
         Display = true,
+        Tooltip = function(char)
+            GameTooltip:AddLine("Time Played", TooltipHeaderColor())
+            GameTooltip:AddLine(format("Total: %d days %d hrs %d mins %d secs", FormatTime(char.TimePlayed.Total)))
+            GameTooltip:AddLine(format("This Level: %d days %d hrs %d mins %d secs", FormatTime(char.TimePlayed.Level)))
+            GameTooltip:Show()
+        end,
         Value = function(char)
-            local days, hours, mintues, seconds = FormatTime(char["TimePlayed"]["Total"])
-            return format("%d:%02d:%02d:%02d", days, hours, minutes, seconds)
+            return format("%d:%02d:%02d:%02d", FormatTime(char.TimePlayed.Total))
         end,
         Color = function(char)
             return DefaultColor()
@@ -403,19 +598,28 @@ local fieldFormatters = {
         Label = "Artifact Levels",
         Order = 100,
         Display = true,
+        Tooltip = function(char)
+            GameTooltip:AddLine("Artifact Levels", TooltipHeaderColor())
+            for k, v in pairs(char.Artifacts) do
+                if k ~= 133755 then -- dont show fishing artifact
+                    if v.Name == nil then v.Name = "UNKNOWN" end
+                    GameTooltip:AddDoubleLine(format("%s", v.Name), format("%d", v.Ranks))
+                end
+            end
+            GameTooltip:Show()
+        end,
         Value = function(char)
             local str = ""
-            for k, v in pairs(char["Artifacts"]) do
+            for k, v in pairs(char.Artifacts) do
                 if k ~= 133755 then -- ignore fishing artifact
-                    str = format("%s, %d", str, v["Ranks"]) 
+                    str = format("%s, %d", str, v.Ranks) 
                 end
             end
             return str:sub(3) -- remove the first 2 characters ", "
         end,
         Color = function(char)
-            for k, v in pairs(char["Artifacts"]) do
-                -- ignore fishing artifact
-                if v["Ranks"] < Config().ArtifactRankThreshold and k ~= 133755 then
+            for k, v in pairs(char.Artifacts) do
+                if v.Ranks < Config().ArtifactRankThreshold and k ~= 133755 then -- ignore fishing artifact
                     return ErrorColor()
                 end
             end
@@ -423,43 +627,69 @@ local fieldFormatters = {
         end,
     },
     ["OrderHallResouces"] = {
-        Label = "Order Hall Resouces",
+        Label = "|T1397630:0|t Order Resouces",
         Order = 90,
         Display = true,
         Value = function(char)
-            if not char["Currencies"] then
+            if not char.Currencies then
                 return ""
             end
-            return char["Currencies"][1220]["CurrentAmount"]
+            return char.Currencies[1220].CurrentAmount
         end,
         Color = function(char)
-            if not char["Currencies"] then
+            if not char.Currencies then
                 return ErrorColor()
             end
-            local cur = char["Currencies"][1220]["CurrentAmount"]
-            if cur < Config().OrderHallResourcesThreshold then
+            if char.Currencies[1220].CurrentAmount < Config().OrderHallResourcesThreshold then
                 return ErrorColor()
             end
             return DefaultColor()
         end,
     },
     ["WakeningEssence"] = {
-        Label = "Wakening Essence",
+        Label = "|T236521:0|t Wakening Essence",
         Order = 91,
         Display = true,
         Value = function(char)
-            if not char["Currencies"] or not char["Currencies"][1533] then
+            if not char.Currencies or not char.Currencies[1533] then
                 return ""
             end
-            return char["Currencies"][1533]["CurrentAmount"]
+            return char.Currencies[1533].CurrentAmount
         end,
         Color = function(char)
-            if not char["Currencies"] or not char["Currencies"][1533] then
+            if not char.Currencies or not char.Currencies[1533] then
                 return ErrorColor()
             end
-            local cur = char["Currencies"][1533]["CurrentAmount"]
+            local cur = char.Currencies[1533].CurrentAmount
             if cur > 1000 then
                 return SuccessColor()
+            end
+            return DefaultColor()
+        end,
+    },
+    ["Gear"] = {
+        Label = "Gear",
+        Order = 21,
+        Display = true,
+        Tooltip = function(char)
+            if char.Gear.AvgItemLevelBags ~= nil then
+                GameTooltip:AddLine("Equipped Gear", TooltipHeaderColor())
+                for k, v in pairs(char.Gear.Items) do
+                    GameTooltip:AddDoubleLine(_G[v.EquipLoc], format("%s (%d) |T%s:0|t", v.Name, v.ItemLevel, v.Texture), 
+                                                nil, nil, nil, GetItemQualityColor(v.Rarity))
+                end
+                GameTooltip:Show()
+            end
+        end,
+        Value = function(char)
+            if char.Gear.AvgItemLevelBags == nil then
+                return "?"
+            end
+            return format("%.1f / %.1f", char.Gear.AvgItemLevelEquipped, char.Gear.AvgItemLevelBags)
+        end,
+        Color = function(char)
+            if char.Gear.AvgItemLevelBags == nil then
+                return ErrorColor()
             end
             return DefaultColor()
         end,
@@ -478,19 +708,19 @@ local fieldFormatters = {
         Label = "Violet Spellwing",
         Order = 500,
         Display = true,
+        Tooltip = function(char)
+            GameTooltip:AddLine("Violet Spellwing", TooltipHeaderColor())
+            GameTooltip:AddLine("Obtained by defeating Argus the Unmaker on Heroic difficulty or higher in Antorus, the Burning Throne.")
+            GameTooltip:Show()
+        end,
         Value = function()
-            local account = ArwicAltManagerDB.Account
-            if not account["Mounts"] then
+            if not Account().Mounts then
                 return "?"
             end
-            return FormatBool(account["Mounts"][253639]["IsCollected"])
+            return FormatBool(Account().Mounts[253639].IsCollected)
         end,
         Color = function()
-            local account = ArwicAltManagerDB.Account
-            if not account["Mounts"] then
-                return ErrorColor()
-            end
-            if not account["Mounts"][253639]["IsCollected"] then
+            if not Account().Mounts or not Account().Mounts[253639].IsCollected then
                 return ErrorColor()
             end
             return DefaultColor()
@@ -500,19 +730,19 @@ local fieldFormatters = {
         Label = "Shackled Urzul",
         Order = 510,
         Display = true,
+        Tooltip = function(char)
+            GameTooltip:AddLine("Shackled Urzul", TooltipHeaderColor())
+            GameTooltip:AddLine("Obtained by defeating Argus the Unmaker on Mythic difficulty in Antorus, the Burning Throne.")
+            GameTooltip:Show()
+        end,
         Value = function()
-            local account = ArwicAltManagerDB.Account
-            if not account["Mounts"] then
+            if not Account().Mounts then
                 return "?"
             end
-            return FormatBool(account["Mounts"][243651]["IsCollected"])
+            return FormatBool(Account().Mounts[243651].IsCollected)
         end,
         Color = function()
-            local account = ArwicAltManagerDB.Account
-            if not account["Mounts"] then
-                return ErrorColor()
-            end
-            if not account["Mounts"][243651]["IsCollected"] then
+            if not Account().Mounts or not Account().Mounts[243651].IsCollected then
                 return ErrorColor()
             end
             return DefaultColor()
@@ -522,19 +752,19 @@ local fieldFormatters = {
         Label = "Hellfire Infernal",
         Order = 520,
         Display = true,
+        Tooltip = function(char)
+            GameTooltip:AddLine("Hellfire Infernal", TooltipHeaderColor())
+            GameTooltip:AddLine("Obtained by defeating Gul'dan on Mythic difficulty in the Nighthold.")
+            GameTooltip:Show()
+        end,
         Value = function()
-            local account = ArwicAltManagerDB.Account
-            if not account["Mounts"] then
+            if not Account().Mounts then
                 return "?"
             end
-            return FormatBool(account["Mounts"][171827]["IsCollected"])
+            return FormatBool(Account().Mounts[171827].IsCollected)
         end,
         Color = function()
-            local account = ArwicAltManagerDB.Account
-            if not account["Mounts"] then
-                return ErrorColor()
-            end
-            if not account["Mounts"][171827]["IsCollected"] then
+            if not Account().Mounts or not Account().Mounts[171827].IsCollected then
                 return ErrorColor()
             end
             return DefaultColor()
@@ -544,19 +774,19 @@ local fieldFormatters = {
         Label = "Felblaze Infernal",
         Order = 520,
         Display = true,
+        Tooltip = function(char)
+            GameTooltip:AddLine("Felblaze Infernal", TooltipHeaderColor())
+            GameTooltip:AddLine("Obtained by defeating Gul'dan on Normal difficulty or higher in the Nighthold.")
+            GameTooltip:Show()
+        end,
         Value = function()
-            local account = ArwicAltManagerDB.Account
-            if not account["Mounts"] then
+            if not Account().Mounts then
                 return "?"
             end
-            return FormatBool(account["Mounts"][213134]["IsCollected"])
+            return FormatBool(Account().Mounts[213134].IsCollected)
         end,
         Color = function()
-            local account = ArwicAltManagerDB.Account
-            if not account["Mounts"] then
-                return ErrorColor()
-            end
-            if not account["Mounts"][213134]["IsCollected"] then
+            if not Account().Mounts or not Account().Mounts[213134].IsCollected then
                 return ErrorColor()
             end
             return DefaultColor()
@@ -566,19 +796,19 @@ local fieldFormatters = {
         Label = "Abyss Worm",
         Order = 520,
         Display = true,
+        Tooltip = function(char)
+            GameTooltip:AddLine("Abyss Worm", TooltipHeaderColor())
+            GameTooltip:AddLine("Obtained by defeating Mistress Sassz'ine on Raid Finder difficulty or higher in the Tomb of Sargeras.")
+            GameTooltip:Show()
+        end,
         Value = function()
-            local account = ArwicAltManagerDB.Account
-            if not account["Mounts"] then
+            if not Account().Mounts then
                 return "?"
             end
-            return FormatBool(account["Mounts"][232519]["IsCollected"])
+            return FormatBool(Account().Mounts[232519].IsCollected)
         end,
         Color = function()
-            local account = ArwicAltManagerDB.Account
-            if not account["Mounts"] then
-                return ErrorColor()
-            end
-            if not account["Mounts"][232519]["IsCollected"] then
+            if not Account().Mounts or not Account().Mounts[232519].IsCollected then
                 return ErrorColor()
             end
             return DefaultColor()
@@ -588,19 +818,19 @@ local fieldFormatters = {
         Label = "Antoran Charhound",
         Order = 520,
         Display = true,
+        Tooltip = function(char)
+            GameTooltip:AddLine("Antoran Charhound", TooltipHeaderColor())
+            GameTooltip:AddLine("Obtained by defeating Felhounds of Sargeras on Raid Finder difficulty or higher in Antorus, the Burning Throne.")
+            GameTooltip:Show()
+        end,
         Value = function()
-            local account = ArwicAltManagerDB.Account
-            if not account["Mounts"] then
+            if not Account().Mounts then
                 return "?"
             end
-            return FormatBool(account["Mounts"][253088]["IsCollected"])
+            return FormatBool(Account().Mounts[253088].IsCollected)
         end,
         Color = function()
-            local account = ArwicAltManagerDB.Account
-            if not account["Mounts"] then
-                return ErrorColor()
-            end
-            if not account["Mounts"][253088]["IsCollected"] then
+            if not Account().Mounts or not Account().Mounts[253088].IsCollected then
                 return ErrorColor()
             end
             return DefaultColor()
@@ -611,10 +841,10 @@ local fieldFormatters = {
         Order = 600,
         Display = true,
         Value = function()
-            return FormatBool(CurrentAccount()["FieldMedic"])
+            return FormatBool(Account().FieldMedic)
         end,
         Color = function()
-            if not CurrentAccount()["FieldMedic"] then
+            if not Account().FieldMedic then
                 return ErrorColor()
             end
             return DefaultColor()
@@ -625,10 +855,10 @@ local fieldFormatters = {
         Order = 701,
         Display = true,
         Value = function()
-            return FormatBool(CurrentAccount()["ChosenTransmogs"][1])
+            return FormatBool(Account().ChosenTransmogs[1])
         end,
         Color = function()
-            if not CurrentAccount()["ChosenTransmogs"][1] then
+            if not Account().ChosenTransmogs[1] then
                 return ErrorColor()
             end
             return DefaultColor()
@@ -639,10 +869,10 @@ local fieldFormatters = {
         Order = 702,
         Display = true,
         Value = function()
-            return FormatBool(CurrentAccount()["ChosenTransmogs"][2])
+            return FormatBool(Account().ChosenTransmogs[2])
         end,
         Color = function()
-            if not CurrentAccount()["ChosenTransmogs"][2] then
+            if not Account().ChosenTransmogs[2] then
                 return ErrorColor()
             end
             return DefaultColor()
@@ -653,10 +883,10 @@ local fieldFormatters = {
         Order = 703,
         Display = true,
         Value = function()
-            return FormatBool(CurrentAccount()["ChosenTransmogs"][3])
+            return FormatBool(Account().ChosenTransmogs[3])
         end,
         Color = function()
-            if not CurrentAccount()["ChosenTransmogs"][3] then
+            if not Account().ChosenTransmogs[3] then
                 return ErrorColor()
             end
             return DefaultColor()
@@ -667,10 +897,10 @@ local fieldFormatters = {
         Order = 704,
         Display = true,
         Value = function()
-            return FormatBool(CurrentAccount()["ChosenTransmogs"][4])
+            return FormatBool(Account().ChosenTransmogs[4])
         end,
         Color = function()
-            if not CurrentAccount()["ChosenTransmogs"][4] then
+            if not Account().ChosenTransmogs[4] then
                 return ErrorColor()
             end
             return DefaultColor()
@@ -681,10 +911,10 @@ local fieldFormatters = {
         Order = 710,
         Display = true,
         Value = function()
-            return FormatBool(CurrentAccount()["FisherfriendOfTheIsles"])
+            return FormatBool(Account().FisherfriendOfTheIsles)
         end,
         Color = function()
-            if not CurrentAccount()["FisherfriendOfTheIsles"] then
+            if not Account().FisherfriendOfTheIsles then
                 return ErrorColor()
             end
             return DefaultColor()
@@ -881,6 +1111,36 @@ local function BuildGrid()
                             end
                             lbl:SetAllPoints(cellFrame)
                             lbl:SetTextColor(formatter.Color(char))
+                            -- register the label's tooltip
+                            cellFrame:SetScript("OnEnter", function(sender)
+                                GameTooltip:SetOwner(sender, "ANCHOR_RIGHT")
+                                if formatter.Tooltip ~= nil then
+                                    formatter.Tooltip(char)
+                                    --[[local ttLines = formatter.Tooltip(char)
+                                    for k, v in pairs(ttLines) do
+                                        if v.Text ~= nil then
+                                            if v.Color == nil then
+                                                v.Color = { nil, nil, nil, nil }
+                                            end
+                                            GameTooltip:AddLine(v.Text, v.Color[1], v.Color[2], v.Color[3], v.Color[4], true)
+                                        elseif v.TextLeft ~= nil and v.TextRight ~= nil then
+                                            if v.ColorLeft == nil then
+                                                v.ColorLeft = { nil, nil, nil, nil }
+                                            end
+                                            if v.ColorRight == nil then
+                                                v.ColorRight = { nil, nil, nil, nil }
+                                            end
+                                            GameTooltip:AddDoubleLine(v.TextLeft, v.TextRight, 
+                                                v.ColorLeft[1], v.ColorLeft[2], v.ColorLeft[3], 
+                                                v.ColorRight[1], v.ColorRight[2], v.ColorRight[3])
+                                        end
+                                    end
+                                    GameTooltip:Show()]]--
+                                end
+                            end)
+                            cellFrame:SetScript("OnLeave", function(sender)
+                                GameTooltip_Hide()
+                            end)
                             -- keep track of the last itteration
                             lastCellFrame = cellFrame
                         end
