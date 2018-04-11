@@ -76,42 +76,42 @@ end
 local fields = {
     ["Name"] = {
         Update = function()
-            CurrentChar()["Name"] = UnitName("player")
+            CurrentChar().Name = UnitName("player")
         end
     },
     ["Class"] = {
         Update = function()
-            _, CurrentChar()["Class"] = UnitClass("player")
+            _, CurrentChar().Class = UnitClass("player")
         end
     },
     ["Realm"] = {
         Update = function()
-            CurrentChar()["Realm"] = GetRealmName()
+            CurrentChar().Realm = GetRealmName()
         end
     },
     ["Faction"] = {
         Update = function()
-            CurrentChar()["Faction"] = UnitFactionGroup("player")
+            CurrentChar().Faction = UnitFactionGroup("player")
         end
     },
     ["Race"] = {
         Update = function()
-            _, CurrentChar()["Race"] = UnitRace("player")
+            _, CurrentChar().Race = UnitRace("player")
         end
     },
     ["Gender"] = {
         Update = function()
-            CurrentChar()["Gender"] = UnitSex("player")
+            CurrentChar().Gender = UnitSex("player")
         end
     },
     ["Timestamp"] = {
         Update = function()
-            CurrentChar()["Timestamp"] = time()
+            CurrentChar().Timestamp = time()
         end
     },
     ["Money"] = {
         Update = function()
-            CurrentChar()["Money"] = GetMoney()
+            CurrentChar().Money = GetMoney()
         end
     },
     ["ClassCampaign"] = {
@@ -131,13 +131,13 @@ local fields = {
                 ["WARLOCK"] = 43414,
                 ["WARRIOR"] = 43425,
             }
-            CurrentChar()["ClassCampaign"] = IsQuestFlaggedCompleted(quests[class])
+            CurrentChar().ClassCampaign = IsQuestFlaggedCompleted(quests[class])
         end
     },
     ["BreachingTheTomb"] = {
         Update = function()
             _, _, _, _, _, _, _, _, _, _, _, _, 
-            CurrentChar()["BreachingTheTomb"], _ = GetAchievementInfo(11546)
+            CurrentChar().BreachingTheTomb, _ = GetAchievementInfo(11546)
         end
     },
     ["ClassMount"] = {
@@ -157,12 +157,12 @@ local fields = {
                 ["WARLOCK"] = 46243,
                 ["WARRIOR"] = 46207,
             }
-            CurrentChar()["ClassMount"] = IsQuestFlaggedCompleted(quests[class])
+            CurrentChar().ClassMount = IsQuestFlaggedCompleted(quests[class])
         end
     },
     ["Level"] = {
         Update = function()
-            CurrentChar()["Level"] = UnitLevel("player")
+            CurrentChar().Level = UnitLevel("player")
         end
     },
     ["Currencies"] = {
@@ -212,13 +212,13 @@ local fields = {
     ["OrderHallUpgrades"] = {
         Update = function()
             _, _, _, _, _, _, _, _, _, _, _, _, 
-            CurrentChar()["OrderHallUpgrades"], _ = GetAchievementInfo(11223)
+            CurrentChar().OrderHallUpgrades, _ = GetAchievementInfo(11223)
         end
     },
     ["BalanceOfPower"] = {
         Update = function()
             _, _, _, _, _, _, _, _, _, _, _, _, 
-            CurrentChar()["BalanceOfPower"], _ = GetAchievementInfo(10459)
+            CurrentChar().BalanceOfPower, _ = GetAchievementInfo(10459)
         end
     },
     ["Gear"] = {
@@ -273,23 +273,23 @@ local fields = {
     ["Professions"] = {
         Update = function()
             local char = CurrentChar()
-            char["Professions"] = {}
-            char["Professions"]["Prof1"] = {}
-            char["Professions"]["Prof2"] = {}
-            char["Professions"]["Archaeology"] = {}
-            char["Professions"]["Fishing"] = {}
-            char["Professions"]["Cooking"] = {}
-            char["Professions"]["FirstAid"] = {}
-            char["Professions"]["Prof1"]["Index"], 
-            char["Professions"]["Prof2"]["Index"], 
-            char["Professions"]["Archaeology"]["Index"], 
-            char["Professions"]["Fishing"]["Index"],
-            char["Professions"]["Cooking"]["Index"], 
-            char["Professions"]["FirstAid"]["Index"] = GetProfessions()
-            for k, v in pairs(char["Professions"]) do
-                if v["Index"] then
-                    v["Name"], _, v["SkillLevel"], v["MaxSkillLevel"], _, _, v["SkillLine"], 
-                    v["SkillModifier"], v["SpecializationIndex"], _ = GetProfessionInfo(v["Index"])
+            char.Professions = {}
+            char.Professions.Prof1 = {}
+            char.Professions.Prof2 = {}
+            char.Professions.Archaeology = {}
+            char.Professions.Fishing = {}
+            char.Professions.Cooking = {}
+            char.Professions.FirstAid = {}
+            char.Professions.Prof1.Index,
+            char.Professions.Prof2.Index,
+            char.Professions.Archaeology.Index,
+            char.Professions.Fishing.Index,
+            char.Professions.Cooking.Index,
+            char.Professions.FirstAid.Index = GetProfessions()
+            for k, v in pairs(char.Professions) do
+                if v.Index then
+                    v.Name, _, v.SkillLevel, v.MaxSkillLevel, _, _, v.SkillLine, 
+                    v.SkillModifier, v.SpecializationIndex, _ = GetProfessionInfo(v.Index)
                 end
             end
         end
@@ -306,9 +306,9 @@ local fields = {
                 45863,
             }
             local char = CurrentChar()
-            char["MageTowerPrereq"] = {}
+            char.MageTowerPrereq = {}
             for k, v in pairs(quests) do
-                char["MageTowerPrereq"][v] = IsQuestFlaggedCompleted(v)
+                char.MageTowerPrereq[v] = IsQuestFlaggedCompleted(v)
             end
         end
     },
@@ -324,54 +324,54 @@ local fields = {
                 46127, -- Thwarting the Twins
             }
             local char = CurrentChar()
-            char["MageTower"] = {}
+            char.MageTower = {}
             for k, v in pairs(quests) do
-                char["MageTower"][v] = IsQuestFlaggedCompleted(v)
+                char.MageTower[v] = IsQuestFlaggedCompleted(v)
             end
         end
     },
     ["Followers"] = {
         Update = function()
-            CurrentChar()["Followers"] = C_Garrison.GetFollowers()
+            CurrentChar().Followers = C_Garrison.GetFollowers()
         end
     },
     ["TimePlayed"] = {
         Update = function()
             local char = CurrentChar()
-            if not char["TimePlayed"] then
-                char["TimePlayed"] = {}
+            if not char.TimePlayed then
+                char.TimePlayed = {}
             end
         end,
         SpecialUpdate = function(total, thisLevel)
             local char = CurrentChar()
-            char["TimePlayed"] = {}
-            char["TimePlayed"]["Total"] = total
-            char["TimePlayed"]["Level"] = thisLevel
+            char.TimePlayed = {}
+            char.TimePlayed.Total = total
+            char.TimePlayed.Level = thisLevel
         end
     },
     ["Artifacts"] = {
         Update = function()
             local char = CurrentChar()
-            if not char["Artifacts"] then 
-                char["Artifacts"] = {} 
+            if not char.Artifacts then 
+                char.Artifacts = {} 
             end
         end,
         SpecialUpdate = function()
             local char = CurrentChar()
-            if not char["Artifacts"] then 
-                char["Artifacts"] = {} 
+            if not char.Artifacts then 
+                char.Artifacts = {} 
             end
             local id, _, name, _, power, ranks, _, _, _, _, _, _ = C_ArtifactUI.GetArtifactInfo()
-            char["Artifacts"][id] = {}
-            char["Artifacts"][id]["Name"] = name
-            char["Artifacts"][id]["Power"] = power
-            char["Artifacts"][id]["Ranks"] = ranks
+            char.Artifacts[id] = {}
+            char.Artifacts[id].Name = name
+            char.Artifacts[id].Power = power
+            char.Artifacts[id].Ranks = ranks
         end
     },
     ["Mounts"] = {
         Update = function()
             local account = CurrentAccount()
-            account["Mounts"] = {}
+            account.Mounts = {}
             local mountSpellIDs = {
                 253639, -- violet spellwing
                 243651, -- shackled urzul
@@ -386,32 +386,32 @@ local fields = {
                 for _, sid in pairs(mountSpellIDs) do
                     local creatureName, spellID, _, _, _, _, _, _, _, _, isCollected = C_MountJournal.GetMountInfoByID(mid)
                     if sid == spellID then
-                        account["Mounts"][sid] = {}
-                        account["Mounts"][sid]["Name"] = creatureName
-                        account["Mounts"][sid]["IsCollected"] = isCollected
+                        account.Mounts[sid] = {}
+                        account.Mounts[sid].Name = creatureName
+                        account.Mounts[sid].IsCollected = isCollected
                     end
                 end
             end
             -- populate data for mounts we cannot see
             for _, sid in pairs(mountSpellIDs) do
-                if account["Mounts"][sid] == nil then
-                    account["Mounts"][sid] = {}
-                    account["Mounts"][sid]["Name"] = "Unknown"
-                    account["Mounts"][sid]["IsCollected"] = isCollected
-                    account["Mounts"][sid]["IsCollected"] = false
+                if account.Mounts[sid] == nil then
+                    account.Mounts[sid] = {}
+                    account.Mounts[sid].Name = "Unknown"
+                    account.Mounts[sid].IsCollected = isCollected
+                    account.Mounts[sid].IsCollected = false
                 end
             end
         end,
     },
     ["FieldMedic"] = {
         Update = function()
-            _, _, _, CurrentAccount()["FieldMedic"] = GetAchievementInfo(11139)
+            _, _, _, CurrentAccount().FieldMedic = GetAchievementInfo(11139)
         end,
     },
     ["KeystoneMaster"] = {
         Update = function()
             _, _, _, _, _, _, _, _, _, _, _, _, 
-            CurrentChar()["KeystoneMaster"], _ = GetAchievementInfo(11162)
+            CurrentChar().KeystoneMaster, _ = GetAchievementInfo(11162)
         end,
     },
     ["ChosenTransmogs"] = {
@@ -421,17 +421,25 @@ local fields = {
             local _, englishClass, _ = UnitClass("player")
             local armorClass = GetArmorClass(englishClass)
             local account = CurrentAccount()
-            if not account["ChosenTransmogs"] then
-                account["ChosenTransmogs"] = {}
+            if not account.ChosenTransmogs then
+                account.ChosenTransmogs = {}
             end
-            account["ChosenTransmogs"][armorClass] = wasEarnedByMe or account["ChosenTransmogs"][armorClass]
+            account.ChosenTransmogs[armorClass] = wasEarnedByMe or account.ChosenTransmogs[armorClass]
         end,
     },
     ["FisherfriendOfTheIsles"] = {
         Update = function()
-            _, _, _, CurrentAccount()["FisherfriendOfTheIsles"] = GetAchievementInfo(11725)
+            _, _, _, CurrentAccount().FisherfriendOfTheIsles = GetAchievementInfo(11725)
         end,
     },
+    ["Guild"] = {
+        Update = function()
+            
+        end,
+        SpecialUpdate = function()
+            CurrentChar().GuildName = GetGuildInfo("player")
+        end,
+    }
 }
 
 function ARWIC_AAM_UpdateData()
@@ -456,6 +464,14 @@ end
 
 function events:PLAYER_STARTED_MOVING(...)
     ARWIC_AAM_UpdateData()
+end
+
+function events:PLAYER_GUILD_UPDATE(...)
+    fields["Guild"].SpecialUpdate()
+end
+
+function events:GUILD_ROSTER_UPDATE(...)
+    fields["Guild"].SpecialUpdate()
 end
 
 local function RegisterEvents()

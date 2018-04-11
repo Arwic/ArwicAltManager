@@ -673,7 +673,7 @@ local fieldFormatters = {
         Display = true,
         Tooltip = function(char)
             if char.Gear.AvgItemLevelBags ~= nil then
-                GameTooltip:AddLine("Equipped Gear", TooltipHeaderColor())
+                GameTooltip:AddLine(format("Item Level %d (Equipped %d)", char.Gear.AvgItemLevelBags, char.Gear.AvgItemLevelEquipped), TooltipHeaderColor())
                 for k, v in pairs(char.Gear.Items) do
                     GameTooltip:AddDoubleLine(_G[v.EquipLoc], format("%s (%d) |T%s:0|t", v.Name, v.ItemLevel, v.Texture), 
                                                 nil, nil, nil, GetItemQualityColor(v.Rarity))
@@ -685,12 +685,26 @@ local fieldFormatters = {
             if char.Gear.AvgItemLevelBags == nil then
                 return "?"
             end
-            return format("%.1f / %.1f", char.Gear.AvgItemLevelEquipped, char.Gear.AvgItemLevelBags)
+            return format("%.0f / %.0f", char.Gear.AvgItemLevelEquipped, char.Gear.AvgItemLevelBags)
         end,
         Color = function(char)
             if char.Gear.AvgItemLevelBags == nil then
                 return ErrorColor()
             end
+            return DefaultColor()
+        end,
+    },
+    ["GuildName"] = {
+        Label = "Guild",
+        Order = 22,
+        Display = true,
+        Tooltip = function(char)
+            
+        end,
+        Value = function(char)
+            return char.GuildName
+        end,
+        Color = function(char)
             return DefaultColor()
         end,
     },
