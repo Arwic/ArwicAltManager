@@ -330,9 +330,40 @@ local fields = {
             end
         end
     },
+    ["Orderhall"] = {
+        Update = function()
+            local missions = C_Garrison.GetAvailableMissions(LE_FOLLOWER_TYPE_GARRISON_7_0)
+            CurrentChar().Missions = missions
+        end     
+    },
     ["Followers"] = {
         Update = function()
-            CurrentChar().Followers = C_Garrison.GetFollowers()
+            CurrentChar().Followers = {}
+            for _, v in pairs(C_Garrison.GetFollowers(LE_FOLLOWER_TYPE_GARRISON_7_0)) do
+                if not v.isTroop and v.isCollected then
+                    local follower = {}
+                    follower.ItemLevel = v.iLevel
+                    follower.Level = v.Level
+                    follower.Quality = v.quality
+                    follower.PortraitIconID = v.portraitIconID
+                    follower.SoundKitID = v.slotSoundKitID
+                    follower.XP = v.xp
+                    follower.ClassName = v.className
+                    follower.ClassSpec = v.classSpec
+                    follower.IsMaxLevel = v.IsMaxLevel
+                    follower.Name = v.name
+                    follower.GUID = v.followerID
+                    follower.GarrisonFollowerID = v.garrFollowerID
+                    follower.Equipment = {}
+                    follower.Equipment[1] = {}
+                    follower.Equipment[1].ID = C_Garrison.GetFollowerTraitAtIndex(follower.GUID, 1)
+                    follower.Equipment[2] = {}
+                    follower.Equipment[2].ID = C_Garrison.GetFollowerTraitAtIndex(follower.GUID, 2)
+                    follower.Equipment[3] = {}
+                    follower.Equipment[3].ID = C_Garrison.GetFollowerTraitAtIndex(follower.GUID, 3)
+                    table.insert(CurrentChar().Followers, follower)
+                end
+            end
         end
     },
     ["TimePlayed"] = {

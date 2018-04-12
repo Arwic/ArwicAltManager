@@ -225,6 +225,36 @@ local function TooltipHeaderColor()
     return 1, 1, 1
 end
 
+local function ChampionEquipmentNames(c)
+    return ARWIC_ChampionEquipment[c.Equipment[1].ID].Name,
+        ARWIC_ChampionEquipment[c.Equipment[2].ID].Name,
+        ARWIC_ChampionEquipment[c.Equipment[3].ID].Name
+end
+
+local function ChampionQualityName(qID)
+    local qualityNames = {
+        [1] = "Common",
+        [2] = "Common",
+        [3] = "Uncommon",
+        [4] = "Rare",
+        [5] = "Epic",
+        [6] = "Titled",
+    }
+    return qualityNames[qID]
+end
+
+local function ChampionQualityColor(qID)
+    local qualityColors = {
+        [1] = "ffffffff",
+        [2] = "ffffffff",
+        [3] = "ff1eff00",
+        [4] = "ff0070dd",
+        [5] = "ffa335ee",
+        [6] = "ffe6cc80",
+    }
+    return qualityColors[qID]
+end
+
 local function SuccessColor()
     return 0.0, 1.0, 0.0
 end
@@ -675,8 +705,7 @@ local fieldFormatters = {
             if char.Gear.AvgItemLevelBags ~= nil then
                 GameTooltip:AddLine(format("Item Level %d (Equipped %d)", char.Gear.AvgItemLevelBags, char.Gear.AvgItemLevelEquipped), TooltipHeaderColor())
                 for k, v in pairs(char.Gear.Items) do
-                    GameTooltip:AddDoubleLine(_G[v.EquipLoc], format("%s (%d) |T%s:0|t", v.Name, v.ItemLevel, v.Texture), 
-                                                nil, nil, nil, GetItemQualityColor(v.Rarity))
+                    GameTooltip:AddDoubleLine(format("|T%s:24|t (%d) %s", v.Texture, v.ItemLevel, v.Name), _G[v.EquipLoc], GetItemQualityColor(v.Rarity))
                 end
                 GameTooltip:Show()
             end
@@ -696,13 +725,54 @@ local fieldFormatters = {
     },
     ["GuildName"] = {
         Label = "Guild",
-        Order = 22,
+        Order = 23,
         Display = true,
         Tooltip = function(char)
             
         end,
         Value = function(char)
             return char.GuildName
+        end,
+        Color = function(char)
+            return DefaultColor()
+        end,
+    },
+    ["Champions"] = {
+        Label = "Orderhall Champions",
+        Order = 22,
+        Display = true,
+        Tooltip = function(char)
+            GameTooltip:AddLine("Orderhall Champions", TooltipHeaderColor())
+            for k, v in pairs(char.Followers) do
+                -- get equipment links
+                local n1 = C_Garrison.GetFollowerAbilityLink(v.Equipment[1].ID)
+                local n2 = C_Garrison.GetFollowerAbilityLink(v.Equipment[2].ID)
+                local n3 = C_Garrison.GetFollowerAbilityLink(v.Equipment[3].ID)
+                -- lock slots if the champ quality is too low
+                if v.Quality < 5 then n3 = "|cff9d9d9d[Locked]|r" end
+                if v.Quality < 4 then n2 = "|cff9d9d9d[Locked]|r" end
+                if v.Quality < 3 then n1 = "|cff9d9d9d[Locked]|r" end
+                 -- shorten empty slot links
+                if v.Equipment[1].ID == 415 or v.Equipment[1].ID == 855 or v.Equipment[1].ID == 414 then
+                    n1 = "|cffff0000[Empty]|r"
+                end
+                if v.Equipment[2].ID == 415 or v.Equipment[2].ID == 855 or v.Equipment[2].ID == 414 then
+                    n2 = "|cffff0000[Empty]|r"
+                end
+                if v.Equipment[3].ID == 415 or v.Equipment[3].ID == 855 or v.Equipment[3].ID == 414 then
+                    n3 = "|cffff0000[Empty]|r"
+                end
+                -- add lines to the tooltip                
+                GameTooltip:AddLine(format("|T%s:24|t |c%s%s|r", v.PortraitIconID, ChampionQualityColor(v.Quality), v.Name))
+                GameTooltip:AddLine(format("       iLvl %d %s", v.ItemLevel, v.ClassName))
+                GameTooltip:AddLine(format("       %s", n1))
+                GameTooltip:AddLine(format("       %s", n2))
+                GameTooltip:AddLine(format("       %s", n3))
+            end
+            GameTooltip:Show()
+        end,
+        Value = function(char)
+            return "View Champions"
         end,
         Color = function(char)
             return DefaultColor()
@@ -1185,19 +1255,22 @@ end
 
 -- loads display and order of field formatters from file
 local function InitFormatters()
-    if ArwicAltManagerDB.Config.FieldFormatters then
-        local configFF = ArwicAltManagerDB.Config.FieldFormatters
-        for k, v in pairs(configFF) do
-            fieldFormatters[k].Display = v.Display
-            fieldFormatters[k].Order = tonumber(v.Order)
-        end
-    else
+    -- create the config table is needed
+    if ArwicAltManagerDB.Config.FieldFormatters == nil then
         ArwicAltManagerDB.Config.FieldFormatters = {}
-        local configFF = ArwicAltManagerDB.Config.FieldFormatters
-        for k, v in pairs(fieldFormatters) do
-            configFF[k] = {}
-            configFF[k].Display = v.Display
-            configFF[k].Order = tonumber(v.Order)
+    end
+    -- load the config table or set it to defaults
+    for k, v in pairs(fieldFormatters) do
+        -- check if the field exists
+        if ArwicAltManagerDB.Config.FieldFormatters[k] == nil then
+            -- it doesnt so copy defaults to the config
+            ArwicAltManagerDB.Config.FieldFormatters[k] = {}
+            ArwicAltManagerDB.Config.FieldFormatters[k].Display = v.Display
+            ArwicAltManagerDB.Config.FieldFormatters[k].Order = tonumber(v.Order)
+        else
+            -- it does so copy config to the formatter
+            v.Display = ArwicAltManagerDB.Config.FieldFormatters[k].Display
+            v.Order = tonumber(ArwicAltManagerDB.Config.FieldFormatters[k].Order)
         end
     end
 end
