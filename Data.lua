@@ -493,10 +493,6 @@ function events:TIME_PLAYED_MSG(...)
     fields["TimePlayed"].SpecialUpdate(total, thisLevel)
 end
 
-function events:PLAYER_STARTED_MOVING(...)
-    ARWIC_AAM_UpdateData()
-end
-
 function events:PLAYER_GUILD_UPDATE(...)
     fields["Guild"].SpecialUpdate()
 end
@@ -513,6 +509,10 @@ local function RegisterEvents()
     for k, v in pairs(events) do
         eventFrame:RegisterEvent(k)
     end
+
+    hooksecurefunc("ToggleGameMenu", ARWIC_AAM_UpdateData)
+    hooksecurefunc("Logout", ARWIC_AAM_UpdateData)
+    hooksecurefunc("Quit", ARWIC_AAM_UpdateData)
 end
 
 RegisterEvents()
