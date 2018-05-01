@@ -48,7 +48,7 @@ local function GetMageTowerPrereqIDs(class)
     if class == "DEATHKNIGHT" then
         return {
             ["Frost"] = 45865, -- Closing the Eye
-            ["Unholy"] = 46065, -- An Impossible Foe
+            ["Unholy"] = 45861, -- An Impossible Foe
             ["Blood"] = 45863, -- The Highlord's Return
         }
     elseif class == "DEMONHUNTER" then
@@ -60,8 +60,8 @@ local function GetMageTowerPrereqIDs(class)
         return {
             ["Balance"] = 45866, -- Thwarting the Twins
             ["Guardian"] = 45863, -- The Highlord's Return
-            ["Feral"] = 46065, -- An Impossible Foe
-            ["Restoration"] = 46035, -- End of the Risen Threat
+            ["Feral"] = 45861, -- An Impossible Foe
+            ["Restoration"] = 45864, -- End of the Risen Threat
         }
     elseif class == "HUNTER" then
         return {
@@ -71,39 +71,39 @@ local function GetMageTowerPrereqIDs(class)
         }
     elseif class == "MAGE" then
         return {
-            ["Fire"] = 46065, -- An Impossible Foe
+            ["Fire"] = 45861, -- An Impossible Foe
             ["Frost"] = 45866, -- Thwarting the Twins
             ["Arcane"] = 45862, -- The God-Queen's Fury
         }
     elseif class == "MONK" then
         return {
             ["Windwalker"] = 45842, -- Feltotem's Fall
-            ["Mistweaver"] = 46035, -- End of the Risen Threat
+            ["Mistweaver"] = 45864, -- End of the Risen Threat
             ["Brewmaster"] = 45863, -- The Highlord's Return
         }
     elseif class == "PALADIN" then
         return {
             ["Retribution"] = 45862, -- The God-Queen's Fury
-            ["Holy"] = 46035, -- End of the Risen Threat
+            ["Holy"] = 45864, -- End of the Risen Threat
             ["Protection"] = 45863, -- The Highlord's Return
         }
     elseif class == "PRIEST" then
         return {
             ["Shadow"] = 45866, -- Thwarting the Twins
-            ["Holy"] = 46035, -- End of the Risen Threat
+            ["Holy"] = 45864, -- End of the Risen Threat
             ["Discipline"] = 45842, -- Feltotem's Fall
         }
     elseif class == "ROGUE" then
         return {
             ["Assassination"] = 45862, -- The God-Queen's Fury
-            ["Outlaw"] = 46065, -- An Impossible Foe
+            ["Outlaw"] = 45861, -- An Impossible Foe
             ["Subtlety"] = 45865, -- Closing the Eye
         }
     elseif class == "SHAMAN" then
         return {
             ["Enhancement"] = 45862, -- The God-Queen's Fury
-            ["Elemental"] = 46065, -- An Impossible Foe
-            ["Restoration"] = 46035, -- End of the Risen Threat
+            ["Elemental"] = 45861, -- An Impossible Foe
+            ["Restoration"] = 45864, -- End of the Risen Threat
         }
     elseif class == "WARLOCK" then
         return {
@@ -114,7 +114,7 @@ local function GetMageTowerPrereqIDs(class)
     elseif class == "WARRIOR" then
         return {
             ["Arms"] = 45865, -- Closing the Eye
-            ["Fury"] = 46065, -- An Impossible Foe
+            ["Fury"] = 45861, -- An Impossible Foe
             ["Protection"] = 45863, -- The Highlord's Return
         }
     end
