@@ -702,7 +702,10 @@ local fieldFormatters = {
         Order = 21,
         Display = true,
         Tooltip = function(char)
-            if char.Gear.AvgItemLevelBags ~= nil then
+            if char.Gear == nil or char.Gear.Items == nil or char.Gear.AvgItemLevelBags == nil then
+                GameTooltip:AddLine("No Gear Data")
+                GameTooltip:Show()
+            else
                 GameTooltip:AddLine(format("Item Level %d (Equipped %d)", char.Gear.AvgItemLevelBags, char.Gear.AvgItemLevelEquipped), TooltipHeaderColor())
                 for k, v in pairs(char.Gear.Items) do
                     GameTooltip:AddDoubleLine(format("|T%s:24|t (%d) %s", v.Texture, v.ItemLevel, v.Name), _G[v.EquipLoc], GetItemQualityColor(v.Rarity))
@@ -742,34 +745,39 @@ local fieldFormatters = {
         Order = 22,
         Display = true,
         Tooltip = function(char)
-            GameTooltip:AddLine("Orderhall Champions", TooltipHeaderColor())
-            for k, v in pairs(char.Followers) do
-                -- get equipment links
-                local n1 = C_Garrison.GetFollowerAbilityLink(v.Equipment[1].ID)
-                local n2 = C_Garrison.GetFollowerAbilityLink(v.Equipment[2].ID)
-                local n3 = C_Garrison.GetFollowerAbilityLink(v.Equipment[3].ID)
-                -- lock slots if the champ quality is too low
-                if v.Quality < 5 then n3 = "|cff9d9d9d[Locked]|r" end
-                if v.Quality < 4 then n2 = "|cff9d9d9d[Locked]|r" end
-                if v.Quality < 3 then n1 = "|cff9d9d9d[Locked]|r" end
-                 -- shorten empty slot links
-                if v.Equipment[1].ID == 415 or v.Equipment[1].ID == 855 or v.Equipment[1].ID == 414 then
-                    n1 = "|cffff0000[Empty]|r"
+            if char.Followers == nil then
+                GameTooltip:AddLine("No Champion Data", ErrorColor())
+                GameTooltip:Show()
+            else
+                GameTooltip:AddLine("Orderhall Champions", TooltipHeaderColor())
+                for k, v in pairs(char.Followers) do
+                    -- get equipment links
+                    local n1 = C_Garrison.GetFollowerAbilityLink(v.Equipment[1].ID)
+                    local n2 = C_Garrison.GetFollowerAbilityLink(v.Equipment[2].ID)
+                    local n3 = C_Garrison.GetFollowerAbilityLink(v.Equipment[3].ID)
+                    -- lock slots if the champ quality is too low
+                    if v.Quality < 5 then n3 = "|cff9d9d9d[Locked]|r" end
+                    if v.Quality < 4 then n2 = "|cff9d9d9d[Locked]|r" end
+                    if v.Quality < 3 then n1 = "|cff9d9d9d[Locked]|r" end
+                    -- shorten empty slot links
+                    if v.Equipment[1].ID == 415 or v.Equipment[1].ID == 855 or v.Equipment[1].ID == 414 then
+                        n1 = "|cffff0000[Empty]|r"
+                    end
+                    if v.Equipment[2].ID == 415 or v.Equipment[2].ID == 855 or v.Equipment[2].ID == 414 then
+                        n2 = "|cffff0000[Empty]|r"
+                    end
+                    if v.Equipment[3].ID == 415 or v.Equipment[3].ID == 855 or v.Equipment[3].ID == 414 then
+                        n3 = "|cffff0000[Empty]|r"
+                    end
+                    -- add lines to the tooltip                
+                    GameTooltip:AddLine(format("|T%s:24|t |c%s%s|r", v.PortraitIconID, ChampionQualityColor(v.Quality), v.Name))
+                    GameTooltip:AddLine(format("       iLvl %d %s", v.ItemLevel, v.ClassName))
+                    GameTooltip:AddLine(format("       %s", n1))
+                    GameTooltip:AddLine(format("       %s", n2))
+                    GameTooltip:AddLine(format("       %s", n3))
                 end
-                if v.Equipment[2].ID == 415 or v.Equipment[2].ID == 855 or v.Equipment[2].ID == 414 then
-                    n2 = "|cffff0000[Empty]|r"
-                end
-                if v.Equipment[3].ID == 415 or v.Equipment[3].ID == 855 or v.Equipment[3].ID == 414 then
-                    n3 = "|cffff0000[Empty]|r"
-                end
-                -- add lines to the tooltip                
-                GameTooltip:AddLine(format("|T%s:24|t |c%s%s|r", v.PortraitIconID, ChampionQualityColor(v.Quality), v.Name))
-                GameTooltip:AddLine(format("       iLvl %d %s", v.ItemLevel, v.ClassName))
-                GameTooltip:AddLine(format("       %s", n1))
-                GameTooltip:AddLine(format("       %s", n2))
-                GameTooltip:AddLine(format("       %s", n3))
+                GameTooltip:Show()
             end
-            GameTooltip:Show()
         end,
         Value = function(char)
             return "View Champions"
