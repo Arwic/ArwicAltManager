@@ -1208,26 +1208,6 @@ local function BuildGrid()
                                 GameTooltip:SetOwner(sender, "ANCHOR_RIGHT")
                                 if formatter.Tooltip ~= nil then
                                     formatter.Tooltip(char)
-                                    --[[local ttLines = formatter.Tooltip(char)
-                                    for k, v in pairs(ttLines) do
-                                        if v.Text ~= nil then
-                                            if v.Color == nil then
-                                                v.Color = { nil, nil, nil, nil }
-                                            end
-                                            GameTooltip:AddLine(v.Text, v.Color[1], v.Color[2], v.Color[3], v.Color[4], true)
-                                        elseif v.TextLeft ~= nil and v.TextRight ~= nil then
-                                            if v.ColorLeft == nil then
-                                                v.ColorLeft = { nil, nil, nil, nil }
-                                            end
-                                            if v.ColorRight == nil then
-                                                v.ColorRight = { nil, nil, nil, nil }
-                                            end
-                                            GameTooltip:AddDoubleLine(v.TextLeft, v.TextRight, 
-                                                v.ColorLeft[1], v.ColorLeft[2], v.ColorLeft[3], 
-                                                v.ColorRight[1], v.ColorRight[2], v.ColorRight[3])
-                                        end
-                                    end
-                                    GameTooltip:Show()]]--
                                 end
                             end)
                             cellFrame:SetScript("OnLeave", function(sender)
@@ -1381,6 +1361,7 @@ SlashCmdList["AAM"] = function(msg)
             print("AAM: Unable to find realm: " .. realmName)
         end
     else
+        ARWIC_AAM_UpdateData()
         if ARWIC_AAM_mainFrame then
             ARWIC_AAM_Toggle()
         else
