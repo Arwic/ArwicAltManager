@@ -1,6 +1,6 @@
-## Interface: 70300
+## Interface: 80000
 ## Title: Arwic Alt Manager
-## Version: v0.0.10
+## Version: v0.1.10
 ## Author: Arwic@Frostmourne-US
 ## Notes: Simple alt manager for completionists
 ## SavedVariables: ArwicAltManagerDB
