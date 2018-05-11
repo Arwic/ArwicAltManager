@@ -4,13 +4,14 @@ local events = {}
 function ArwicAltManager.InitDB()
     -- check the saved data version
     local REQ_CONFIG_VERSION = tonumber(GetAddOnMetadata("ArwicAltManager", "X-SavedVariablesVersion"))
+    if REQ_CONFIG_VERSION == nil then REQ_CONFIG_VERSION = 1 end
     if ArwicAltManagerDB ~= nil then
         if ArwicAltManagerDB.Version == nil then
-            ArwicAltManagerDB.Version = 0
+            ArwicAltManagerDB.Version = 1
         end
         if ArwicAltManagerDB.Version < REQ_CONFIG_VERSION then
             print(format("ArwicAltManager: Your saved data is incompatible with the current version of AAM and has been reset. (You: v%d, Current: v%d)", ArwicAltManagerDB.Version, REQ_CONFIG_VERSION))
-            ArwicAltManagerDB = nil
+            --ArwicAltManagerDB = nil
         end
     end
 

@@ -342,17 +342,31 @@ ArwicAltManager.Fields.Character = {
         Order = 121,
         Display = true,
         Tooltip = function(char)
-            GameTooltip:SetHyperlink(char.BreachingTheTomb.Link)
-            GameTooltip:Show()
+            if char.BreachingTheTomb and type(char.BreachingTheTomb) ~= "boolean" then
+                GameTooltip:SetHyperlink(char.BreachingTheTomb.Link)
+                GameTooltip:Show()
+            end
         end,
         Value = function(char)
+            if not char.BreachingTheTomb then
+                return "?"
+            end
+            if type(char.BreachingTheTomb) == "boolean" then
+                return AAM.FormatBool(char.BreachingTheTomb)
+            end
             return AAM.FormatBool(char.BreachingTheTomb.Completed)
         end,
         Color = function(char)
-            if not char.BreachingTheTomb.Completed then
+            if not char.BreachingTheTomb then
                 return AAM.ErrorColor()
             end
-            return AAM.DefaultColor()
+            if type(char.BreachingTheTomb) == "boolean" and char.BreachingTheTomb then
+                return AAM.DefaultColor()
+            end
+            if char.BreachingTheTomb.Completed then
+                return AAM.DefaultColor()
+            end
+            return AAM.ErrorColor()
         end,
         Update = function()
             CurrentChar().BreachingTheTomb = {}
@@ -1001,6 +1015,9 @@ ArwicAltManager.Fields.Character = {
         Tooltip = function(char)
         end,
         Value = function(char)
+            if char.Title == nil then
+                return "?"
+            end
             return GetTitleName(char.Title)
         end,
         Color = function(char)
