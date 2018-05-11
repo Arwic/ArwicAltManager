@@ -1,38 +1,5 @@
 local dataLabels = {}
-local realmFrames = {}
-local charFrames = {}
 local events = {}
-local ElvUI_E, ElvUI_L, ElvUI_V, ElvUI_P, ElvUI_G, ElvUI_S
-local allRealmGroups = {}
-local allCharCols = {}
-
-function table.len(t)
-    local count = 0
-    for k, v in pairs(t) do
-        count = count + 1
-    end
-    return count
-end
-
-function table.containskey(t, k)
-    for tk, _ in pairs(t) do
-        if tk == k then
-            return true
-        end
-    end
-end
-
-function table.containsval(t, v)
-    for _, tv in pairs(t) do
-        if tv == v then
-            return true
-        end
-    end
-end
-
-function string.starts(s, v)
-   return string.sub(s, 1, string.len(v)) == v
-end
 
 local function Config()
     return ArwicAltManagerDB.Config
@@ -786,256 +753,7 @@ local fieldFormatters = {
             return DefaultColor()
         end,
     },
-
-    --------------------------------------------------------------------
-    --------------------------------------------------------------------
-    --------------------------------------------------------------------
-    --------------------------------------------------------------------
-    --------------------- TEMP ACCOUNT WIDE DATA -----------------------
-    --------------------------------------------------------------------
-    --------------------------------------------------------------------
-    --------------------------------------------------------------------
-    --------------------------------------------------------------------
-    ["Mount_VioletSpellwing"] = {
-        Label = "Violet Spellwing",
-        Order = 500,
-        Display = true,
-        Tooltip = function(char)
-            GameTooltip:AddLine("Violet Spellwing", TooltipHeaderColor())
-            GameTooltip:AddLine("Obtained by defeating Argus the Unmaker on Heroic difficulty or higher in Antorus, the Burning Throne.")
-            GameTooltip:Show()
-        end,
-        Value = function()
-            if not Account().Mounts then
-                return "?"
-            end
-            return FormatBool(Account().Mounts[253639].IsCollected)
-        end,
-        Color = function()
-            if not Account().Mounts or not Account().Mounts[253639].IsCollected then
-                return ErrorColor()
-            end
-            return DefaultColor()
-        end,
-    },
-    ["Mount_ShackledUrzul"] = {
-        Label = "Shackled Urzul",
-        Order = 510,
-        Display = true,
-        Tooltip = function(char)
-            GameTooltip:AddLine("Shackled Urzul", TooltipHeaderColor())
-            GameTooltip:AddLine("Obtained by defeating Argus the Unmaker on Mythic difficulty in Antorus, the Burning Throne.")
-            GameTooltip:Show()
-        end,
-        Value = function()
-            if not Account().Mounts then
-                return "?"
-            end
-            return FormatBool(Account().Mounts[243651].IsCollected)
-        end,
-        Color = function()
-            if not Account().Mounts or not Account().Mounts[243651].IsCollected then
-                return ErrorColor()
-            end
-            return DefaultColor()
-        end,
-    },
-    ["Mount_HellfireInfernal"] = {
-        Label = "Hellfire Infernal",
-        Order = 520,
-        Display = true,
-        Tooltip = function(char)
-            GameTooltip:AddLine("Hellfire Infernal", TooltipHeaderColor())
-            GameTooltip:AddLine("Obtained by defeating Gul'dan on Mythic difficulty in the Nighthold.")
-            GameTooltip:Show()
-        end,
-        Value = function()
-            if not Account().Mounts then
-                return "?"
-            end
-            return FormatBool(Account().Mounts[171827].IsCollected)
-        end,
-        Color = function()
-            if not Account().Mounts or not Account().Mounts[171827].IsCollected then
-                return ErrorColor()
-            end
-            return DefaultColor()
-        end,
-    },
-    ["Mount_FelblazeInfernal"] = {
-        Label = "Felblaze Infernal",
-        Order = 520,
-        Display = true,
-        Tooltip = function(char)
-            GameTooltip:AddLine("Felblaze Infernal", TooltipHeaderColor())
-            GameTooltip:AddLine("Obtained by defeating Gul'dan on Normal difficulty or higher in the Nighthold.")
-            GameTooltip:Show()
-        end,
-        Value = function()
-            if not Account().Mounts then
-                return "?"
-            end
-            return FormatBool(Account().Mounts[213134].IsCollected)
-        end,
-        Color = function()
-            if not Account().Mounts or not Account().Mounts[213134].IsCollected then
-                return ErrorColor()
-            end
-            return DefaultColor()
-        end,
-    },
-    ["Mount_AbyssWorm"] = {
-        Label = "Abyss Worm",
-        Order = 520,
-        Display = true,
-        Tooltip = function(char)
-            GameTooltip:AddLine("Abyss Worm", TooltipHeaderColor())
-            GameTooltip:AddLine("Obtained by defeating Mistress Sassz'ine on Raid Finder difficulty or higher in the Tomb of Sargeras.")
-            GameTooltip:Show()
-        end,
-        Value = function()
-            if not Account().Mounts then
-                return "?"
-            end
-            return FormatBool(Account().Mounts[232519].IsCollected)
-        end,
-        Color = function()
-            if not Account().Mounts or not Account().Mounts[232519].IsCollected then
-                return ErrorColor()
-            end
-            return DefaultColor()
-        end,
-    },
-    ["Mount_AntoranCharhound"] = {
-        Label = "Antoran Charhound",
-        Order = 520,
-        Display = true,
-        Tooltip = function(char)
-            GameTooltip:AddLine("Antoran Charhound", TooltipHeaderColor())
-            GameTooltip:AddLine("Obtained by defeating Felhounds of Sargeras on Raid Finder difficulty or higher in Antorus, the Burning Throne.")
-            GameTooltip:Show()
-        end,
-        Value = function()
-            if not Account().Mounts then
-                return "?"
-            end
-            return FormatBool(Account().Mounts[253088].IsCollected)
-        end,
-        Color = function()
-            if not Account().Mounts or not Account().Mounts[253088].IsCollected then
-                return ErrorColor()
-            end
-            return DefaultColor()
-        end,
-    },
-    ["FieldMedic"] = {
-        Label = "Field Medic",
-        Order = 600,
-        Display = true,
-        Value = function()
-            return FormatBool(Account().FieldMedic)
-        end,
-        Color = function()
-            if not Account().FieldMedic then
-                return ErrorColor()
-            end
-            return DefaultColor()
-        end,
-    },
-    ["ChosenTransmogs_Cloth"] = {
-        Label = "Chosen Cloth",
-        Order = 701,
-        Display = true,
-        Value = function()
-            return FormatBool(Account().ChosenTransmogs[1])
-        end,
-        Color = function()
-            if not Account().ChosenTransmogs[1] then
-                return ErrorColor()
-            end
-            return DefaultColor()
-        end,
-    },
-    ["ChosenTransmogs_Leather"] = {
-        Label = "Chosen Leather",
-        Order = 702,
-        Display = true,
-        Value = function()
-            return FormatBool(Account().ChosenTransmogs[2])
-        end,
-        Color = function()
-            if not Account().ChosenTransmogs[2] then
-                return ErrorColor()
-            end
-            return DefaultColor()
-        end,
-    },
-    ["ChosenTransmogs_Mail"] = {
-        Label = "Chosen Mail",
-        Order = 703,
-        Display = true,
-        Value = function()
-            return FormatBool(Account().ChosenTransmogs[3])
-        end,
-        Color = function()
-            if not Account().ChosenTransmogs[3] then
-                return ErrorColor()
-            end
-            return DefaultColor()
-        end,
-    },
-    ["ChosenTransmogs_Plate"] = {
-        Label = "Chosen Plate",
-        Order = 704,
-        Display = true,
-        Value = function()
-            return FormatBool(Account().ChosenTransmogs[4])
-        end,
-        Color = function()
-            if not Account().ChosenTransmogs[4] then
-                return ErrorColor()
-            end
-            return DefaultColor()
-        end,
-    },
-    ["FisherfriendOfTheIsles"] = {
-        Label = "Fisherfriend of the Isles",
-        Order = 710,
-        Display = true,
-        Value = function()
-            return FormatBool(Account().FisherfriendOfTheIsles)
-        end,
-        Color = function()
-            if not Account().FisherfriendOfTheIsles then
-                return ErrorColor()
-            end
-            return DefaultColor()
-        end,
-    },
 }
-
-function spairs(t, order) -- https://stackoverflow.com/a/15706820/3105105
-    -- collect the keys
-    local keys = {}
-    for k in pairs(t) do keys[#keys+1] = k end
-
-    -- if order function given, sort by it by passing the table and keys a, b,
-    -- otherwise just sort the keys 
-    if order then
-        table.sort(keys, function(a,b) return order(t, a, b) end)
-    else
-        table.sort(keys)
-    end
-
-    -- return the iterator function
-    local i = 0
-    return function()
-        i = i + 1
-        if keys[i] then
-            return keys[i], t[keys[i]]
-        end
-    end
-end
 
 local function NewLabel(parent, fontHeight, text)
     local str = parent:CreateFontString()
@@ -1045,7 +763,7 @@ local function NewLabel(parent, fontHeight, text)
     return str
 end
 
-local function BuildGrid()
+function ARWIC_AAM_BuildGrid()
     -- dont remake the frame if it already exists
     if ARWIC_AAM_mainFrame ~= nil then return end
     dataLabels = {}
@@ -1081,7 +799,7 @@ local function BuildGrid()
     NewLabel(titleBar, 20, "Arwic Alt Manager"):SetAllPoints(titleBar)
     
     -- close button
-    local closeButton = CreateFrame("BUTTON", "AAM_closeButton", AAM_titleBarFrame, "UIPanelCloseButton")
+    local closeButton = CreateFrame("BUTTON", "AAM_closeButton", titleBar, "UIPanelCloseButton")
     closeButton:SetPoint("TOPRIGHT", 0, 0)
     closeButton:SetWidth(titleBarHeight)
     closeButton:SetHeight(titleBarHeight)
@@ -1090,7 +808,7 @@ local function BuildGrid()
     end)
 
     -- config button
-    local configButton = CreateFrame("BUTTON", "AAM_closeButton", AAM_titleBarFrame, "OptionsBoxTemplate")
+    local configButton = CreateFrame("BUTTON", "AAM_configButton", titleBar, "OptionsBoxTemplate")
     configButton:SetPoint("TOPRIGHT", closeButton, "TOPLEFT")
     configButton:SetWidth(titleBarHeight)
     configButton:SetHeight(titleBarHeight)
@@ -1231,9 +949,9 @@ local function BuildGrid()
     mainFrame:SetWidth(headerCol:GetWidth() + totalWidthSoFar)
 end
 
-local function UpdateGrid()
+function ARWIC_AAM_UpdateGrid()
     -- make sure we have a grid
-    BuildGrid()
+    ARWIC_AAM_BuildGrid()
     -- update the values in the grid
     for _, v in pairs(dataLabels) do
         v.lbl:SetText(v.formatter.Value(v.char))
@@ -1243,7 +961,7 @@ end
 
 -- loads display and order of field formatters from file
 local function InitFormatters()
-    -- create the config table is needed
+    -- create the config table if needed
     if ArwicAltManagerDB.Config.FieldFormatters == nil then
         ArwicAltManagerDB.Config.FieldFormatters = {}
     end
@@ -1264,12 +982,12 @@ local function InitFormatters()
 end
 
 function ARWIC_AAM_Toggle()
-    UpdateGrid()
+    ARWIC_AAM_UpdateGrid()
     ARWIC_AAM_mainFrame:SetShown(not ARWIC_AAM_mainFrame:IsVisible())
 end
 
 function ARWIC_AAM_Show()
-    UpdateGrid()
+    ARWIC_AAM_UpdateGrid()
     ARWIC_AAM_mainFrame:Show()
 end
 
@@ -1280,11 +998,6 @@ end
 function events:PLAYER_ENTERING_WORLD(...)
     -- init formatters
     InitFormatters()
-    -- get elvui
-    if ElvIU then
-        ElvUI_E, ElvUI_L, ElvUI_V, ElvUI_P, ElvUI_G = unpack(ElvUI)
-        ElvUI_S = ElvUI_E:GetModule("Skins")
-    end
 end
 
 local function RegisterEvents()
@@ -1298,74 +1011,3 @@ local function RegisterEvents()
 end
 
 RegisterEvents()
-
-SLASH_AAM1 = "/aam"
-SLASH_AAM2 = "/arwicaltmanager"
-SlashCmdList["AAM"] = function(msg)
-    local args = {}
-    for a in string.gmatch(msg, "%S+") do
-        table.insert(args, a)
-    end
-    if args[1] == "update" then
-        ARWIC_AAM_UpdateData()
-        print("AAM: Updated data for " .. UnitName("player") .. "-" .. GetRealmName())
-        if ARWIC_AAM_mainFrame then
-            ARWIC_AAM_Show()
-        end
-    elseif args[1] == "config" then
-        ARWIC_AAM_ToggleConfig()
-    elseif args[1] == "char" and args[2] == "hide" then
-        local charName = args[3]:gsub("^%l", string.upper)
-        local realmName = args[4]:gsub("^%l", string.upper)
-        if ArwicAltManagerDB.Realms[realmName] then
-            if ArwicAltManagerDB.Realms[realmName].Characters[charName] then
-                CharData(charName, realmName).Display = false
-                print(format("AAM: Character '%s-%s' will now be hidden.", charName, realmName))
-                print("AAM: You will need to '/reload' for changes to take effect")
-            else
-                print("AAM: Unable to find character name: " .. charName)
-            end
-        else
-            print("AAM: Unable to find realm: %s" .. realmName)
-        end
-    elseif args[1] == "char" and args[2] == "show" then
-        local charName = args[3]:gsub("^%l", string.upper)
-        local realmName = args[4]:gsub("^%l", string.upper)
-        if ArwicAltManagerDB.Realms[realmName] then
-            if ArwicAltManagerDB.Realms[realmName].Characters[charName] then
-                CharData(charName, realmName).Display = true
-                print(format("AAM: Character '%s-%s' will now be displayed.", charName, realmName))
-                print("AAM: You will need to '/reload' for changes to take effect")
-            else
-                print("AAM: Unable to find character name: " .. charName)
-            end
-        else
-            print("AAM: Unable to find realm: %s" .. realmName)
-        end
-    elseif args[1] == "realm" and args[2] == "hide" then
-        local realmName = args[3]:gsub("^%l", string.upper)
-        if ArwicAltManagerDB.Realms[realmName] then
-            ArwicAltManagerDB.Realms[realmName].Display = false
-            print(format("AAM: Realm '%s' will now be hidden.", realmName))
-            print("AAM: You will need to '/reload' for changes to take effect")
-        else
-            print("AAM: Unable to find realm: " .. realmName)
-        end
-    elseif args[1] == "realm" and args[2] == "show" then
-        local realmName = args[3]:gsub("^%l", string.upper)
-        if ArwicAltManagerDB.Realms[realmName] then
-            ArwicAltManagerDB.Realms[realmName].Display = true
-            print(format("AAM: Realm '%s' will now be displayed.", realmName))
-            print("AAM: You will need to '/reload' for changes to take effect")
-        else
-            print("AAM: Unable to find realm: " .. realmName)
-        end
-    else
-        ARWIC_AAM_UpdateData()
-        if ARWIC_AAM_mainFrame then
-            ARWIC_AAM_Toggle()
-        else
-            BuildGrid()
-        end
-    end
-end

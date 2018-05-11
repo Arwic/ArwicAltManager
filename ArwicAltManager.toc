@@ -5,6 +5,9 @@
 ## Notes: Simple alt manager for completionists
 ## SavedVariables: ArwicAltManagerDB
 
+Extensions.lua
 Config.lua
 Data.lua
 Display.lua
+AccountDisplay.lua
+SlashCommand.lua
