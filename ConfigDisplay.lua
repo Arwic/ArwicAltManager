@@ -12,7 +12,6 @@ local function NewLabel(parent, fontHeight, text)
     return str
 end
 
-
 local function BuildAccountFieldDisplayOrder()
     local ITEM_WIDTH = 300
     local ITEM_HEIGHT = 24
@@ -25,8 +24,10 @@ local function BuildAccountFieldDisplayOrder()
     local NUM_ITEMS = 0
     local LABEL_OFFSET_Y = 18
     local LABEL_OFFSET_X = 5
-    for fk, fv in pairs(ArwicAltManagerDB.Config.AccountFieldFormatters) do
-        NUM_ITEMS = NUM_ITEMS + 1
+    for fk, fv in pairs(ArwicAltManagerDB.Config.Fields.Account) do
+        if not fv.Internal then
+            NUM_ITEMS = NUM_ITEMS + 1
+        end
     end
 
     -- create the main frame
@@ -68,11 +69,14 @@ local function BuildAccountFieldDisplayOrder()
 
     local function GetFieldListItem(index)
         local counter = 0
-        for fk, fv in spairs(ArwicAltManagerDB.Config.AccountFieldFormatters, function(t, a, b)
+        for fk, fv in spairs(ArwicAltManagerDB.Config.Fields.Account, function(t, a, b)
             return t[a].Order < t[b].Order
-        end) do            counter = counter + 1
-            if counter == index then
-                return fk, fv.Display, fv.Order
+        end) do
+            if not fv.Internal then
+                counter = counter + 1
+                if counter == index then
+                    return fk, fv.Display, fv.Order
+                end
             end
         end
     end
@@ -88,7 +92,9 @@ local function BuildAccountFieldDisplayOrder()
                 ebOrder:SetPoint("LEFT", frame, "LEFT")
                 ebOrder:SetText(order)
                 ebOrder:SetScript("OnTextChanged", function(sender)
-                    ArwicAltManagerDB.Config.AccountFieldFormatters[name].Order = tonumber(ebOrder:GetText())
+                    local text = ebOrder:GetText()
+                    if text == "" then text = "0" end
+                    ArwicAltManagerDB.Config.Fields.Account[name].Order = tonumber(text)
                 end)
                 ebOrder:Show()
                 local cbDisplay = frame.list[i].Display
@@ -97,7 +103,7 @@ local function BuildAccountFieldDisplayOrder()
                 cbDisplay:SetSize(ITEM_HEIGHT, ITEM_HEIGHT)
                 _G[cbDisplay:GetName() .. "Text"]:SetText(name)
                 cbDisplay:SetScript("OnClick", function(sender)
-                    ArwicAltManagerDB.Config.AccountFieldFormatters[name].Display = cbDisplay:GetChecked()
+                    ArwicAltManagerDB.Config.Fields.Account[name].Display = cbDisplay:GetChecked()
                 end)
                 cbDisplay:Show()
             else
@@ -125,8 +131,10 @@ local function BuildCharacterFieldDisplayOrder()
     local NUM_ITEMS = 0
     local LABEL_OFFSET_Y = 18
     local LABEL_OFFSET_X = 5
-    for fk, fv in pairs(ArwicAltManagerDB.Config.FieldFormatters) do
-        NUM_ITEMS = NUM_ITEMS + 1
+    for fk, fv in pairs(ArwicAltManagerDB.Config.Fields.Character) do
+        if not fv.Internal then
+            NUM_ITEMS = NUM_ITEMS + 1
+        end
     end
 
     -- create the main frame
@@ -168,12 +176,14 @@ local function BuildCharacterFieldDisplayOrder()
 
     local function GetFieldListItem(index)
         local counter = 0
-        for fk, fv in spairs(ArwicAltManagerDB.Config.FieldFormatters, function(t, a, b)
+        for fk, fv in spairs(ArwicAltManagerDB.Config.Fields.Character, function(t, a, b)
             return t[a].Order < t[b].Order
         end) do
-            counter = counter + 1
-            if counter == index then
-                return fk, fv.Display, fv.Order
+            if not fv.Internal then
+                counter = counter + 1
+                if counter == index then
+                    return fk, fv.Display, fv.Order
+                end
             end
         end
     end
@@ -189,7 +199,9 @@ local function BuildCharacterFieldDisplayOrder()
                 ebOrder:SetPoint("LEFT", frame, "LEFT")
                 ebOrder:SetText(order)
                 ebOrder:SetScript("OnTextChanged", function(sender)
-                    ArwicAltManagerDB.Config.FieldFormatters[name].Order = tonumber(ebOrder:GetText())
+                    local text = ebOrder:GetText()
+                    if text == "" then text = "0" end
+                    ArwicAltManagerDB.Config.Fields.Character[name].Order = tonumber(text)
                 end)
                 ebOrder:Show()
                 local cbDisplay = frame.list[i].Display
@@ -198,7 +210,7 @@ local function BuildCharacterFieldDisplayOrder()
                 cbDisplay:SetSize(ITEM_HEIGHT, ITEM_HEIGHT)
                 _G[cbDisplay:GetName() .. "Text"]:SetText(name)
                 cbDisplay:SetScript("OnClick", function(sender)
-                    ArwicAltManagerDB.Config.FieldFormatters[name].Display = cbDisplay:GetChecked()
+                    ArwicAltManagerDB.Config.Fields.Character[name].Display = cbDisplay:GetChecked()
                 end)
                 cbDisplay:Show()
             else
@@ -314,7 +326,7 @@ local function BuildRealmDisplay()
     return frame
 end
 
-local function BuildConfig()
+function ArwicAltManager.BuildConfig()
     -- dont remake the frame if it already exists
     if ARWIC_AAM_configFrame ~= nil then return end
     local warningHeight = 50
@@ -383,40 +395,20 @@ local function BuildConfig()
 
     configFrame:SetWidth(framePadding * 3 + realmDisplayFrame:GetWidth() + fieldDisplayOrderFrame:GetWidth() + accountFieldDisplayOrderFrame:GetWidth())
     configFrame:SetHeight(framePadding * 3 + titleBarHeight + warningHeight + reloadButton:GetHeight() + realmDisplayFrame:GetHeight())
+    configFrame:SetShown(false)
 end
 
-function ARWIC_AAM_ToggleConfig()
-    local firstTime = false
-    if not ARWIC_AAM_configFrame then
-        firstTime = true
-    end
-    BuildConfig()
-    if not firstTime then
-        ARWIC_AAM_configFrame:SetShown(not ARWIC_AAM_configFrame:IsVisible())
-    end
+function ArwicAltManager.ToggleConfig()
+    ArwicAltManager.BuildConfig()
+    ARWIC_AAM_configFrame:SetShown(not ARWIC_AAM_configFrame:IsVisible())
 end
 
-function ARWIC_AAM_ShowConfig()
-    BuildConfig()
+function ArwicAltManager.ShowConfig()
+    ArwicAltManager.BuildConfig()
     ARWIC_AAM_configFrame:Show()
 end
 
-function ARWIC_AAM_HideConfig()
+function ArwicAltManager.HideConfig()
     ARWIC_AAM_configFrame:Hide()
 end
 
-
-function AAM_InitConfigDB()
-    if not ArwicAltManagerDB then ArwicAltManagerDB = {} end
-    if not ArwicAltManagerDB.Config then ArwicAltManagerDB.Config = {} end
-    if not ArwicAltManagerDB.Config.FieldFormatters then ArwicAltManagerDB.Config.FieldFormatters = {} end
-    if not ArwicAltManagerDB.Config.AccountFieldFormatters then ArwicAltManagerDB.Config.AccountFieldFormatters = {} end
-    local config = ArwicAltManagerDB.Config
-    if not config.GoldThreshold then config.GoldThreshold = 10000 end
-    if not config.MountSpeedThreshold then config.MountSpeedThreshold = 310 end
-    if not config.ArtifactRankThreshold then config.ArtifactRankThreshold = 52 end
-    if not config.OrderHallResourcesThreshold then config.OrderHallResourcesThreshold = 4000 end
-    if not config.LevelThreshold then config.LevelThreshold = 110 end
-end
-
-AAM_InitConfigDB()

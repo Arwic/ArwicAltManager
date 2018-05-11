@@ -1,296 +1,4 @@
 local dataLabels = {}
-local events = {}
-
-local function Config()
-    return ArwicAltManagerDB.Config
-end
-
-local function ErrorColor()
-    return 0.85, 0.33, 0.25
-end
-
-local function DefaultColor()
-    return 1.0, 1.0, 1.0
-end
-
-local function TooltipHeaderColor()
-    return 1, 1, 1
-end
-
-local function SuccessColor()
-    return 0.0, 1.0, 0.0
-end
-
-local function FormatBool(b)
-    if b then 
-        return "Yes" 
-    else
-        return "No" 
-    end
-end
-
-local function FormatInt(i)
-    return tostring(i):reverse():gsub("%d%d%d", "%1,"):reverse():gsub("^,", "")
-end
-
-local function FormatTime(timeSeconds)
-    local days = floor(timeSeconds / 86400)
-    local hours = floor((timeSeconds % 86400) / 3600)
-    local minutes = floor((timeSeconds % 3600) / 60)
-    local seconds = floor(timeSeconds % 60)
-    return days, hours, minutes, seconds
-end
-
-local function Account()
-    return ArwicAltManagerDB.Account
-end
-
-local fieldFormatters = {
-    ["Mount_VioletSpellwing"] = {
-        Label = "Violet Spellwing",
-        Order = 500,
-        Display = true,
-        Tooltip = function(char)
-            GameTooltip:AddLine("Violet Spellwing", TooltipHeaderColor())
-            GameTooltip:AddLine("Obtained by defeating Argus the Unmaker on Heroic difficulty or higher in Antorus, the Burning Throne.", nil, nil, nil, true)
-            GameTooltip:Show()
-        end,
-        Value = function()
-            if not Account().Mounts then
-                return "?"
-            end
-            return FormatBool(Account().Mounts[253639].IsCollected)
-        end,
-        Color = function()
-            if not Account().Mounts or not Account().Mounts[253639].IsCollected then
-                return ErrorColor()
-            end
-            return DefaultColor()
-        end,
-    },
-    ["Mount_ShackledUrzul"] = {
-        Label = "Shackled Urzul",
-        Order = 510,
-        Display = true,
-        Tooltip = function(char)
-            GameTooltip:AddLine("Shackled Urzul", TooltipHeaderColor())
-            GameTooltip:AddLine("Obtained by defeating Argus the Unmaker on Mythic difficulty in Antorus, the Burning Throne.", nil, nil, nil, true)
-            GameTooltip:Show()
-        end,
-        Value = function()
-            if not Account().Mounts then
-                return "?"
-            end
-            return FormatBool(Account().Mounts[243651].IsCollected)
-        end,
-        Color = function()
-            if not Account().Mounts or not Account().Mounts[243651].IsCollected then
-                return ErrorColor()
-            end
-            return DefaultColor()
-        end,
-    },
-    ["Mount_HellfireInfernal"] = {
-        Label = "Hellfire Infernal",
-        Order = 520,
-        Display = true,
-        Tooltip = function(char)
-            GameTooltip:AddLine("Hellfire Infernal", TooltipHeaderColor())
-            GameTooltip:AddLine("Obtained by defeating Gul'dan on Mythic difficulty in the Nighthold.", nil, nil, nil, true)
-            GameTooltip:Show()
-        end,
-        Value = function()
-            if not Account().Mounts then
-                return "?"
-            end
-            return FormatBool(Account().Mounts[171827].IsCollected)
-        end,
-        Color = function()
-            if not Account().Mounts or not Account().Mounts[171827].IsCollected then
-                return ErrorColor()
-            end
-            return DefaultColor()
-        end,
-    },
-    ["Mount_FelblazeInfernal"] = {
-        Label = "Felblaze Infernal",
-        Order = 520,
-        Display = true,
-        Tooltip = function(char)
-            GameTooltip:AddLine("Felblaze Infernal", TooltipHeaderColor())
-            GameTooltip:AddLine("Obtained by defeating Gul'dan on Normal difficulty or higher in the Nighthold.", nil, nil, nil, true)
-            GameTooltip:Show()
-        end,
-        Value = function()
-            if not Account().Mounts then
-                return "?"
-            end
-            return FormatBool(Account().Mounts[213134].IsCollected)
-        end,
-        Color = function()
-            if not Account().Mounts or not Account().Mounts[213134].IsCollected then
-                return ErrorColor()
-            end
-            return DefaultColor()
-        end,
-    },
-    ["Mount_AbyssWorm"] = {
-        Label = "Abyss Worm",
-        Order = 520,
-        Display = true,
-        Tooltip = function(char)
-            GameTooltip:AddLine("Abyss Worm", TooltipHeaderColor())
-            GameTooltip:AddLine("Obtained by defeating Mistress Sassz'ine on Raid Finder difficulty or higher in the Tomb of Sargeras.", nil, nil, nil, true)
-            GameTooltip:Show()
-        end,
-        Value = function()
-            if not Account().Mounts then
-                return "?"
-            end
-            return FormatBool(Account().Mounts[232519].IsCollected)
-        end,
-        Color = function()
-            if not Account().Mounts or not Account().Mounts[232519].IsCollected then
-                return ErrorColor()
-            end
-            return DefaultColor()
-        end,
-    },
-    ["Mount_AntoranCharhound"] = {
-        Label = "Antoran Charhound",
-        Order = 520,
-        Display = true,
-        Tooltip = function(char)
-            GameTooltip:AddLine("Antoran Charhound", TooltipHeaderColor())
-            GameTooltip:AddLine("Obtained by defeating Felhounds of Sargeras on Raid Finder difficulty or higher in Antorus, the Burning Throne.", nil, nil, nil, true)
-            GameTooltip:Show()
-        end,
-        Value = function()
-            if not Account().Mounts then
-                return "?"
-            end
-            return FormatBool(Account().Mounts[253088].IsCollected)
-        end,
-        Color = function()
-            if not Account().Mounts or not Account().Mounts[253088].IsCollected then
-                return ErrorColor()
-            end
-            return DefaultColor()
-        end,
-    },
-    ["FieldMedic"] = {
-        Label = "Field Medic",
-        Order = 600,
-        Display = true,
-        Value = function()
-            return FormatBool(Account().FieldMedic)
-        end,
-        Color = function()
-            if not Account().FieldMedic then
-                return ErrorColor()
-            end
-            return DefaultColor()
-        end,
-        Tooltip = function()
-            GameTooltip:SetHyperlink(GetAchievementLink(11139))
-            GameTooltip:Show()
-        end,
-    },
-    ["ChosenTransmogs_Cloth"] = {
-        Label = "Chosen Cloth",
-        Order = 701,
-        Display = true,
-        Value = function()
-            return FormatBool(Account().ChosenTransmogs[1])
-        end,
-        Color = function()
-            if not Account().ChosenTransmogs[1] then
-                return ErrorColor()
-            end
-            return DefaultColor()
-        end,
-        Tooltip = function(char)
-            GameTooltip:AddLine("Chosen Cloth", TooltipHeaderColor())
-            GameTooltip:AddLine("Obtained by completing the achievement [The Chosen] and opening the box on a cloth wearing character.", nil, nil, nil, true)
-            GameTooltip:Show()
-        end,
-    },
-    ["ChosenTransmogs_Leather"] = {
-        Label = "Chosen Leather",
-        Order = 702,
-        Display = true,
-        Value = function()
-            return FormatBool(Account().ChosenTransmogs[2])
-        end,
-        Color = function()
-            if not Account().ChosenTransmogs[2] then
-                return ErrorColor()
-            end
-            return DefaultColor()
-        end,
-        Tooltip = function(char)
-            GameTooltip:AddLine("Chosen Cloth", TooltipHeaderColor())
-            GameTooltip:AddLine("Obtained by completing the achievement [The Chosen] and opening the box on a leather wearing character.", nil, nil, nil, true)
-            GameTooltip:Show()
-        end,
-    },
-    ["ChosenTransmogs_Mail"] = {
-        Label = "Chosen Mail",
-        Order = 703,
-        Display = true,
-        Value = function()
-            return FormatBool(Account().ChosenTransmogs[3])
-        end,
-        Color = function()
-            if not Account().ChosenTransmogs[3] then
-                return ErrorColor()
-            end
-            return DefaultColor()
-        end,
-        Tooltip = function(char)
-            GameTooltip:AddLine("Chosen Cloth", TooltipHeaderColor())
-            GameTooltip:AddLine("Obtained by completing the achievement [The Chosen] and opening the box on a mail wearing character.", nil, nil, nil, true)
-            GameTooltip:Show()
-        end,
-    },
-    ["ChosenTransmogs_Plate"] = {
-        Label = "Chosen Plate",
-        Order = 704,
-        Display = true,
-        Value = function()
-            return FormatBool(Account().ChosenTransmogs[4])
-        end,
-        Color = function()
-            if not Account().ChosenTransmogs[4] then
-                return ErrorColor()
-            end
-            return DefaultColor()
-        end,
-        Tooltip = function(char)
-            GameTooltip:AddLine("Chosen Cloth", TooltipHeaderColor())
-            GameTooltip:AddLine("Obtained by completing the achievement [The Chosen] and opening the box on a plate wearing character.", nil, nil, nil, true)
-            GameTooltip:Show()
-        end,
-    },
-    ["FisherfriendOfTheIsles"] = {
-        Label = "Fisherfriend of the Isles",
-        Order = 710,
-        Display = true,
-        Value = function()
-            return FormatBool(Account().FisherfriendOfTheIsles)
-        end,
-        Color = function()
-            if not Account().FisherfriendOfTheIsles then
-                return ErrorColor()
-            end
-            return DefaultColor()
-        end,
-        Tooltip = function()
-            GameTooltip:SetHyperlink(GetAchievementLink(11725))
-            GameTooltip:Show()
-        end,
-    },
-}
 
 local function NewLabel(parent, fontHeight, text)
     local str = parent:CreateFontString()
@@ -300,7 +8,7 @@ local function NewLabel(parent, fontHeight, text)
     return str
 end
 
-function ARWIC_AAM_BuildAccountGrid()
+function ArwicAltManager.BuildAccountGrid()
     -- dont remake the frame if it already exists
     if ARWIC_AAM_accountFrame ~= nil then return end
     dataLabels = {}
@@ -352,7 +60,7 @@ function ARWIC_AAM_BuildAccountGrid()
     configButton:SetHeight(titleBarHeight)
     configButton:SetScript("OnClick", function()
         accountFrame:Hide()
-        ARWIC_AAM_ShowConfig()
+        ArwicAltManager.ShowConfig()
     end)
 
     -- row headers
@@ -362,10 +70,10 @@ function ARWIC_AAM_BuildAccountGrid()
     local maxLabelWidth = 0
     local lastCellFrame = titleBar
     local i = 0
-    for formatterKey, formatter in spairs(fieldFormatters, function(t, a, b)
+    for formatterKey, formatter in spairs(ArwicAltManager.Fields.Account, function(t, a, b)
         return t[a].Order < t[b].Order
     end) do
-        if formatter.Display then
+        if formatter.Internal == nil and formatter.Display then
             -- make a cell
             local cellFrame = CreateFrame("FRAME", "AAM_accountCell_" .. formatterKey, headerCol)
             cellFrame:SetHeight(rowHeight)
@@ -409,10 +117,10 @@ function ARWIC_AAM_BuildAccountGrid()
 
     local maxLabelWidth = 0
     local lastCellFrame = titleBar
-    for formatterKey, formatter in spairs(fieldFormatters, function(t, a, b)
+    for formatterKey, formatter in spairs(ArwicAltManager.Fields.Account, function(t, a, b)
         return t[a].Order < t[b].Order
     end) do
-        if formatter.Display then
+        if formatter.Internal == nil and formatter.Display then
             -- make the cell
             local cellFrame = CreateFrame("FRAME", "AAM_accountDataCell_" .. formatterKey, dataCol)
             cellFrame:SetHeight(rowHeight)
@@ -452,11 +160,12 @@ function ARWIC_AAM_BuildAccountGrid()
         frameWidth = headerCol:GetWidth() + dataCol:GetWidth()
     end
     accountFrame:SetWidth(frameWidth)
+    accountFrame:SetShown(false)
 end
 
-function ARWIC_AAM_UpdateAccountGrid()
+function ArwicAltManager.UpdateAccountGrid()
     -- make sure we have a grid
-    ARWIC_AAM_BuildAccountGrid()
+    ArwicAltManager.BuildAccountGrid()
     -- update the values in the grid
     for _, v in pairs(dataLabels) do
         v.lbl:SetText(v.formatter.Value())
@@ -464,55 +173,16 @@ function ARWIC_AAM_UpdateAccountGrid()
     end
 end
 
--- loads display and order of field formatters from file
-local function InitFormatters()
-    -- create the config table if needed
-    if ArwicAltManagerDB.Config.AccountFieldFormatters == nil then
-        ArwicAltManagerDB.Config.AccountFieldFormatters = {}
-    end
-    -- load the config table or set it to defaults
-    for k, v in pairs(fieldFormatters) do
-        -- check if the field exists
-        if ArwicAltManagerDB.Config.AccountFieldFormatters[k] == nil then
-            -- it doesnt so copy defaults to the config
-            ArwicAltManagerDB.Config.AccountFieldFormatters[k] = {}
-            ArwicAltManagerDB.Config.AccountFieldFormatters[k].Display = v.Display
-            ArwicAltManagerDB.Config.AccountFieldFormatters[k].Order = tonumber(v.Order)
-        else
-            -- it does so copy config to the formatter
-            v.Display = ArwicAltManagerDB.Config.AccountFieldFormatters[k].Display
-            v.Order = tonumber(ArwicAltManagerDB.Config.AccountFieldFormatters[k].Order)
-        end
-    end
-end
-
-function ARWIC_AAM_ToggleAccount()
-    ARWIC_AAM_UpdateAccountGrid()
+function ArwicAltManager.ToggleAccountGrid()
+    ArwicAltManager.UpdateAccountGrid()
     ARWIC_AAM_accountFrame:SetShown(not ARWIC_AAM_accountFrame:IsVisible())
 end
 
-function ARWIC_AAM_ShowAccount()
-    ARWIC_AAM_UpdateAccountGrid()
+function ArwicAltManager.ShowAccountGrid()
+    ArwicAltManager.UpdateAccountGrid()
     ARWIC_AAM_accountFrame:Show()
 end
 
-function ARWIC_AAM_HideAccount()
+function ArwicAltManager.HideAccountGrid()
     ARWIC_AAM_accountFrame:Hide()
 end
-
-function events:PLAYER_ENTERING_WORLD(...)
-    -- init formatters
-    InitFormatters()
-end
-
-local function RegisterEvents()
-    local eventFrame = CreateFrame("FRAME", "AAM_accountEventFrame")
-    eventFrame:SetScript("OnEvent", function(self, event, ...)
-        events[event](self, ...)
-    end)
-    for k, v in pairs(events) do
-        eventFrame:RegisterEvent(k)
-    end
-end
-
-RegisterEvents()

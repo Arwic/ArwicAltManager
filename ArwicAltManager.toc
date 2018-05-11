@@ -4,10 +4,13 @@
 ## Author: Arwic@Frostmourne-US
 ## Notes: Simple alt manager for completionists
 ## SavedVariables: ArwicAltManagerDB
+## X-SavedVariablesVersion: 1
 
 Extensions.lua
-Config.lua
-Data.lua
-Display.lua
+Core.lua
+Formatting.lua
+CharacterFields.lua
+AccountFields.lua
+ConfigDisplay.lua
+CharacterDisplay.lua
 AccountDisplay.lua
-SlashCommand.lua

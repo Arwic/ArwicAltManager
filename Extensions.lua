@@ -1,4 +1,3 @@
-
 function table.len(t)
     local count = 0
     for k, v in pairs(t) do
@@ -47,5 +46,11 @@ function spairs(t, order) -- https://stackoverflow.com/a/15706820/3105105
         if keys[i] then
             return keys[i], t[keys[i]]
         end
+    end
+end
+
+function dir(t)
+    for k, v in pairs(t) do
+        print(k, v)
     end
 end
