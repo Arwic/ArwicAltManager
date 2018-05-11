@@ -62,6 +62,32 @@ function ArwicAltManager.BuildAccountGrid()
         accountFrame:Hide()
         ArwicAltManager.ShowConfig()
     end)
+    configButton:SetScript("OnEnter", function(sender)
+        GameTooltip:SetOwner(sender, "ANCHOR_RIGHT")
+        GameTooltip:SetText("Open Config")
+        GameTooltip:Show()
+    end)
+    configButton:SetScript("OnLeave", function()
+        GameTooltip_Hide()
+    end)
+
+    -- character button
+    local characterButton = CreateFrame("BUTTON", "AAM_accountCharacterButton", titleBar, "OptionsBoxTemplate")
+    characterButton:SetPoint("TOPRIGHT", configButton, "TOPLEFT")
+    characterButton:SetWidth(titleBarHeight)
+    characterButton:SetHeight(titleBarHeight)
+    characterButton:SetScript("OnClick", function()
+        accountFrame:Hide()
+        ArwicAltManager.ShowCharacterGrid()
+    end)
+    characterButton:SetScript("OnEnter", function(sender)
+        GameTooltip:SetOwner(sender, "ANCHOR_RIGHT")
+        GameTooltip:SetText("View Character Data")
+        GameTooltip:Show()
+    end)
+    characterButton:SetScript("OnLeave", function()
+        GameTooltip_Hide()
+    end)
 
     -- row headers
     local headerCol = CreateFrame("FRAME", "AAM_accountHeaderCol", accountFrame)
@@ -155,7 +181,7 @@ function ArwicAltManager.BuildAccountGrid()
     end
     -- set the column width to the widest labels width
     dataCol:SetWidth(maxLabelWidth + textOffset * 2)
-    local frameWidth = titleBarText:GetStringWidth() + 200
+    local frameWidth = titleBarText:GetStringWidth() + 50
     if frameWidth < headerCol:GetWidth() + dataCol:GetWidth() then
         frameWidth = headerCol:GetWidth() + dataCol:GetWidth()
     end
@@ -166,6 +192,7 @@ end
 function ArwicAltManager.UpdateAccountGrid()
     -- make sure we have a grid
     ArwicAltManager.BuildAccountGrid()
+    ArwicAltManager.UpdateAccountData()
     -- update the values in the grid
     for _, v in pairs(dataLabels) do
         v.lbl:SetText(v.formatter.Value())

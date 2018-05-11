@@ -61,6 +61,32 @@ function ArwicAltManager.BuildCharacterGrid()
         mainFrame:Hide()
         ArwicAltManager.ShowConfig()
     end)
+    configButton:SetScript("OnEnter", function(sender)
+        GameTooltip:SetOwner(sender, "ANCHOR_RIGHT")
+        GameTooltip:SetText("Open Config")
+        GameTooltip:Show()
+    end)
+    configButton:SetScript("OnLeave", function()
+        GameTooltip_Hide()
+    end)
+
+    -- account button
+    local accountButton = CreateFrame("BUTTON", "AAM_accountButton", titleBar, "OptionsBoxTemplate")
+    accountButton:SetPoint("TOPRIGHT", configButton, "TOPLEFT")
+    accountButton:SetWidth(titleBarHeight)
+    accountButton:SetHeight(titleBarHeight)
+    accountButton:SetScript("OnClick", function()
+        mainFrame:Hide()
+        ArwicAltManager.ShowAccountGrid()
+    end)
+    accountButton:SetScript("OnEnter", function(sender)
+        GameTooltip:SetOwner(sender, "ANCHOR_RIGHT")
+        GameTooltip:SetText("View Account Wide Data")
+        GameTooltip:Show()
+    end)
+    accountButton:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
 
     -- row headers
     local headerCol = CreateFrame("FRAME", "AAM_headerCol", mainFrame)
@@ -198,6 +224,7 @@ end
 function ArwicAltManager.UpdateCharacterGrid()
     -- make sure we have a grid
     ArwicAltManager.BuildCharacterGrid()
+    ArwicAltManager.UpdateCharacterData()
     -- update the values in the grid
     for _, v in pairs(dataLabels) do
         v.lbl:SetText(v.formatter.Value(v.char))

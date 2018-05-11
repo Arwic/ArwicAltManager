@@ -819,7 +819,11 @@ ArwicAltManager.Fields.Character = {
             else
                 GameTooltip:AddLine(format("Item Level %d (Equipped %d)", char.Gear.AvgItemLevelBags, char.Gear.AvgItemLevelEquipped), AAM.TooltipHeaderColor())
                 for k, v in pairs(char.Gear.Items) do
-                    GameTooltip:AddDoubleLine(format("|T%s:24|t (%d) %s", v.Texture, v.ItemLevel, v.Name), _G[v.EquipLoc], GetItemQualityColor(v.Rarity))
+                    if v.Texture ~= nil and v.ItemLevel ~= nil and v.Name ~= nil then
+                        GameTooltip:AddDoubleLine(format("|T%s:24|t (%d) %s", v.Texture, v.ItemLevel, v.Name), _G[v.EquipLoc], GetItemQualityColor(v.Rarity))
+                    else
+                        GameTooltip:AddLine("Unknown", AAM.ErrorColor())
+                    end
                 end
                 GameTooltip:Show()
             end
@@ -846,7 +850,6 @@ ArwicAltManager.Fields.Character = {
                 4, -- shirt
                 19, -- tabard
                 9, -- wrist
-
                 10, -- hands
                 6, -- waist
                 7, -- legs
