@@ -83,16 +83,14 @@ function ArwicAltManager.InitLDB()
             GameTooltip:AddLine("Arwic Alt Manager")
             if ArwicAltManagerDB.Config.MinimapIcon.EnablePeeking then
                 if ArwicAltManagerDB.Config.MinimapIcon.PeekingRequireShift then
-                    GameTooltip:AddDoubleLine("Peek Character Grid", "Hold Shift", nil, nil, nil, 1, 1, 1)
+                    GameTooltip:AddLine("|cFFFFA500Hold Shift|cFFFFFFFF to peek character grid.")
                 else
-                    GameTooltip:AddDoubleLine("Peek Character Grid", "Hover", nil, nil, nil, 1, 1, 1)
+                    GameTooltip:AddLine("|cFFFFA500Hover|cFFFFFFFF to peek character grid.")
                 end
-            else
-                GameTooltip:AddDoubleLine("Peek Character Grid", "Disabled", nil, nil, nil, 1, 0, 0)
             end
-            GameTooltip:AddDoubleLine("Open Character Grid", "Left Click", nil, nil, nil, 1, 1, 1)
-            GameTooltip:AddDoubleLine("Open Account Grid", "Control Left Click", nil, nil, nil, 1, 1, 1)
-            GameTooltip:AddDoubleLine("Open Config", "Right Click", nil, nil, nil, 1, 1, 1)
+            GameTooltip:AddLine("|cFFFFA500Left Click|cFFFFFFFF to open character grid.")
+            GameTooltip:AddLine("|cFFFFA500Control Left Click|cFFFFFFFF to open account grid.")
+            GameTooltip:AddLine("|cFFFFA500Right Click|cFFFFFFFF to open config.")
             GameTooltip:AddLine("You can change peeking behaviour and hide this icon in config", 0.4, 1, 0.4, true)
             GameTooltip:Show()
             if ArwicAltManagerDB.Config.MinimapIcon.EnablePeeking then
