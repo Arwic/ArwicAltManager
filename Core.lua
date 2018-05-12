@@ -1,6 +1,7 @@
 ArwicAltManager = {}
 local events = {}
 local ldb = LibStub:GetLibrary("LibDataBroker-1.1")
+local ldbi = LibStub:GetLibrary("LibDBIcon-1.0")
 
 function ArwicAltManager.InitDB()
     -- check the saved data version
@@ -22,6 +23,8 @@ function ArwicAltManager.InitDB()
     -- config table
     if not ArwicAltManagerDB.Config then ArwicAltManagerDB.Config = {} end
     local config = ArwicAltManagerDB.Config
+    -- minimap icon config tabesl
+    if not config.MinimapIcon then config.MinimapIcon = {} end
     -- field config tables
     if not config.Fields then config.Fields = {} end
     if not config.Fields.Character then config.Fields.Character = {} end
@@ -47,7 +50,40 @@ function ArwicAltManager.InitDB()
 end
 
 function ArwicAltManager.InitLDB()
-    
+    local ldbConfig = {
+        type = "launcher",
+        icon = "132212",
+        label = "Arwic Alt Manager",
+        text  = "AAM",
+        OnClick = function(sender, btn)
+            if btn == "LeftButton" then
+                if IsShiftKeyDown() then
+                    ArwicAltManager.ToggleAccountGrid()
+                else
+                    ArwicAltManager.ToggleCharacterGrid()
+                end
+            elseif btn == "RightButton" then
+                ArwicAltManager.ToggleConfig()
+            end
+        end,
+        OnEnter = function(sender)
+            GameTooltip:SetOwner(sender, "ANCHOR_BOTTOMLEFT")
+            GameTooltip:AddLine("Arwic Alt Manager")
+            GameTooltip:AddDoubleLine("Character Grid", "Left Click")
+            GameTooltip:AddDoubleLine("Account Grid", "Shift Left Click")
+            GameTooltip:AddDoubleLine("Config", "Right Click")
+            GameTooltip:Show()
+            if IsShiftKeyDown() then
+                ArwicAltManager.Peeking = true
+                ArwicAltManager.ShowCharacterGrid() 
+            end
+        end,
+        OnLeave = function(sender)
+            GameTooltip_Hide()
+        end,
+    }
+    local obj = ldb:NewDataObject("ArwicAltManager", ldbConfig)
+    ldbi:Register("ArwicAltManager", obj, ArwicAltManagerDB.Config.MinimapIcon)
 end
 
 local function RegisterEvents()

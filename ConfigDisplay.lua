@@ -326,6 +326,40 @@ local function BuildRealmDisplay()
     return frame
 end
 
+local function BuildMiscSettings()
+    -- create the main frame
+    local frame = CreateFrame("FRAME", "AAM_config_miscFrame", ARWIC_AAM_configFrame)
+    -- create label above the frame
+    local frameLabel = NewLabel(frame, fontHeight * 1.25, "Other Settings"):SetPoint("BOTTOMLEFT", frame, "TOPLEFT", LABEL_OFFSET_X, LABEL_OFFSET_Y)
+    -- set up main frame
+    frame:SetPoint("TOPLEFT", AAM_config_realmDisplayFrame, "BOTTOMLEFT", 0, -framePadding * 2)
+    frame:SetPoint("TOPRIGHT", AAM_config_accountFieldFrame, "BOTTOMRIGHT", 0, -framePadding * 2)
+    frame:SetHeight(100)
+    frame.texture = frame:CreateTexture(nil, "BACKGROUND")
+    frame.texture:SetColorTexture(0.15, 0.15, 0.15, 0.8)
+    frame.texture:SetAllPoints(frame)
+    frame:SetPoint("CENTER")
+
+    local lastSettingFrame = frame
+    -- mini map icon toggle
+    local mapButtonToggle = CreateFrame("CHECKBUTTON", "AAM_config_mapButtonToggle", frame, "ChatConfigCheckButtonTemplate")
+    mapButtonToggle:SetSize(24, 24)
+    mapButtonToggle:SetPoint("TOPLEFT", lastSettingFrame, "TOPLEFT")
+    _G[mapButtonToggle:GetName() .. "Text"]:SetText("Show Minimap Button")
+    mapButtonToggle:SetChecked(not ArwicAltManagerDB.Config.MinimapIcon.hide)
+    mapButtonToggle:SetScript("OnClick", function(sender)
+        ArwicAltManagerDB.Config.MinimapIcon.hide = not mapButtonToggle:GetChecked()
+        if ArwicAltManagerDB.Config.MinimapIcon.hide then
+            LibStub:GetLibrary("LibDBIcon-1.0"):Hide("ArwicAltManager")
+        else
+            LibStub:GetLibrary("LibDBIcon-1.0"):Show("ArwicAltManager")
+        end
+    end)
+    lastSettingFrame = mapButtonToggle
+
+    return frame
+end
+
 function ArwicAltManager.BuildConfig()
     -- dont remake the frame if it already exists
     if ARWIC_AAM_configFrame ~= nil then return end
@@ -408,13 +442,10 @@ function ArwicAltManager.BuildConfig()
     local fieldDisplayOrderFrame = BuildCharacterFieldDisplayOrder()
     -- account field display order
     local accountFieldDisplayOrderFrame = BuildAccountFieldDisplayOrder()
+    -- misc settings
+    local miscFrame = BuildMiscSettings()
     
-    local reloadButton = CreateFrame("BUTTON", "AAM_config_reloadButton", configFrame)
-    reloadButton:SetText("RELOAD")
-    reloadButton:SetPoint("BOTTOM")
-    reloadButton:SetWidth(150)
-    reloadButton:SetHeight(30)
-
+    -- reload button and warning message
     local reloadButton = CreateFrame("BUTTON", "AAM_config_reloadButton", configFrame, "UIGoldBorderButtonTemplate")
     reloadButton:SetPoint("BOTTOM", configFrame, "BOTTOM", 0, framePadding)
     reloadButton:SetWidth(150)
@@ -423,28 +454,34 @@ function ArwicAltManager.BuildConfig()
     reloadButton:SetScript("OnClick", function()
         ReloadUI()
     end)
-
-    -- warning message
     local warningMessage = NewLabel(configFrame, 1.8 * fontHeight, "Changes will only take effect after reloading the UI")
     warningMessage:SetPoint("BOTTOM", reloadButton, "TOP", 0, framePadding)
     warningMessage:SetTextColor(1, 0, 0, 1)
 
-    configFrame:SetWidth(framePadding * 3 + realmDisplayFrame:GetWidth() + fieldDisplayOrderFrame:GetWidth() + accountFieldDisplayOrderFrame:GetWidth())
-    configFrame:SetHeight(framePadding * 3 + titleBarHeight + warningHeight + reloadButton:GetHeight() + realmDisplayFrame:GetHeight())
+    -- size the main frame
+    configFrame:SetWidth(framePadding * 4 + realmDisplayFrame:GetWidth() + fieldDisplayOrderFrame:GetWidth() + accountFieldDisplayOrderFrame:GetWidth())
+    configFrame:SetHeight(framePadding * 4 + titleBarHeight + warningHeight + reloadButton:GetHeight() + realmDisplayFrame:GetHeight() + miscFrame:GetHeight())
     configFrame:SetShown(false)
 end
 
-function ArwicAltManager.ToggleConfig()
-    ArwicAltManager.BuildConfig()
-    ARWIC_AAM_configFrame:SetShown(not ARWIC_AAM_configFrame:IsVisible())
-end
-
 function ArwicAltManager.ShowConfig()
+    ArwicAltManager.HideCharacterGrid()
+    ArwicAltManager.HideAccountGrid()
     ArwicAltManager.BuildConfig()
     ARWIC_AAM_configFrame:Show()
 end
 
 function ArwicAltManager.HideConfig()
-    ARWIC_AAM_configFrame:Hide()
+    if ARWIC_AAM_configFrame ~= nil then
+        ARWIC_AAM_configFrame:Hide()
+    end
 end
 
+function ArwicAltManager.ToggleConfig()
+    ArwicAltManager.BuildConfig()
+    if ARWIC_AAM_configFrame:IsShown() then
+        ArwicAltManager.HideConfig()
+    else
+        ArwicAltManager.ShowConfig()
+    end
+end

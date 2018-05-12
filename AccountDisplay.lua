@@ -200,16 +200,24 @@ function ArwicAltManager.UpdateAccountGrid()
     end
 end
 
-function ArwicAltManager.ToggleAccountGrid()
-    ArwicAltManager.UpdateAccountGrid()
-    ARWIC_AAM_accountFrame:SetShown(not ARWIC_AAM_accountFrame:IsVisible())
-end
-
 function ArwicAltManager.ShowAccountGrid()
+    ArwicAltManager.HideConfig()
+    ArwicAltManager.HideCharacterGrid()
     ArwicAltManager.UpdateAccountGrid()
     ARWIC_AAM_accountFrame:Show()
 end
 
 function ArwicAltManager.HideAccountGrid()
-    ARWIC_AAM_accountFrame:Hide()
+    if ARWIC_AAM_accountFrame ~= nil then
+        ARWIC_AAM_accountFrame:Hide()
+    end
+end
+
+function ArwicAltManager.ToggleAccountGrid()
+    ArwicAltManager.BuildAccountGrid()
+    if ARWIC_AAM_accountFrame:IsShown() then
+        ArwicAltManager.HideAccountGrid()
+    else
+        ArwicAltManager.ShowAccountGrid()
+    end
 end

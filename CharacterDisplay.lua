@@ -232,16 +232,24 @@ function ArwicAltManager.UpdateCharacterGrid()
     end
 end
 
-function ArwicAltManager.ToggleCharacterGrid()
-    ArwicAltManager.UpdateCharacterGrid()
-    ARWIC_AAM_mainFrame:SetShown(not ARWIC_AAM_mainFrame:IsVisible())
-end
-
 function ArwicAltManager.ShowCharacterGrid()
+    ArwicAltManager.HideConfig()
+    ArwicAltManager.HideAccountGrid()
     ArwicAltManager.UpdateCharacterGrid()
     ARWIC_AAM_mainFrame:Show()
 end
 
 function ArwicAltManager.HideCharacterGrid()
-    ARWIC_AAM_mainFrame:Hide()
+    if ARWIC_AAM_mainFrame ~= nil then
+        ARWIC_AAM_mainFrame:Hide()
+    end
+end
+
+function ArwicAltManager.ToggleCharacterGrid()
+    ArwicAltManager.BuildCharacterGrid()
+    if ARWIC_AAM_mainFrame:IsShown() then
+        ArwicAltManager.HideCharacterGrid()
+    else
+        ArwicAltManager.ShowCharacterGrid()
+    end
 end
