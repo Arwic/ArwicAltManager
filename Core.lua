@@ -63,6 +63,7 @@ function ArwicAltManager.InitLDB()
         OnClick = function(sender, btn)
             if btn == "LeftButton" then
                 if IsControlKeyDown() then
+                    ArwicAltManager.ManuallyOpen = false
                     ArwicAltManager.ToggleAccountGrid()
                 else
                     if ArwicAltManager.ManuallyOpen then
@@ -74,6 +75,7 @@ function ArwicAltManager.InitLDB()
                     end
                 end
             elseif btn == "RightButton" then
+                ArwicAltManager.ManuallyOpen = false
                 ArwicAltManager.ToggleConfig()
             end
         end,
