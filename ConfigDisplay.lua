@@ -340,22 +340,43 @@ local function BuildMiscSettings()
     frame.texture:SetAllPoints(frame)
     frame:SetPoint("CENTER")
 
-    local lastSettingFrame = frame
     -- mini map icon toggle
-    local mapButtonToggle = CreateFrame("CHECKBUTTON", "AAM_config_mapButtonToggle", frame, "ChatConfigCheckButtonTemplate")
-    mapButtonToggle:SetSize(24, 24)
-    mapButtonToggle:SetPoint("TOPLEFT", lastSettingFrame, "TOPLEFT")
-    _G[mapButtonToggle:GetName() .. "Text"]:SetText("Show Minimap Button")
-    mapButtonToggle:SetChecked(not ArwicAltManagerDB.Config.MinimapIcon.hide)
-    mapButtonToggle:SetScript("OnClick", function(sender)
-        ArwicAltManagerDB.Config.MinimapIcon.hide = not mapButtonToggle:GetChecked()
+    local cb = CreateFrame("CHECKBUTTON", "AAM_config_mapButtonToggle", frame, "ChatConfigCheckButtonTemplate")
+    cb:SetSize(24, 24)
+    cb:SetPoint("TOPLEFT", frame, "TOPLEFT")
+    _G[cb:GetName() .. "Text"]:SetText("Show Minimap Button")
+    cb:SetChecked(not ArwicAltManagerDB.Config.MinimapIcon.hide)
+    cb:SetScript("OnClick", function(sender)
+        ArwicAltManagerDB.Config.MinimapIcon.hide = not cb:GetChecked()
         if ArwicAltManagerDB.Config.MinimapIcon.hide then
             LibStub:GetLibrary("LibDBIcon-1.0"):Hide("ArwicAltManager")
         else
             LibStub:GetLibrary("LibDBIcon-1.0"):Show("ArwicAltManager")
         end
     end)
-    lastSettingFrame = mapButtonToggle
+    local lastSettingFrame = cb
+
+    -- enable peeking
+    local cb = CreateFrame("CHECKBUTTON", "AAM_config_peekingToggle", frame, "ChatConfigCheckButtonTemplate")
+    cb:SetSize(24, 24)
+    cb:SetPoint("TOPLEFT", lastSettingFrame, "BOTTOMLEFT")
+    _G[cb:GetName() .. "Text"]:SetText("Show character grid when mousing over icon")
+    cb:SetChecked(ArwicAltManagerDB.Config.MinimapIcon.EnablePeeking)
+    cb:SetScript("OnClick", function(sender)
+        ArwicAltManagerDB.Config.MinimapIcon.EnablePeeking = cb:GetChecked()
+    end)
+    lastSettingFrame = cb
+
+    -- require shift to peek
+    local cb = CreateFrame("CHECKBUTTON", "AAM_config_shiftPeekingToggle", frame, "ChatConfigCheckButtonTemplate")
+    cb:SetSize(24, 24)
+    cb:SetPoint("TOPLEFT", lastSettingFrame, "BOTTOMLEFT")
+    _G[cb:GetName() .. "Text"]:SetText("Require shift be held to see character grid when mosuing over icon")
+    cb:SetChecked(ArwicAltManagerDB.Config.MinimapIcon.PeekingRequireShift)
+    cb:SetScript("OnClick", function(sender)
+        ArwicAltManagerDB.Config.MinimapIcon.PeekingRequireShift = cb:GetChecked()
+    end)
+    lastSettingFrame = cb
 
     return frame
 end

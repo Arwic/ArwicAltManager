@@ -23,8 +23,12 @@ function ArwicAltManager.InitDB()
     -- config table
     if not ArwicAltManagerDB.Config then ArwicAltManagerDB.Config = {} end
     local config = ArwicAltManagerDB.Config
-    -- minimap icon config tabesl
-    if not config.MinimapIcon then config.MinimapIcon = {} end
+    -- minimap icon config tabes
+    if not config.MinimapIcon then 
+        config.MinimapIcon = {} 
+        config.MinimapIcon.EnablePeeking = true
+        config.MinimapIcon.PeekingRequireShift = true
+    end
     -- field config tables
     if not config.Fields then config.Fields = {} end
     if not config.Fields.Character then config.Fields.Character = {} end
@@ -50,6 +54,7 @@ function ArwicAltManager.InitDB()
 end
 
 function ArwicAltManager.InitLDB()
+    ArwicAltManager.ManuallyOpen = false
     local ldbConfig = {
         type = "launcher",
         icon = "132212",
@@ -57,28 +62,52 @@ function ArwicAltManager.InitLDB()
         text  = "AAM",
         OnClick = function(sender, btn)
             if btn == "LeftButton" then
-                if IsShiftKeyDown() then
+                if IsControlKeyDown() then
                     ArwicAltManager.ToggleAccountGrid()
                 else
-                    ArwicAltManager.ToggleCharacterGrid()
+                    if ArwicAltManager.ManuallyOpen then
+                        ArwicAltManager.ManuallyOpen = false
+                        ArwicAltManager.HideCharacterGrid()
+                    else
+                        ArwicAltManager.ManuallyOpen = true
+                        ArwicAltManager.ShowCharacterGrid()
+                    end
                 end
             elseif btn == "RightButton" then
                 ArwicAltManager.ToggleConfig()
             end
         end,
         OnEnter = function(sender)
+            ArwicAltManager.MouseOverIcon = true
             GameTooltip:SetOwner(sender, "ANCHOR_BOTTOMLEFT")
             GameTooltip:AddLine("Arwic Alt Manager")
-            GameTooltip:AddDoubleLine("Character Grid", "Left Click")
-            GameTooltip:AddDoubleLine("Account Grid", "Shift Left Click")
-            GameTooltip:AddDoubleLine("Config", "Right Click")
+            if ArwicAltManagerDB.Config.MinimapIcon.EnablePeeking then
+                if ArwicAltManagerDB.Config.MinimapIcon.PeekingRequireShift then
+                    GameTooltip:AddDoubleLine("Peek Character Grid", "Hold Shift", nil, nil, nil, 1, 1, 1)
+                else
+                    GameTooltip:AddDoubleLine("Peek Character Grid", "Hover", nil, nil, nil, 1, 1, 1)
+                end
+            else
+                GameTooltip:AddDoubleLine("Peek Character Grid", "Disabled", nil, nil, nil, 1, 0, 0)
+            end
+            GameTooltip:AddDoubleLine("Open Character Grid", "Left Click", nil, nil, nil, 1, 1, 1)
+            GameTooltip:AddDoubleLine("Open Account Grid", "Control Left Click", nil, nil, nil, 1, 1, 1)
+            GameTooltip:AddDoubleLine("Open Config", "Right Click", nil, nil, nil, 1, 1, 1)
+            GameTooltip:AddLine("You can change peeking behaviour and hide this icon in config", 0.4, 1, 0.4, true)
             GameTooltip:Show()
-            if IsShiftKeyDown() then
-                ArwicAltManager.Peeking = true
-                ArwicAltManager.ShowCharacterGrid() 
+            if ArwicAltManagerDB.Config.MinimapIcon.EnablePeeking then
+                if ArwicAltManagerDB.Config.MinimapIcon.PeekingRequireShift and IsShiftKeyDown() then
+                    ArwicAltManager.ShowCharacterGrid()
+                elseif not ArwicAltManagerDB.Config.MinimapIcon.PeekingRequireShift then
+                    ArwicAltManager.ShowCharacterGrid()
+                end
             end
         end,
         OnLeave = function(sender)
+            ArwicAltManager.MouseOverIcon = false
+            if not ArwicAltManager.ManuallyOpen then -- we should hide the grid only if it is not manually open
+                ArwicAltManager.HideCharacterGrid()
+            end
             GameTooltip_Hide()
         end,
     }
@@ -86,15 +115,36 @@ function ArwicAltManager.InitLDB()
     ldbi:Register("ArwicAltManager", obj, ArwicAltManagerDB.Config.MinimapIcon)
 end
 
-local function RegisterEvents()
-    local f = CreateFrame("FRAME")
-    f:SetScript("OnEvent", function(self, event, addonName)
-        if event == "ADDON_LOADED" and addonName == "ArwicAltManager" then
-            ArwicAltManager.InitDB()
-            ArwicAltManager.InitLDB()
+events["ADDON_LOADED"] = function(self, addonName)
+    if addonName == "ArwicAltManager" then
+        ArwicAltManager.InitDB()
+        ArwicAltManager.InitLDB()
+    end
+end
+
+events["MODIFIER_STATE_CHANGED"] = function(self, key, state)
+    if ArwicAltManagerDB.Config.MinimapIcon.PeekingRequireShift and ArwicAltManagerDB.Config.MinimapIcon.EnablePeeking then
+        if key == "LSHIFT" or key == "RSHIFT" then
+            if ArwicAltManager.MouseOverIcon and not ArwicAltManager.ManuallyOpen then
+                if state == 0 then -- key release
+                    ArwicAltManager.HideCharacterGrid()
+                elseif state == 1 then -- key pressed
+                    ArwicAltManager.ShowCharacterGrid()
+                end
+            end
         end
+    end
+end
+
+local function RegisterEvents()
+    -- register events
+    local eventFrame = CreateFrame("FRAME", "AAM_core_eventFrame")
+    eventFrame:SetScript("OnEvent", function(self, event, ...)
+        events[event](self, ...)
     end)
-    f:RegisterEvent("ADDON_LOADED")
+    for k, v in pairs(events) do
+        eventFrame:RegisterEvent(k)
+    end
 end
 RegisterEvents()
 
