@@ -1,5 +1,6 @@
 ArwicAltManager = {}
 local events = {}
+local ldb = LibStub:GetLibrary("LibDataBroker-1.1")
 
 function ArwicAltManager.InitDB()
     -- check the saved data version
@@ -45,11 +46,16 @@ function ArwicAltManager.InitDB()
     end
 end
 
+function ArwicAltManager.InitLDB()
+    
+end
+
 local function RegisterEvents()
     local f = CreateFrame("FRAME")
     f:SetScript("OnEvent", function(self, event, addonName)
         if event == "ADDON_LOADED" and addonName == "ArwicAltManager" then
             ArwicAltManager.InitDB()
+            ArwicAltManager.InitLDB()
         end
     end)
     f:RegisterEvent("ADDON_LOADED")
