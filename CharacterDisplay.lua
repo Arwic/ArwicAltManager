@@ -21,6 +21,7 @@ function ArwicAltManager.BuildCharacterGrid()
 
     -- main frame
     local mainFrame = CreateFrame("Frame", "ARWIC_AAM_mainFrame", UIParent)
+    table.insert(UISpecialFrames, mainFrame:GetName()) -- make frame close with escape
     mainFrame:SetFrameStrata("HIGH")
     mainFrame:SetPoint("CENTER",0,0)
     mainFrame.texture = mainFrame:CreateTexture(nil, "BACKGROUND")

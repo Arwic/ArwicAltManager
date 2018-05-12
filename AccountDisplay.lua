@@ -21,6 +21,7 @@ function ArwicAltManager.BuildAccountGrid()
 
     -- main frame
     local accountFrame = CreateFrame("Frame", "ARWIC_AAM_accountFrame", UIParent)
+    table.insert(UISpecialFrames, accountFrame:GetName()) -- make frame close with escape
     accountFrame:SetFrameStrata("HIGH")
     accountFrame:SetPoint("CENTER",0,0)
     accountFrame.texture = accountFrame:CreateTexture(nil, "BACKGROUND")

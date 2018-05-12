@@ -367,6 +367,7 @@ function ArwicAltManager.BuildConfig()
 
     -- main frame
     local configFrame = CreateFrame("Frame", "ARWIC_AAM_configFrame", UIParent)
+    table.insert(UISpecialFrames, configFrame:GetName()) -- make frame close with escape
     configFrame:SetFrameStrata("HIGH")
     configFrame:SetPoint("CENTER", 0, 0)
     configFrame.texture = configFrame:CreateTexture(nil, "BACKGROUND")
