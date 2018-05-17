@@ -4,6 +4,16 @@ local function CurrentChar()
     return ArwicAltManagerDB.Realms[GetRealmName()].Characters[UnitName("player")]
 end
 
+local function AddTooltipHeader(char, label)
+    local lr, lg, lb = AAM.ClassColor(char.Class)
+    --local rr, rg, rb = AAM.TooltipHeaderColor()
+    GameTooltip:AddDoubleLine(label, format("%s - %s", char.Name, char.Realm), nil, nil, nil, lr, lg, lb)--, rr, rg, rb)
+end
+
+local function AddCurrencyLine(char, cID, icon)
+    GameTooltip:AddLine(format("%s %s", icon, AAM.FormatInt(char.Currencies[cID].CurrentAmount)), AAM.DefaultColor())
+end
+
 if ArwicAltManager.Fields == nil then ArwicAltManager.Fields = {} end
 ArwicAltManager.Fields.Character = {
     ["INTERNAL_Currencies"] = {
@@ -111,8 +121,7 @@ ArwicAltManager.Fields.Character = {
         Order = 10,
         Display = true,
         Tooltip = function(char)
-            GameTooltip:AddLine("Character Name", AAM.TooltipHeaderColor())
-            GameTooltip:AddLine(format("%s - %s", char.Name, char.Realm), AAM.ClassColor(char.Class))
+            AddTooltipHeader(char, "Name")
             GameTooltip:AddLine(format("Level %d %s %s", char.Level, char.Race, AAM.ClassName(char.Class)), AAM.ClassColor(char.Class))
             GameTooltip:Show()
         end,
@@ -131,9 +140,9 @@ ArwicAltManager.Fields.Character = {
         Order = 20,
         Display = false,
         Tooltip = function(char)
-            GameTooltip:AddLine(format("%s - %s", char.Name, char.Realm), AAM.ClassColor(char.Class))
-            GameTooltip:AddLine("Class")
+            AddTooltipHeader(char, "Class")
             GameTooltip:AddLine(AAM.ClassName(char.Class), AAM.ClassColor(char.Class))
+            GameTooltip:Show()
         end,
         Value = function(char)
             return AAM.ClassName(char.Class)
@@ -150,9 +159,9 @@ ArwicAltManager.Fields.Character = {
         Order = 40,
         Display = true,
         Tooltip = function(char)
-            GameTooltip:AddLine(format("%s - %s", char.Name, char.Realm), AAM.ClassColor(char.Class))
-            GameTooltip:AddLine("Realm")
+            AddTooltipHeader(char, "Realm")
             GameTooltip:AddLine(char.Realm, AAM.DefaultColor())
+            GameTooltip:Show()
         end,
         Value = function(char)
             return char.Realm
@@ -169,9 +178,9 @@ ArwicAltManager.Fields.Character = {
         Order = 30,
         Display = false,
         Tooltip = function(char)
-            GameTooltip:AddLine(format("%s - %s", char.Name, char.Realm), AAM.ClassColor(char.Class))
-            GameTooltip:AddLine("Faction")
-            GameTooltip:AddLine(char.Realm, AAM.DefaultColor())
+            AddTooltipHeader(char, "Faction")
+            GameTooltip:AddLine(char.Faction, AAM.FactionColor(char.Faction))
+            GameTooltip:Show()
         end,
         Value = function(char)
             return char.Faction
@@ -187,6 +196,11 @@ ArwicAltManager.Fields.Character = {
         Label = "Race",
         Order = 60,
         Display = false,
+        Tooltip = function(char)
+            AddTooltipHeader(char, "Race")
+            GameTooltip:AddLine(char.Race, AAM.DefaultColor())
+            GameTooltip:Show()
+        end,
         Value = function(char)
             return char.Race
         end,
@@ -201,6 +215,16 @@ ArwicAltManager.Fields.Character = {
         Label = "Gender",
         Order = 70,
         Display = false,
+        Tooltip = function(char)
+            AddTooltipHeader(char, "Gender")
+            local map = {
+                [1] = "Unknown",
+                [2] = "Male",
+                [3] = "Female",
+            }
+            GameTooltip:AddLine(map[char.Gender], AAM.DefaultColor())
+            GameTooltip:Show()
+        end,
         Value = function(char)
             local map = {
                 [1] = "Unknown",
@@ -222,8 +246,8 @@ ArwicAltManager.Fields.Character = {
         Display = true,
         Tooltip = function(char)
             local days, hours, minutes, seconds = AAM.FormatTime(time() - char.Timestamp)
-            GameTooltip:AddLine("Time since character data updated", AAM.TooltipHeaderColor())
-            GameTooltip:AddLine(format("%d days %d hrs %d mins %d secs", days, hours, minutes, seconds))
+            AddTooltipHeader(char, "Updated")
+            GameTooltip:AddLine(format("%d days %d hrs %d mins %d secs", days, hours, minutes, seconds), AAM.DefaultColor())
             GameTooltip:Show()
         end,
         Value = function(char)
@@ -257,8 +281,8 @@ ArwicAltManager.Fields.Character = {
             local g = floor(char.Money / 100 / 100)
             local s = (char.Money / 100) % 100
             local c = char.Money % 100
-            GameTooltip:AddLine("Character Wealth", AAM.TooltipHeaderColor())
-            GameTooltip:AddLine(format("%sg %ds %dc", AAM.FormatInt(g), s, c))
+            AddTooltipHeader(char, "Gold")
+            GameTooltip:AddLine(format("|T133784:0|t %sg %ds %dc", AAM.FormatInt(g), s, c), AAM.DefaultColor())
             GameTooltip:Show()
         end,
         Value = function(char)
@@ -277,6 +301,15 @@ ArwicAltManager.Fields.Character = {
         Label = "Class Campaign",
         Order = 110,
         Display = true,
+        Tooltip = function(char)
+            AddTooltipHeader(char, "Class Campaign")
+            if not char.ClassCampaign then
+                GameTooltip:AddLine(AAM.FormatBool(char.ClassCampaign), AAM.ErrorColor())
+            else
+                GameTooltip:AddLine(AAM.FormatBool(char.ClassCampaign), AAM.DefaultColor())
+            end
+            GameTooltip:Show()
+        end,
         Value = function(char)
             return AAM.FormatBool(char.ClassCampaign)
         end,
@@ -309,6 +342,15 @@ ArwicAltManager.Fields.Character = {
         Label = "Class Mount",
         Order = 120,
         Display = true,
+        Tooltip = function(char)
+            AddTooltipHeader(char, "Class Mount")
+            if not char.ClassMount then
+                GameTooltip:AddLine(AAM.FormatBool(char.ClassMount), AAM.ErrorColor())
+            else
+                GameTooltip:AddLine(AAM.FormatBool(char.ClassMount), AAM.DefaultColor())
+            end
+            GameTooltip:Show()
+        end,
         Value = function(char)
             return AAM.FormatBool(char.ClassMount)
         end,
@@ -378,6 +420,11 @@ ArwicAltManager.Fields.Character = {
         Label = "Level",
         Order = 50,
         Display = true,
+        Tooltip = function(char)
+            AddTooltipHeader(char, "Level")
+            GameTooltip:AddLine(format("Level %d", char.Level), AAM.DefaultColor())
+            GameTooltip:Show()
+        end,
         Value = function(char)
             return char.Level
         end,
@@ -392,6 +439,11 @@ ArwicAltManager.Fields.Character = {
         Label = "Riding",
         Order = 160,
         Display = true,
+        Tooltip = function(char)
+            AddTooltipHeader(char, "Riding")
+            GameTooltip:AddLine(format("%s%%", char.MountSpeed), AAM.DefaultColor())
+            GameTooltip:Show()
+        end,
         Value = function(char)
             return format("%s%%", char.MountSpeed)
         end,
@@ -421,6 +473,15 @@ ArwicAltManager.Fields.Character = {
         Label = "All Order Hall Upgrades",
         Order = 130,
         Display = true,
+        Tooltip = function(char)
+            AddTooltipHeader(char, "All Order Hall Upgrades")
+            if not char.OrderHallUpgrades then
+                GameTooltip:AddLine(AAM.FormatBool(char.OrderHallUpgrades), AAM.ErrorColor())
+            else
+                GameTooltip:AddLine(AAM.FormatBool(char.OrderHallUpgrades), AAM.DefaultColor())
+            end
+            GameTooltip:Show()
+        end,
         Value = function(char)
             return AAM.FormatBool(char.OrderHallUpgrades)
         end,
@@ -438,6 +499,15 @@ ArwicAltManager.Fields.Character = {
         Label = "Balance of Power",
         Order = 150,
         Display = true,
+        Tooltip = function(char)
+            AddTooltipHeader(char, "Balance of Power")
+            if not char.BalanceOfPower then
+                GameTooltip:AddLine(AAM.FormatBool(char.BalanceOfPower), AAM.ErrorColor())
+            else
+                GameTooltip:AddLine(AAM.FormatBool(char.BalanceOfPower), AAM.DefaultColor())
+            end
+            GameTooltip:Show()
+        end,
         Value = function(char)
             return AAM.FormatBool(char.BalanceOfPower)
         end,
@@ -455,6 +525,15 @@ ArwicAltManager.Fields.Character = {
         Label = "Keystone Master",
         Order = 135,
         Display = true,
+        Tooltip = function(char)
+            AddTooltipHeader(char, "Keystone Master")
+            if not char.KeystoneMaster then
+                GameTooltip:AddLine(AAM.FormatBool(char.KeystoneMaster), AAM.ErrorColor())
+            else
+                GameTooltip:AddLine(AAM.FormatBool(char.KeystoneMaster), AAM.DefaultColor())
+            end
+            GameTooltip:Show()
+        end,
         Value = function(char)
             return AAM.FormatBool(char.KeystoneMaster)
         end,
@@ -535,9 +614,15 @@ ArwicAltManager.Fields.Character = {
                     ["Protection"] = 45863, -- The Highlord's Return
                 },
             }
-            GameTooltip:AddLine("Mage Tower Unlocked", AAM.TooltipHeaderColor())
+            AddTooltipHeader(char, "Mage Tower Unlocked")
             for k, v in pairs(ids[char.Class]) do
-                GameTooltip:AddDoubleLine(k, AAM.FormatBool(char.MageTowerPrereq[v]))
+                local r, g, b = AAM.DefaultColor()
+                local unlocked = char.MageTowerPrereq[v]
+                if not unlocked then
+                    GameTooltip:AddDoubleLine(k, AAM.FormatBool(unlocked), r, g, b, AAM.ErrorColor())
+                else
+                    GameTooltip:AddDoubleLine(k, AAM.FormatBool(unlocked), r, g, b, AAM.DefaultColor())
+                end
             end
             GameTooltip:Show()
         end,
@@ -659,9 +744,15 @@ ArwicAltManager.Fields.Character = {
                     ["Protection"] = 45416, -- The Highlord's Return
                 },
             }
-            GameTooltip:AddLine("Mage Tower Completed", AAM.TooltipHeaderColor())
+            AddTooltipHeader(char, "Mage Tower Completed")
             for k, v in pairs(ids[char.Class]) do
-                GameTooltip:AddDoubleLine(k, AAM.FormatBool(char.MageTower[v]))
+                local r, g, b = AAM.DefaultColor()
+                local completed = char.MageTower[v]
+                if not completed then
+                    GameTooltip:AddDoubleLine(k, AAM.FormatBool(completed), r, g, b, AAM.ErrorColor())
+                else
+                    GameTooltip:AddDoubleLine(k, AAM.FormatBool(completed), r, g, b, AAM.DefaultColor())
+                end
             end
             GameTooltip:Show()
         end,
@@ -716,9 +807,9 @@ ArwicAltManager.Fields.Character = {
         Display = true,
         Tooltip = function(char)
             if char.TimePlayed ~= nil then
-                GameTooltip:AddLine("Time Played", AAM.TooltipHeaderColor())
-                GameTooltip:AddLine(format("Total: %d days %d hrs %d mins %d secs", AAM.FormatTime(char.TimePlayed.Total)))
-                GameTooltip:AddLine(format("This Level: %d days %d hrs %d mins %d secs", AAM.FormatTime(char.TimePlayed.Level)))
+                AddTooltipHeader(char, "Time Played")
+                GameTooltip:AddLine(format("Total: %d days %d hrs %d mins %d secs", AAM.FormatTime(char.TimePlayed.Total)), AAM.DefaultColor())
+                GameTooltip:AddLine(format("This Level: %d days %d hrs %d mins %d secs", AAM.FormatTime(char.TimePlayed.Level)), AAM.DefaultColor())
                 GameTooltip:Show()
             end
         end,
@@ -746,11 +837,12 @@ ArwicAltManager.Fields.Character = {
         Order = 100,
         Display = true,
         Tooltip = function(char)
-            GameTooltip:AddLine("Artifact Levels", AAM.TooltipHeaderColor())
+            AddTooltipHeader(char, "Artifact Levels")
             for k, v in pairs(char.Artifacts) do
                 if k ~= 133755 then -- dont show fishing artifact
                     if v.Name == nil then v.Name = "UNKNOWN" end
-                    GameTooltip:AddDoubleLine(format("%s", v.Name), format("%d", v.Ranks))
+                    local r, g, b = AAM.DefaultColor()
+                    GameTooltip:AddDoubleLine(format("%s", v.Name), format("%d", v.Ranks), r, g, b, AAM.DefaultColor())
                 end
             end
             GameTooltip:Show()
@@ -791,11 +883,18 @@ ArwicAltManager.Fields.Character = {
         Label = "|T1397630:0|t Order Resouces",
         Order = 90,
         Display = true,
+        Tooltip = function(char)
+            if char.Currencies ~= nil then
+                AddTooltipHeader(char, "Order Resouces")
+                AddCurrencyLine(char, 1220, "|T1397630:0|t")
+                GameTooltip:Show()
+            end
+        end,
         Value = function(char)
             if not char.Currencies then
                 return ""
             end
-            return char.Currencies[1220].CurrentAmount
+            return AAM.FormatInt(char.Currencies[1220].CurrentAmount)
         end,
         Color = function(char)
             return AAM.DefaultColor()
@@ -805,11 +904,18 @@ ArwicAltManager.Fields.Character = {
         Label = "|T236521:0|t Wakening Essence",
         Order = 91,
         Display = true,
+        Tooltip = function(char)
+            if char.Currencies ~= nil then
+                AddTooltipHeader(char, "Wakening Essence")
+                AddCurrencyLine(char, 1533, "|T236521:0|t")
+                GameTooltip:Show()
+            end
+        end,
         Value = function(char)
             if not char.Currencies or not char.Currencies[1533] then
                 return ""
             end
-            return char.Currencies[1533].CurrentAmount
+            return AAM.FormatInt(char.Currencies[1533].CurrentAmount)
         end,
         Color = function(char)
             if not char.Currencies or not char.Currencies[1533] then
@@ -827,14 +933,12 @@ ArwicAltManager.Fields.Character = {
         Order = 21,
         Display = true,
         Tooltip = function(char)
-            if char.Gear == nil or char.Gear.Items == nil or char.Gear.AvgItemLevelBags == nil then
-                GameTooltip:AddLine("No Gear Data")
-                GameTooltip:Show()
-            else
-                GameTooltip:AddLine(format("Item Level %d (Equipped %d)", char.Gear.AvgItemLevelBags, char.Gear.AvgItemLevelEquipped), AAM.TooltipHeaderColor())
+            if char.Gear ~= nil and char.Gear.Items ~= nil and char.Gear.AvgItemLevelBags ~= nil then
+                AddTooltipHeader(char, format("Item Level %d (Equipped %d)", char.Gear.AvgItemLevelBags, char.Gear.AvgItemLevelEquipped))
                 for k, v in pairs(char.Gear.Items) do
                     if v.Texture ~= nil and v.ItemLevel ~= nil and v.Name ~= nil then
-                        GameTooltip:AddDoubleLine(format("|T%s:24|t (%d) %s", v.Texture, v.ItemLevel, v.Name), _G[v.EquipLoc], GetItemQualityColor(v.Rarity))
+                        local r, g, b = GetItemQualityColor(v.Rarity)
+                        GameTooltip:AddDoubleLine(format("|T%s:24|t (%d) %s", v.Texture, v.ItemLevel, v.Name), _G[v.EquipLoc], r, g, b, AAM.DefaultColor())
                     else
                         GameTooltip:AddLine("Unknown", AAM.ErrorColor())
                     end
@@ -906,7 +1010,9 @@ ArwicAltManager.Fields.Character = {
         Order = 23,
         Display = true,
         Tooltip = function(char)
-            
+            AddTooltipHeader(char, "Guild")
+            GameTooltip:AddLine(char.GuildName, AAM.DefaultColor())
+            GameTooltip:Show()
         end,
         Value = function(char)
             return char.GuildName
@@ -928,11 +1034,8 @@ ArwicAltManager.Fields.Character = {
         Order = 22,
         Display = true,
         Tooltip = function(char)
-            if char.Followers == nil then
-                GameTooltip:AddLine("No Champion Data", AAM.ErrorColor())
-                GameTooltip:Show()
-            else
-                GameTooltip:AddLine("Orderhall Champions", AAM.TooltipHeaderColor())
+            if char.Followers ~= nil then
+                AddTooltipHeader(char, "Orderhall Champions")
                 for k, v in pairs(char.Followers) do
                     -- get equipment links
                     local n1 = C_Garrison.GetFollowerAbilityLink(v.Equipment[1].ID)
@@ -1013,6 +1116,11 @@ ArwicAltManager.Fields.Character = {
         Order = 15,
         Display = true,
         Tooltip = function(char)
+            if char.Title ~= nil then
+                AddTooltipHeader(char, "Title")
+                GameTooltip:AddLine(GetTitleName(char.Title), AAM.DefaultColor())
+                GameTooltip:Show()
+            end
         end,
         Value = function(char)
             if char.Title == nil then
