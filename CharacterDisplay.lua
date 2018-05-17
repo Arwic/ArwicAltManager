@@ -32,6 +32,11 @@ function ArwicAltManager.BuildCharacterGrid()
     mainFrame:RegisterForDrag("LeftButton")
     mainFrame:SetScript("OnDragStart", function(self) self:StartMoving() end)
     mainFrame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
+    local oldHide = mainFrame.Hide
+    mainFrame.Hide = function()
+        ArwicAltManager.ManuallyOpen = false
+        oldHide(mainFrame)
+    end
 
     -- title bar
     local titleBar = CreateFrame("FRAME", "AAM_titleBarFrame", mainFrame)
