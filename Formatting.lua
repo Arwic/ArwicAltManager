@@ -6,7 +6,7 @@ end
 
 function ArwicAltManager.FactionColor(factionName)
     if factionName == "Alliance" then
-        return 0, 0.8, 1
+        return 0, 0.6, 1
     elseif factionName == "Horde" then
         return 0.85, 0, 0
     end

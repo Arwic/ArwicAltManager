@@ -278,11 +278,98 @@ ArwicAltManager.Fields.Character = {
         Order = 80,
         Display = true,
         Tooltip = function(char)
-            local g = floor(char.Money / 100 / 100)
-            local s = (char.Money / 100) % 100
-            local c = char.Money % 100
+            -- character
+            local charGold = floor(char.Money / 100 / 100)
+            local charSilver = (char.Money / 100) % 100
+            local charCopper = char.Money % 100
+            -- realm
+            local realmChars = ArwicAltManagerDB.Realms[char.Realm].Characters
+            local realmMoney = 0
+            for _, c in pairs(realmChars) do
+                realmMoney = realmMoney + c.Money
+            end
+            local realmGold = floor(realmMoney / 100 / 100)
+            local realmSilver = (realmMoney / 100) % 100
+            local realmCopper = realmMoney % 100
+            -- alliance realm total
+            local realmAlliMoney = 0
+            for _, c in pairs(realmChars) do
+                if c.Faction == "Alliance" then
+                    realmAlliMoney = realmAlliMoney + c.Money
+                end
+            end
+            local realmAlliGold = floor(realmAlliMoney / 100 / 100)
+            local realmAlliSilver = (realmAlliMoney / 100) % 100
+            local realmAlliCopper = realmAlliMoney % 100
+            -- horde realm total
+            local realmHordeMoney = 0
+            for _, c in pairs(realmChars) do
+                if c.Faction == "Horde" then
+                    realmHordeMoney = realmHordeMoney + c.Money
+                end
+            end
+            local realmHordeGold = floor(realmHordeMoney / 100 / 100)
+            local realmHordeSilver = (realmHordeMoney / 100) % 100
+            local realmHordeCopper = realmHordeMoney % 100
+            -- total
+            local totalMoney = 0
+            for _, realm in pairs(ArwicAltManagerDB.Realms) do
+                for _, c in pairs(realm.Characters) do
+                    totalMoney = totalMoney + c.Money
+                end
+            end
+            local totalGold = floor(totalMoney / 100 / 100)
+            local totalSilver = (totalMoney / 100) % 100
+            local totalCopper = totalMoney % 100
+            -- alliance total
+            local totalAlliMoney = 0
+            for _, realm in pairs(ArwicAltManagerDB.Realms) do
+                for _, c in pairs(realm.Characters) do
+                    if c.Faction == "Alliance" then
+                        totalAlliMoney = totalAlliMoney + c.Money
+                    end
+                end
+            end
+            local totalAlliGold = floor(totalAlliMoney / 100 / 100)
+            local totalAlliSilver = (totalAlliMoney / 100) % 100
+            local totalAlliCopper = totalAlliMoney % 100
+            -- horde total
+            local totalHordeMoney = 0
+            for _, realm in pairs(ArwicAltManagerDB.Realms) do
+                for _, c in pairs(realm.Characters) do
+                    if c.Faction == "Horde" then
+                        totalHordeMoney = totalHordeMoney + c.Money
+                    end
+                end
+            end
+            local totalHordeGold = floor(totalHordeMoney / 100 / 100)
+            local totalHordeSilver = (totalHordeMoney / 100) % 100
+            local totalHordeCopper = totalHordeMoney % 100
             AddTooltipHeader(char, "Gold")
-            GameTooltip:AddLine(format("|T133784:0|t %s|cFFefca00g|r %d|cFFcdcdd6s|r %d|cFFe2a05fc|r", AAM.FormatInt(g), s, c), AAM.DefaultColor())
+            local r, g, b = AAM.DefaultColor()
+            GameTooltip:AddDoubleLine("Character:", 
+                format("%s|cFFefca00g|r %d|cFFcdcdd6s|r %d|cFFe2a05fc|r", AAM.FormatInt(charGold), charSilver, charCopper), 
+                r, g, b, AAM.DefaultColor())
+            GameTooltip:AddLine(" ")
+            GameTooltip:AddDoubleLine(format("%s |cFF0099FFAlliance|r Total:", char.Realm), 
+                format("%s|cFFefca00g|r %d|cFFcdcdd6s|r %d|cFFe2a05fc|r", AAM.FormatInt(realmAlliGold), realmAlliSilver, realmAlliCopper), 
+                r, g, b, AAM.DefaultColor())
+            GameTooltip:AddDoubleLine(format("%s |cFFD80000Horde|r Total:", char.Realm), 
+                format("%s|cFFefca00g|r %d|cFFcdcdd6s|r %d|cFFe2a05fc|r", AAM.FormatInt(realmHordeGold), realmHordeSilver, realmHordeCopper), 
+                r, g, b, AAM.DefaultColor())
+            GameTooltip:AddDoubleLine(format("%s Total:", char.Realm), 
+                format("%s|cFFefca00g|r %d|cFFcdcdd6s|r %d|cFFe2a05fc|r", AAM.FormatInt(realmGold), realmSilver, realmCopper), 
+                r, g, b, AAM.DefaultColor())
+            GameTooltip:AddLine(" ")
+                GameTooltip:AddDoubleLine("Account |cFF0099FFAlliance|r Total:", 
+                format("%s|cFFefca00g|r %d|cFFcdcdd6s|r %d|cFFe2a05fc|r", AAM.FormatInt(totalAlliGold), totalAlliSilver, totalAlliCopper), 
+                r, g, b, AAM.DefaultColor())
+            GameTooltip:AddDoubleLine("Account |cFFD80000Horde|r Total:", 
+                format("%s|cFFefca00g|r %d|cFFcdcdd6s|r %d|cFFe2a05fc|r", AAM.FormatInt(totalHordeGold), totalHordeSilver, totalHordeCopper), 
+                r, g, b, AAM.DefaultColor())
+            GameTooltip:AddDoubleLine("Account Total:", 
+                format("%s|cFFefca00g|r %d|cFFcdcdd6s|r %d|cFFe2a05fc|r", AAM.FormatInt(totalGold), totalSilver, totalCopper), 
+                r, g, b, AAM.DefaultColor())
             GameTooltip:Show()
         end,
         Value = function(char)
