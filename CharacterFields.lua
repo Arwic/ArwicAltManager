@@ -282,12 +282,12 @@ ArwicAltManager.Fields.Character = {
             local s = (char.Money / 100) % 100
             local c = char.Money % 100
             AddTooltipHeader(char, "Gold")
-            GameTooltip:AddLine(format("|T133784:0|t %sg %ds %dc", AAM.FormatInt(g), s, c), AAM.DefaultColor())
+            GameTooltip:AddLine(format("|T133784:0|t %s|cFFefca00g|r %d|cFFcdcdd6s|r %d|cFFe2a05fc|r", AAM.FormatInt(g), s, c), AAM.DefaultColor())
             GameTooltip:Show()
         end,
         Value = function(char)
             local g = floor(char.Money / 100 / 100)
-            local str = format("%sg", AAM.FormatInt(g))
+            local str = format("%s|cFFefca00g|r", AAM.FormatInt(g))
             return str
         end,
         Color = function(char)
