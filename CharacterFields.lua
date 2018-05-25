@@ -101,7 +101,7 @@ ArwicAltManager.Fields.Character = {
                 1533, -- Wakening Essence
             }
             local char = CurrentChar()
-            char["Currencies"] = {}
+            char.Currencies = {}
             for _, cid in pairs(curIDs) do
                 if not char.Currencies[cid] then 
                     char.Currencies[cid] = {} 
@@ -114,6 +114,53 @@ ArwicAltManager.Fields.Character = {
                 char.Currencies[cid].TotalMax,
                 char.Currencies[cid].IsDiscovered = GetCurrencyInfo(cid)
             end
+        end,
+    },
+    ["INTERNAL_Professions"] = {
+        Internal = true,
+        Display = false,
+        Order = 0,
+        Update = function()
+            print("updating profession data")
+            local char = CurrentChar()
+            char.Professions = {}
+            local prof1, prof2, archaeology, fishing, cooking, firstAid = GetProfessions()
+            
+            char.Professions.Primary1 = {}
+            char.Professions.Primary1.Name, 
+            char.Professions.Primary1.Icon, 
+            char.Professions.Primary1.SkillLevel, 
+            char.Professions.Primary1.MaxSkillLevel = GetProfessionInfo(prof1)
+
+            char.Professions.Primary2 = {}
+            char.Professions.Primary2.Name, 
+            char.Professions.Primary2.Icon, 
+            char.Professions.Primary2.SkillLevel, 
+            char.Professions.Primary2.MaxSkillLevel = GetProfessionInfo(prof2)
+
+            char.Professions.Archaeology = {}
+            char.Professions.Archaeology.Name, 
+            char.Professions.Archaeology.Icon, 
+            char.Professions.Archaeology.SkillLevel, 
+            char.Professions.Archaeology.MaxSkillLevel = GetProfessionInfo(archaeology)
+
+            char.Professions.Fishing = {}
+            char.Professions.Fishing.Name, 
+            char.Professions.Fishing.Icon, 
+            char.Professions.Fishing.SkillLevel, 
+            char.Professions.Fishing.MaxSkillLevel = GetProfessionInfo(fishing)
+
+            char.Professions.Cooking = {}
+            char.Professions.Cooking.Name, 
+            char.Professions.Cooking.Icon, 
+            char.Professions.Cooking.SkillLevel, 
+            char.Professions.Cooking.MaxSkillLevel = GetProfessionInfo(cooking)
+
+            char.Professions.FirstAid = {}
+            char.Professions.FirstAid.Name, 
+            char.Professions.FirstAid.Icon, 
+            char.Professions.FirstAid.SkillLevel, 
+            char.Professions.FirstAid.MaxSkillLevel = GetProfessionInfo(firstAid)
         end,
     },
     ["Name"] = {
@@ -1222,6 +1269,145 @@ ArwicAltManager.Fields.Character = {
             CurrentChar().Title = GetCurrentTitle()
         end,
     },
+    ["Prof_Primary1"] = {
+        Label = "Profession 1",
+        Order = 101,
+        Display = true,
+        Tooltip = function(char)
+            if char.Professions ~= nil and char.Professions.Primary1 ~= nil then
+                AddTooltipHeader(char, char.Professions.Primary1.Name)
+                GameTooltip:AddLine(format("|T%s:0|t %d/%d", char.Professions.Primary1.Icon, char.Professions.Primary1.SkillLevel, char.Professions.Primary1.MaxSkillLevel), AAM.DefaultColor())
+                GameTooltip:Show()
+            end
+        end,
+        Value = function(char)
+            if char.Professions ~= nil and char.Professions.Primary1 ~= nil then
+                return format("|T%s:0|t %d/%d", char.Professions.Primary1.Icon, char.Professions.Primary1.SkillLevel, char.Professions.Primary1.MaxSkillLevel)
+            end
+            return "?"
+        end,
+        Color = function(char)
+            return AAM.DefaultColor()
+        end,
+        Update = function()
+        end,
+    },
+    ["Prof_Primary2"] = {
+        Label = "Profession 2",
+        Order = 102,
+        Display = true,
+        Tooltip = function(char)
+            if char.Professions ~= nil and char.Professions.Primary2 ~= nil then
+                AddTooltipHeader(char, char.Professions.Primary2.Name)
+                GameTooltip:AddLine(format("|T%s:0|t %d/%d", char.Professions.Primary2.Icon, char.Professions.Primary2.SkillLevel, char.Professions.Primary2.MaxSkillLevel), AAM.DefaultColor())
+                GameTooltip:Show()
+            end
+        end,
+        Value = function(char)
+            if char.Professions ~= nil and char.Professions.Primary2 ~= nil then
+                return format("|T%s:0|t %d/%d", char.Professions.Primary2.Icon, char.Professions.Primary2.SkillLevel, char.Professions.Primary2.MaxSkillLevel)
+            end
+            return "?"
+        end,
+        Color = function(char)
+            return AAM.DefaultColor()
+        end,
+        Update = function()
+        end,
+    },
+    ["Prof_Archaeology"] = {
+        Label = "Archaeology",
+        Order = 103,
+        Display = true,
+        Tooltip = function(char)
+            if char.Professions ~= nil and char.Professions.Archaeology ~= nil and char.Professions.Archaeology.Icon ~= nil then
+                AddTooltipHeader(char, char.Professions.Archaeology.Name)
+                GameTooltip:AddLine(format("|T%s:0|t %d/%d", char.Professions.Archaeology.Icon, char.Professions.Archaeology.SkillLevel, char.Professions.Archaeology.MaxSkillLevel), AAM.DefaultColor())
+                GameTooltip:Show()
+            end
+        end,
+        Value = function(char)
+            if char.Professions ~= nil and char.Professions.Archaeology ~= nil and char.Professions.Archaeology.Icon ~= nil then
+                return format("|T%s:0|t %d/%d", char.Professions.Archaeology.Icon, char.Professions.Archaeology.SkillLevel, char.Professions.Archaeology.MaxSkillLevel)
+            end
+            return "?"
+        end,
+        Color = function(char)
+            return AAM.DefaultColor()
+        end,
+        Update = function()
+        end,
+    },
+    ["Prof_Fishing"] = {
+        Label = "Fishing",
+        Order = 103,
+        Display = true,
+        Tooltip = function(char)
+            if char.Professions ~= nil and char.Professions.Fishing ~= nil and char.Professions.Fishing.Icon ~= nil then
+                AddTooltipHeader(char, char.Professions.Fishing.Name)
+                GameTooltip:AddLine(format("|T%s:0|t %d/%d", char.Professions.Fishing.Icon, char.Professions.Fishing.SkillLevel, char.Professions.Fishing.MaxSkillLevel), AAM.DefaultColor())
+                GameTooltip:Show()
+            end
+        end,
+        Value = function(char)
+            if char.Professions ~= nil and char.Professions.Fishing ~= nil and char.Professions.Fishing.Icon ~= nil then
+                return format("|T%s:0|t %d/%d", char.Professions.Fishing.Icon, char.Professions.Fishing.SkillLevel, char.Professions.Fishing.MaxSkillLevel)
+            end
+            return "?"
+        end,
+        Color = function(char)
+            return AAM.DefaultColor()
+        end,
+        Update = function()
+        end,
+    },
+    ["Prof_Cooking"] = {
+        Label = "Cooking",
+        Order = 103,
+        Display = true,
+        Tooltip = function(char)
+            if char.Professions ~= nil and char.Professions.Cooking ~= nil and char.Professions.Cooking.Icon ~= nil then
+                AddTooltipHeader(char, char.Professions.Cooking.Name)
+                GameTooltip:AddLine(format("|T%s:0|t %d/%d", char.Professions.Cooking.Icon, char.Professions.Cooking.SkillLevel, char.Professions.Cooking.MaxSkillLevel), AAM.DefaultColor())
+                GameTooltip:Show()
+            end
+        end,
+        Value = function(char)
+            if char.Professions ~= nil and char.Professions.Cooking ~= nil and char.Professions.Cooking.Icon ~= nil then
+                return format("|T%s:0|t %d/%d", char.Professions.Cooking.Icon, char.Professions.Cooking.SkillLevel, char.Professions.Cooking.MaxSkillLevel)
+            end
+            return "?"
+        end,
+        Color = function(char)
+            return AAM.DefaultColor()
+        end,
+        Update = function()
+        end,
+    },
+    ["Prof_FirstAid"] = {
+        Label = "First Aid",
+        Order = 103,
+        Display = true,
+        Tooltip = function(char)
+            if char.Professions ~= nil and char.Professions.FirstAid ~= nil and char.Professions.FirstAid.Icon ~= nil then
+                AddTooltipHeader(char, char.Professions.FirstAid.Name)
+                GameTooltip:AddLine(format("|T%s:0|t %d/%d", char.Professions.FirstAid.Icon, char.Professions.FirstAid.SkillLevel, char.Professions.FirstAid.MaxSkillLevel), AAM.DefaultColor())
+                GameTooltip:Show()
+            end
+        end,
+        Value = function(char)
+            if char.Professions ~= nil and char.Professions.FirstAid ~= nil and char.Professions.FirstAid.Icon ~= nil then
+                return format("|T%s:0|t %d/%d", char.Professions.FirstAid.Icon, char.Professions.FirstAid.SkillLevel, char.Professions.FirstAid.MaxSkillLevel)
+            end
+            return "?"
+        end,
+        Color = function(char)
+            return AAM.DefaultColor()
+        end,
+        Update = function()
+        end,
+    },
+
 }
 
 function ArwicAltManager.UpdateCharacterData()
