@@ -121,7 +121,6 @@ ArwicAltManager.Fields.Character = {
         Display = false,
         Order = 0,
         Update = function()
-            print("updating profession data")
             local char = CurrentChar()
             char.Professions = {}
             local prof1, prof2, archaeology, fishing, cooking, firstAid = GetProfessions()
@@ -1407,7 +1406,6 @@ ArwicAltManager.Fields.Character = {
         Update = function()
         end,
     },
-
 }
 
 function ArwicAltManager.UpdateCharacterData()
