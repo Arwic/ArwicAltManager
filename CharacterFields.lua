@@ -124,42 +124,48 @@ ArwicAltManager.Fields.Character = {
             local char = CurrentChar()
             char.Professions = {}
             local prof1, prof2, archaeology, fishing, cooking, firstAid = GetProfessions()
-            
-            char.Professions.Primary1 = {}
-            char.Professions.Primary1.Name, 
-            char.Professions.Primary1.Icon, 
-            char.Professions.Primary1.SkillLevel, 
-            char.Professions.Primary1.MaxSkillLevel = GetProfessionInfo(prof1)
-
-            char.Professions.Primary2 = {}
-            char.Professions.Primary2.Name, 
-            char.Professions.Primary2.Icon, 
-            char.Professions.Primary2.SkillLevel, 
-            char.Professions.Primary2.MaxSkillLevel = GetProfessionInfo(prof2)
-
-            char.Professions.Archaeology = {}
-            char.Professions.Archaeology.Name, 
-            char.Professions.Archaeology.Icon, 
-            char.Professions.Archaeology.SkillLevel, 
-            char.Professions.Archaeology.MaxSkillLevel = GetProfessionInfo(archaeology)
-
-            char.Professions.Fishing = {}
-            char.Professions.Fishing.Name, 
-            char.Professions.Fishing.Icon, 
-            char.Professions.Fishing.SkillLevel, 
-            char.Professions.Fishing.MaxSkillLevel = GetProfessionInfo(fishing)
-
-            char.Professions.Cooking = {}
-            char.Professions.Cooking.Name, 
-            char.Professions.Cooking.Icon, 
-            char.Professions.Cooking.SkillLevel, 
-            char.Professions.Cooking.MaxSkillLevel = GetProfessionInfo(cooking)
-
-            char.Professions.FirstAid = {}
-            char.Professions.FirstAid.Name, 
-            char.Professions.FirstAid.Icon, 
-            char.Professions.FirstAid.SkillLevel, 
-            char.Professions.FirstAid.MaxSkillLevel = GetProfessionInfo(firstAid)
+            if prof1 ~= nil then
+                char.Professions.Primary1 = {}
+                char.Professions.Primary1.Name, 
+                char.Professions.Primary1.Icon, 
+                char.Professions.Primary1.SkillLevel, 
+                char.Professions.Primary1.MaxSkillLevel = GetProfessionInfo(prof1)
+            end
+            if prof2 ~= nil then
+                char.Professions.Primary2 = {}
+                char.Professions.Primary2.Name, 
+                char.Professions.Primary2.Icon, 
+                char.Professions.Primary2.SkillLevel, 
+                char.Professions.Primary2.MaxSkillLevel = GetProfessionInfo(prof2)
+            end
+            if archaeology ~= nil then
+                char.Professions.Archaeology = {}
+                char.Professions.Archaeology.Name, 
+                char.Professions.Archaeology.Icon, 
+                char.Professions.Archaeology.SkillLevel, 
+                char.Professions.Archaeology.MaxSkillLevel = GetProfessionInfo(archaeology)
+            end
+            if fishing ~= nil then
+                char.Professions.Fishing = {}
+                char.Professions.Fishing.Name, 
+                char.Professions.Fishing.Icon, 
+                char.Professions.Fishing.SkillLevel, 
+                char.Professions.Fishing.MaxSkillLevel = GetProfessionInfo(fishing)
+            end
+            if cooking ~= nil then
+                char.Professions.Cooking = {}
+                char.Professions.Cooking.Name, 
+                char.Professions.Cooking.Icon, 
+                char.Professions.Cooking.SkillLevel, 
+                char.Professions.Cooking.MaxSkillLevel = GetProfessionInfo(cooking)
+            end
+            if firstAid ~= nil then
+                char.Professions.FirstAid = {}
+                char.Professions.FirstAid.Name, 
+                char.Professions.FirstAid.Icon, 
+                char.Professions.FirstAid.SkillLevel, 
+                char.Professions.FirstAid.MaxSkillLevel = GetProfessionInfo(firstAid)
+            end
         end,
     },
     ["Name"] = {
