@@ -197,13 +197,15 @@ ArwicAltManager.Fields.Account = {
         Order = 701,
         Display = true,
         Value = function()
-            return AAM.FormatBool(Account().ChosenTransmogs[1])
+            if Account().ChosenTransmogUnlocked ~= nil then
+                return AAM.FormatBool(Account().ChosenTransmogUnlocked[1])
+            end
         end,
         Color = function()
-            if not Account().ChosenTransmogs[1] then
-                return AAM.ErrorColor()
+            if Account().ChosenTransmogUnlocked ~= nil and Account().ChosenTransmogUnlocked[1] then
+                return AAM.DefaultColor()
             end
-            return AAM.DefaultColor()
+            return AAM.ErrorColor()
         end,
         Tooltip = function(char)
             GameTooltip:AddLine("Chosen Cloth", AAM.TooltipHeaderColor())
@@ -211,12 +213,9 @@ ArwicAltManager.Fields.Account = {
             GameTooltip:Show()
         end,
         Update = function()
-            local wasEarnedByMe = select(13, GetAchievementInfo(11387))
-            local englishClass = select(2, UnitClass("player"))
-            local armorClass = armorProficiency[englishClass]
             local account = Account()
-            if not account.ChosenTransmogs then account.ChosenTransmogs = {} end
-            account.ChosenTransmogs[armorClass] = wasEarnedByMe or account.ChosenTransmogs[armorClass]
+            if not account.ChosenTransmogUnlocked then account.ChosenTransmogUnlocked = {} end
+            account.ChosenTransmogUnlocked[1] = C_TransmogCollection.PlayerHasTransmog(143346) or account.ChosenTransmogUnlocked[1]
         end,
     },
     ["ChosenTransmogs_Leather"] = {
@@ -224,26 +223,25 @@ ArwicAltManager.Fields.Account = {
         Order = 702,
         Display = true,
         Value = function()
-            return AAM.FormatBool(Account().ChosenTransmogs[2])
+            if Account().ChosenTransmogUnlocked ~= nil then
+                return AAM.FormatBool(Account().ChosenTransmogUnlocked[2])
+            end
         end,
         Color = function()
-            if not Account().ChosenTransmogs[2] then
-                return AAM.ErrorColor()
+            if Account().ChosenTransmogUnlocked ~= nil and Account().ChosenTransmogUnlocked[2] then
+                return AAM.DefaultColor()
             end
-            return AAM.DefaultColor()
+            return AAM.ErrorColor()
         end,
         Tooltip = function(char)
-            GameTooltip:AddLine("Chosen Cloth", AAM.TooltipHeaderColor())
+            GameTooltip:AddLine("Chosen Leather", AAM.TooltipHeaderColor())
             GameTooltip:AddLine("Obtained by completing the achievement [The Chosen] and opening the box on a leather wearing character.", nil, nil, nil, true)
             GameTooltip:Show()
         end,
         Update = function()
-            local wasEarnedByMe = select(13, GetAchievementInfo(11387))
-            local englishClass = select(2, UnitClass("player"))
-            local armorClass = armorProficiency[englishClass]
             local account = Account()
-            if not account.ChosenTransmogs then account.ChosenTransmogs = {} end
-            account.ChosenTransmogs[armorClass] = wasEarnedByMe or account.ChosenTransmogs[armorClass]
+            if not account.ChosenTransmogUnlocked then account.ChosenTransmogUnlocked = {} end
+            account.ChosenTransmogUnlocked[2] = C_TransmogCollection.PlayerHasTransmog(143348) or account.ChosenTransmogUnlocked[2]
         end,
     },
     ["ChosenTransmogs_Mail"] = {
@@ -251,26 +249,25 @@ ArwicAltManager.Fields.Account = {
         Order = 703,
         Display = true,
         Value = function()
-            return AAM.FormatBool(Account().ChosenTransmogs[3])
+            if Account().ChosenTransmogUnlocked ~= nil then
+                return AAM.FormatBool(Account().ChosenTransmogUnlocked[3])
+            end
         end,
         Color = function()
-            if not Account().ChosenTransmogs[3] then
-                return AAM.ErrorColor()
+            if Account().ChosenTransmogUnlocked ~= nil and Account().ChosenTransmogUnlocked[3] then
+                return AAM.DefaultColor()
             end
-            return AAM.DefaultColor()
+            return AAM.ErrorColor()
         end,
         Tooltip = function(char)
-            GameTooltip:AddLine("Chosen Cloth", AAM.TooltipHeaderColor())
+            GameTooltip:AddLine("Chosen Mail", AAM.TooltipHeaderColor())
             GameTooltip:AddLine("Obtained by completing the achievement [The Chosen] and opening the box on a mail wearing character.", nil, nil, nil, true)
             GameTooltip:Show()
         end,
         Update = function()
-            local wasEarnedByMe = select(13, GetAchievementInfo(11387))
-            local englishClass = select(2, UnitClass("player"))
-            local armorClass = armorProficiency[englishClass]
             local account = Account()
-            if not account.ChosenTransmogs then account.ChosenTransmogs = {} end
-            account.ChosenTransmogs[armorClass] = wasEarnedByMe or account.ChosenTransmogs[armorClass]
+            if not account.ChosenTransmogUnlocked then account.ChosenTransmogUnlocked = {} end
+            account.ChosenTransmogUnlocked[3] = C_TransmogCollection.PlayerHasTransmog(143347) or account.ChosenTransmogUnlocked[3]
         end,
     },
     ["ChosenTransmogs_Plate"] = {
@@ -278,26 +275,25 @@ ArwicAltManager.Fields.Account = {
         Order = 704,
         Display = true,
         Value = function()
-            return AAM.FormatBool(Account().ChosenTransmogs[4])
+            if Account().ChosenTransmogUnlocked ~= nil then
+                return AAM.FormatBool(Account().ChosenTransmogUnlocked[4])
+            end
         end,
         Color = function()
-            if not Account().ChosenTransmogs[4] then
-                return AAM.ErrorColor()
+            if Account().ChosenTransmogUnlocked ~= nil and Account().ChosenTransmogUnlocked[4] then
+                return AAM.DefaultColor()
             end
-            return AAM.DefaultColor()
+            return AAM.ErrorColor()
         end,
         Tooltip = function(char)
-            GameTooltip:AddLine("Chosen Cloth", AAM.TooltipHeaderColor())
+            GameTooltip:AddLine("Chosen Plate", AAM.TooltipHeaderColor())
             GameTooltip:AddLine("Obtained by completing the achievement [The Chosen] and opening the box on a plate wearing character.", nil, nil, nil, true)
             GameTooltip:Show()
         end,
         Update = function()
-            local wasEarnedByMe = select(13, GetAchievementInfo(11387))
-            local englishClass = select(2, UnitClass("player"))
-            local armorClass = armorProficiency[englishClass]
             local account = Account()
-            if not account.ChosenTransmogs then account.ChosenTransmogs = {} end
-            account.ChosenTransmogs[armorClass] = wasEarnedByMe or account.ChosenTransmogs[armorClass]
+            if account.ChosenTransmogUnlocked == nil then account.ChosenTransmogUnlocked = {} end
+            account.ChosenTransmogUnlocked[4] = C_TransmogCollection.PlayerHasTransmog(143345) or account.ChosenTransmogUnlocked[4]
         end,
     },
     ["FisherfriendOfTheIsles"] = {
