@@ -1412,6 +1412,74 @@ ArwicAltManager.Fields.Character = {
         Update = function()
         end,
     },
+    ["Honor"] = {
+        Label = "Honor",
+        Order = 95,
+        Display = true,
+        Tooltip = function(char)
+            if char.Honor ~= nil then
+                local r, g, b = AAM.DefaultColor()
+                AddTooltipHeader(char, "Honor")
+                GameTooltip:AddDoubleLine("Points", format("%d/%d", char.Honor.Points, char.Honor.PointsMax), r, g, b, r, g, b)
+                GameTooltip:AddDoubleLine("Level", format("%d/50", char.Honor.Level), r, g, b, r, g, b)
+                GameTooltip:AddDoubleLine("Prestige", format("%d/25", char.Honor.Prestige), r, g, b, r, g, b)
+                GameTooltip:Show()
+            end
+        end,
+        Value = function(char)
+            if char.Honor ~= nil then
+                return format("%d (%d)", char.Honor.Level, char.Honor.Prestige)
+            end
+            return "?"
+        end,
+        Color = function(char)
+            return AAM.DefaultColor()
+        end,
+        Update = function()
+            local prestigeAchLevel = {
+                [10991] = 1,
+                [10992] = 2,
+                [10993] = 3,
+                [10995] = 4,
+                [11468] = 5,
+                [11469] = 6,
+                [11470] = 7,
+                [11471] = 8,
+                [11472] = 9,
+                [11685] = 10,
+                [11686] = 11,
+                [11687] = 12,
+                [11688] = 13,
+                [11689] = 14,
+                [11690] = 15,
+                [11691] = 16,
+                [11692] = 17,
+                [11693] = 18,
+                [11694] = 19,
+                [12108] = 20,
+                [12109] = 21,
+                [12180] = 22,
+                [12181] = 23,
+                [12182] = 24,
+                [12183] = 25,
+                [12183] = 26,
+                [12217] = 27,
+                [12218] = 28,
+                [12219] = 29,
+            }
+            local char = CurrentChar()
+            char.Honor = {}
+            char.Honor.Level = UnitHonorLevel("player")
+            char.Honor.Points = UnitHonor("player")
+            char.Honor.PointsMax = UnitHonorMax("player")
+            char.Honor.Prestige = 0
+            for achID, pLvl in pairs(prestigeAchLevel) do
+                if char.Honor.Prestige < pLvl and select(13, GetAchievementInfo(achID)) then
+                    char.Honor.Prestige = pLvl
+                end
+            end
+        end,
+    },
 }
 
 function ArwicAltManager.UpdateCharacterData()
