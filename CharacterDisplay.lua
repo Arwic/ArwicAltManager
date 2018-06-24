@@ -9,6 +9,9 @@ local function NewLabel(parent, fontHeight, text)
 end
 
 function ArwicAltManager.BuildCharacterGrid()
+    ArwicAltManager.RestoreDefaultFields()
+    ArwicAltManager.InitCustomFields()
+
     -- dont remake the frame if it already exists
     if ARWIC_AAM_mainFrame ~= nil then return end
     dataLabels = {}
@@ -101,7 +104,7 @@ function ArwicAltManager.BuildCharacterGrid()
     local maxLabelWidth = 0
     local lastCellFrame = titleBar
     local i = 0
-    for formatterKey, formatter in spairs(ArwicAltManager.Fields.Character, function(t, a, b)
+    for formatterKey, formatter in spairs(ArwicAltManagerDB.Fields.Character, function(t, a, b)
         return t[a].Order < t[b].Order
     end) do
         if not formatter.Internal and formatter.Display then
@@ -175,10 +178,10 @@ function ArwicAltManager.BuildCharacterGrid()
                     -- make the cells for each field in the character column
                     local maxLabelWidth = 0
                     local lastCellFrame = titleBar
-                    for formatterKey, formatter in spairs(ArwicAltManager.Fields.Character, function(t, a, b)
+                    for formatterKey, formatter in spairs(ArwicAltManagerDB.Fields.Character, function(t, a, b)
                         return t[a].Order < t[b].Order
                     end) do
-                        if not formatter.Internal and formatter.Display then
+                        if not formatter.Internal and formatter.Display and formatter.FuncStr ~= nil then
                             -- make the cell
                             local cellFrame = CreateFrame("FRAME", "AAM_charCell_" .. realmKey .. "_" .. charKey .. "_" .. formatterKey, charCol)
                             cellFrame:SetHeight(rowHeight)
@@ -186,7 +189,7 @@ function ArwicAltManager.BuildCharacterGrid()
                             cellFrame:SetPoint("RIGHT", charCol, "RIGHT")
                             cellFrame:SetPoint("TOP", lastCellFrame, "BOTTOM")
                             -- make the label and put it in the cell
-                            local lbl = NewLabel(cellFrame, fontHeight, formatter.Value(char))
+                            local lbl = NewLabel(cellFrame, fontHeight, formatter.Value()(char))
                             table.insert(dataLabels, {
                                 ["lbl"] = lbl,
                                 ["formatter"] = formatter,
@@ -197,12 +200,12 @@ function ArwicAltManager.BuildCharacterGrid()
                                 maxLabelWidth = lblWidth
                             end
                             lbl:SetAllPoints(cellFrame)
-                            lbl:SetTextColor(formatter.Color(char))
+                            --lbl:SetTextColor(formatter.Color(char))
                             -- register the label's tooltip
                             cellFrame:SetScript("OnEnter", function(sender)
                                 GameTooltip:SetOwner(sender, "ANCHOR_RIGHT")
                                 if formatter.Tooltip ~= nil then
-                                    formatter.Tooltip(char)
+                                    formatter.Tooltip()(char)
                                 end
                             end)
                             cellFrame:SetScript("OnLeave", function(sender)
@@ -233,8 +236,8 @@ function ArwicAltManager.UpdateCharacterGrid()
     ArwicAltManager.UpdateCharacterData()
     -- update the values in the grid
     for _, v in pairs(dataLabels) do
-        v.lbl:SetText(v.formatter.Value(v.char))
-        v.lbl:SetTextColor(v.formatter.Color(v.char))
+        v.lbl:SetText(v.formatter.Value()(v.char))
+        --v.lbl:SetTextColor(v.formatter.Color()(v.char))
     end
 end
 
@@ -257,5 +260,22 @@ function ArwicAltManager.ToggleCharacterGrid()
         ArwicAltManager.HideCharacterGrid()
     else
         ArwicAltManager.ShowCharacterGrid()
+    end
+end
+
+function ArwicAltManager.InitCustomFields()
+    -- load user defined functions
+    for k, v in pairs(ArwicAltManagerDB.Fields.Character) do
+        if v.FuncStr ~= nil then
+            if v.FuncStr.Update then
+                v.Update = loadstring("return " .. v.FuncStr.Update, format("Field.%s.Update", k))
+            end
+            if v.FuncStr.Value then
+                v.Value = loadstring("return " .. v.FuncStr.Value, format("Field.%s.Value", k))
+            end
+            if v.FuncStr.Tooltip then
+                v.Tooltip = loadstring("return " .. v.FuncStr.Tooltip, format("Field.%s.Tooltip", k))
+            end
+        end
     end
 end
