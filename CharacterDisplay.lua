@@ -9,7 +9,7 @@ local function NewLabel(parent, fontHeight, text)
 end
 
 function ArwicAltManager.BuildCharacterGrid()
-    ArwicAltManager.RestoreDefaultFields()
+    --ArwicAltManager.RestoreDefaultFields()
     ArwicAltManager.InitCustomFields()
 
     -- dont remake the frame if it already exists

@@ -18,102 +18,100 @@ function ArwicAltManager.RestoreDefaultFields()
         Display = false,
         Order = 0,
         FuncStr = {
-            Update = [[
-                function(char)
-                    curIDs = {
-                        61, -- Dalaran Jewelcrafter's Token
-                        81, -- Epicurean's Award
-                        241, -- Champion's Seal
-                        361, -- Illustrious Jewelcrafter's Token
-                        384, -- Dwarf Archaeology Fragment
-                        385, -- Troll Archaeology Fragment
-                        390, -- Conquest Points
-                        391, -- Tol Barad Commendation
-                        392, -- Honor Points
-                        393, -- Fossil Archaeology Fragment
-                        394, -- Night Elf Archaeology Fragment
-                        395, -- Justice Points
-                        396, -- Valor Points
-                        397, -- Orc Archaeology Fragment
-                        398, -- Draenei Archaeology Fragment
-                        399, -- Vrykul Archaeology Fragment
-                        400, -- Nerubian Archaeology Fragment
-                        401, -- Tol'vir Archaeology Fragment
-                        402, -- Chef's Award
-                        416, -- Mark of the World Tree
-                        515, -- Darkmoon Prize Ticket
-                        614, -- Mote of Darkness
-                        615, -- Essence of Corrupted Deathwing
-                        676, -- Pandaren Archaeology Fragment
-                        677, -- Mogu Archaeology Fragment
-                        697, -- Elder Charm of Good Fortune
-                        738, -- Lesser Charm of Good Fortune
-                        752, -- Mogu Rune of Fate
-                        754, -- Mantid Archaeology Fragment
-                        776, -- Warforged Seal
-                        777, -- Timeless Coin
-                        789, -- Bloody Coin
-                        821, -- Draenor Clans Archaeology Fragment
-                        823, -- Apexis Crystal
-                        824, -- Garrison Resources
-                        828, -- Ogre Archaeology Fragment
-                        829, -- Arakkoa Archaeology Fragment
-                        910, -- Seal of Draenor Alchemy
-                        944, -- Artifact Fragment
-                        980, -- Dingy Iron Coins
-                        994, -- Seal of Tempered Fate
-                        999, -- Secret of Draenor Tailoring
-                        1008, -- Secret of Draenor Jewelcrafting
-                        1017, -- Secret of Draenor Leatherworking
-                        1020, -- Secret of Draenor Blacksmithing
-                        1101, -- Oil
-                        1129, -- Seal of Inevitable Fate
-                        1149, -- Sightless Eye
-                        1154, -- Shadowy Coins
-                        1155, -- Ancient Mana
-                        1166, -- Timewarped Badge
-                        1171, -- Artifact Knowledge
-                        1172, -- Highborne Archaeology Fragment
-                        1173, -- Highmountain Tauren Archaeology Fragment
-                        1174, -- Demonic Archaeology Fragment
-                        1191, -- Valor
-                        1220, -- Order Resources
-                        1226, -- Nethershard
-                        1268, -- Timeworn Artifact
-                        1273, -- Seal of Broken Fate
-                        1275, -- Curious Coin
-                        1299, -- Brawler's Gold
-                        1314, -- Lingering Soul Fragment
-                        1324, -- Horde Qiraji Commendation
-                        1325, -- Alliance Qiraji Commendation
-                        1342, -- Legionfall War Supplies
-                        1347, -- Legionfall Building - Personal Tracker - Mage Tower (Hidden)
-                        1349, -- Legionfall Building - Personal Tracker - Command Tower (Hidden)
-                        1350, -- Legionfall Building - Personal Tracker - Nether Tower (Hidden)
-                        1355, -- Felessence
-                        1356, -- Echoes of Battle
-                        1357, -- Echoes of Domination
-                        1379, -- Trial of Style Token
-                        1416, -- Coins of Air
-                        1506, -- Argus Waystone
-                        1508, -- Veiled Argunite
-                        1533, -- Wakening Essence
-                    }
-                    char.Currencies = {}
-                    for _, cid in pairs(curIDs) do
-                        if not char.Currencies[cid] then 
-                            char.Currencies[cid] = {} 
-                        end
-                        char.Currencies[cid].Name, 
-                        char.Currencies[cid].CurrentAmount, 
-                        _, 
-                        char.Currencies[cid].EarnedThisWeek, 
-                        char.Currencies[cid].WeeklyMax,
-                        char.Currencies[cid].TotalMax,
-                        char.Currencies[cid].IsDiscovered = GetCurrencyInfo(cid)
+            Update = [[function(char)
+                curIDs = {
+                    61, -- Dalaran Jewelcrafter's Token
+                    81, -- Epicurean's Award
+                    241, -- Champion's Seal
+                    361, -- Illustrious Jewelcrafter's Token
+                    384, -- Dwarf Archaeology Fragment
+                    385, -- Troll Archaeology Fragment
+                    390, -- Conquest Points
+                    391, -- Tol Barad Commendation
+                    392, -- Honor Points
+                    393, -- Fossil Archaeology Fragment
+                    394, -- Night Elf Archaeology Fragment
+                    395, -- Justice Points
+                    396, -- Valor Points
+                    397, -- Orc Archaeology Fragment
+                    398, -- Draenei Archaeology Fragment
+                    399, -- Vrykul Archaeology Fragment
+                    400, -- Nerubian Archaeology Fragment
+                    401, -- Tol'vir Archaeology Fragment
+                    402, -- Chef's Award
+                    416, -- Mark of the World Tree
+                    515, -- Darkmoon Prize Ticket
+                    614, -- Mote of Darkness
+                    615, -- Essence of Corrupted Deathwing
+                    676, -- Pandaren Archaeology Fragment
+                    677, -- Mogu Archaeology Fragment
+                    697, -- Elder Charm of Good Fortune
+                    738, -- Lesser Charm of Good Fortune
+                    752, -- Mogu Rune of Fate
+                    754, -- Mantid Archaeology Fragment
+                    776, -- Warforged Seal
+                    777, -- Timeless Coin
+                    789, -- Bloody Coin
+                    821, -- Draenor Clans Archaeology Fragment
+                    823, -- Apexis Crystal
+                    824, -- Garrison Resources
+                    828, -- Ogre Archaeology Fragment
+                    829, -- Arakkoa Archaeology Fragment
+                    910, -- Seal of Draenor Alchemy
+                    944, -- Artifact Fragment
+                    980, -- Dingy Iron Coins
+                    994, -- Seal of Tempered Fate
+                    999, -- Secret of Draenor Tailoring
+                    1008, -- Secret of Draenor Jewelcrafting
+                    1017, -- Secret of Draenor Leatherworking
+                    1020, -- Secret of Draenor Blacksmithing
+                    1101, -- Oil
+                    1129, -- Seal of Inevitable Fate
+                    1149, -- Sightless Eye
+                    1154, -- Shadowy Coins
+                    1155, -- Ancient Mana
+                    1166, -- Timewarped Badge
+                    1171, -- Artifact Knowledge
+                    1172, -- Highborne Archaeology Fragment
+                    1173, -- Highmountain Tauren Archaeology Fragment
+                    1174, -- Demonic Archaeology Fragment
+                    1191, -- Valor
+                    1220, -- Order Resources
+                    1226, -- Nethershard
+                    1268, -- Timeworn Artifact
+                    1273, -- Seal of Broken Fate
+                    1275, -- Curious Coin
+                    1299, -- Brawler's Gold
+                    1314, -- Lingering Soul Fragment
+                    1324, -- Horde Qiraji Commendation
+                    1325, -- Alliance Qiraji Commendation
+                    1342, -- Legionfall War Supplies
+                    1347, -- Legionfall Building - Personal Tracker - Mage Tower (Hidden)
+                    1349, -- Legionfall Building - Personal Tracker - Command Tower (Hidden)
+                    1350, -- Legionfall Building - Personal Tracker - Nether Tower (Hidden)
+                    1355, -- Felessence
+                    1356, -- Echoes of Battle
+                    1357, -- Echoes of Domination
+                    1379, -- Trial of Style Token
+                    1416, -- Coins of Air
+                    1506, -- Argus Waystone
+                    1508, -- Veiled Argunite
+                    1533, -- Wakening Essence
+                }
+                char.Currencies = {}
+                for _, cid in pairs(curIDs) do
+                    if not char.Currencies[cid] then 
+                        char.Currencies[cid] = {} 
                     end
+                    char.Currencies[cid].Name, 
+                    char.Currencies[cid].CurrentAmount, 
+                    _, 
+                    char.Currencies[cid].EarnedThisWeek, 
+                    char.Currencies[cid].WeeklyMax,
+                    char.Currencies[cid].TotalMax,
+                    char.Currencies[cid].IsDiscovered = GetCurrencyInfo(cid)
                 end
-            ]],
+            end]],
         }
     }
     c["INTERNAL_Professions"] = {
@@ -121,54 +119,52 @@ function ArwicAltManager.RestoreDefaultFields()
         Display = false,
         Order = 0,
         FuncStr = {
-            Update = [[
-                function(char)
-                    char.Professions = {}
-                    local prof1, prof2, archaeology, fishing, cooking, firstAid = GetProfessions()
-                    if prof1 ~= nil then
-                        char.Professions.Primary1 = {}
-                        char.Professions.Primary1.Name, 
-                        char.Professions.Primary1.Icon, 
-                        char.Professions.Primary1.SkillLevel, 
-                        char.Professions.Primary1.MaxSkillLevel = GetProfessionInfo(prof1)
-                    end
-                    if prof2 ~= nil then
-                        char.Professions.Primary2 = {}
-                        char.Professions.Primary2.Name, 
-                        char.Professions.Primary2.Icon, 
-                        char.Professions.Primary2.SkillLevel, 
-                        char.Professions.Primary2.MaxSkillLevel = GetProfessionInfo(prof2)
-                    end
-                    if archaeology ~= nil then
-                        char.Professions.Archaeology = {}
-                        char.Professions.Archaeology.Name, 
-                        char.Professions.Archaeology.Icon, 
-                        char.Professions.Archaeology.SkillLevel, 
-                        char.Professions.Archaeology.MaxSkillLevel = GetProfessionInfo(archaeology)
-                    end
-                    if fishing ~= nil then
-                        char.Professions.Fishing = {}
-                        char.Professions.Fishing.Name, 
-                        char.Professions.Fishing.Icon, 
-                        char.Professions.Fishing.SkillLevel, 
-                        char.Professions.Fishing.MaxSkillLevel = GetProfessionInfo(fishing)
-                    end
-                    if cooking ~= nil then
-                        char.Professions.Cooking = {}
-                        char.Professions.Cooking.Name, 
-                        char.Professions.Cooking.Icon, 
-                        char.Professions.Cooking.SkillLevel, 
-                        char.Professions.Cooking.MaxSkillLevel = GetProfessionInfo(cooking)
-                    end
-                    if firstAid ~= nil then
-                        char.Professions.FirstAid = {}
-                        char.Professions.FirstAid.Name, 
-                        char.Professions.FirstAid.Icon, 
-                        char.Professions.FirstAid.SkillLevel, 
-                        char.Professions.FirstAid.MaxSkillLevel = GetProfessionInfo(firstAid)
-                    end
+            Update = [[function(char)
+                char.Professions = {}
+                local prof1, prof2, archaeology, fishing, cooking, firstAid = GetProfessions()
+                if prof1 ~= nil then
+                    char.Professions.Primary1 = {}
+                    char.Professions.Primary1.Name, 
+                    char.Professions.Primary1.Icon, 
+                    char.Professions.Primary1.SkillLevel, 
+                    char.Professions.Primary1.MaxSkillLevel = GetProfessionInfo(prof1)
                 end
-            ]],
+                if prof2 ~= nil then
+                    char.Professions.Primary2 = {}
+                    char.Professions.Primary2.Name, 
+                    char.Professions.Primary2.Icon, 
+                    char.Professions.Primary2.SkillLevel, 
+                    char.Professions.Primary2.MaxSkillLevel = GetProfessionInfo(prof2)
+                end
+                if archaeology ~= nil then
+                    char.Professions.Archaeology = {}
+                    char.Professions.Archaeology.Name, 
+                    char.Professions.Archaeology.Icon, 
+                    char.Professions.Archaeology.SkillLevel, 
+                    char.Professions.Archaeology.MaxSkillLevel = GetProfessionInfo(archaeology)
+                end
+                if fishing ~= nil then
+                    char.Professions.Fishing = {}
+                    char.Professions.Fishing.Name, 
+                    char.Professions.Fishing.Icon, 
+                    char.Professions.Fishing.SkillLevel, 
+                    char.Professions.Fishing.MaxSkillLevel = GetProfessionInfo(fishing)
+                end
+                if cooking ~= nil then
+                    char.Professions.Cooking = {}
+                    char.Professions.Cooking.Name, 
+                    char.Professions.Cooking.Icon, 
+                    char.Professions.Cooking.SkillLevel, 
+                    char.Professions.Cooking.MaxSkillLevel = GetProfessionInfo(cooking)
+                end
+                if firstAid ~= nil then
+                    char.Professions.FirstAid = {}
+                    char.Professions.FirstAid.Name, 
+                    char.Professions.FirstAid.Icon, 
+                    char.Professions.FirstAid.SkillLevel, 
+                    char.Professions.FirstAid.MaxSkillLevel = GetProfessionInfo(firstAid)
+                end
+            end]],
         }
     }
     c["Name"] = {
@@ -176,23 +172,17 @@ function ArwicAltManager.RestoreDefaultFields()
         Order = 10,
         Display = true,
         FuncStr = {
-            Tooltip = [[
-                function(char)
-                    AAM_AddTooltipHeader(char, "Name")
-                    GameTooltip:AddLine(format("Level %d %s %s", char.Level, char.Race, AAM_ClassName(char.Class)))
-                    GameTooltip:Show()
-                end
-            ]],
-            Value = [[
-                function(char)
-                    return format("|c%s%s", RAID_CLASS_COLORS[char.Class].colorStr, char.Name)
-                end
-            ]],
-            Update = [[
-                function(char)
-                    char.Name = UnitName("player")
-                end
-            ]],
+            Tooltip = [[function(char)
+                AAM_AddTooltipHeader(char, "Name")
+                GameTooltip:AddLine(format("Level %d %s %s", char.Level, char.Race, AAM_ClassName(char.Class)))
+                GameTooltip:Show()
+            end]],
+            Value = [[function(char)
+                return format("|c%s%s", RAID_CLASS_COLORS[char.Class].colorStr, char.Name)
+            end]],
+            Update = [[function(char)
+                char.Name = UnitName("player")
+            end]],
         }
     }
     c["Class"] = {
@@ -200,23 +190,17 @@ function ArwicAltManager.RestoreDefaultFields()
         Order = 20,
         Display = true,
         FuncStr = {
-            Tooltip = [[
-                function(char)
-                    AAM_AddTooltipHeader(char, "Class")
-                    GameTooltip:AddLine(AAM_ClassName(char.Class), AAM_ClassColor(char.Class))
-                    GameTooltip:Show()
-                end
-            ]],
-            Value = [[
-                function(char)
-                    return format("|c%s%s", RAID_CLASS_COLORS[char.Class].colorStr, AAM_ClassName(char.Class))
-                end
-            ]],
-            Update = [[
-                function(char)
-                    char.Class = select(2, UnitClass("player"))
-                end
-            ]],
+            Tooltip = [[function(char)
+                AAM_AddTooltipHeader(char, "Class")
+                GameTooltip:AddLine(AAM_ClassName(char.Class), AAM_ClassColor(char.Class))
+                GameTooltip:Show()
+            end]],
+            Value = [[function(char)
+                return format("|c%s%s", RAID_CLASS_COLORS[char.Class].colorStr, AAM_ClassName(char.Class))
+            end]],
+            Update = [[function(char)
+                char.Class = select(2, UnitClass("player"))
+            end]],
         }
     }
     c["Realm"] = {

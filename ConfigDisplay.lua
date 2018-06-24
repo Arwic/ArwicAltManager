@@ -119,6 +119,64 @@ local function BuildAccountFieldDisplayOrder()
     return frame
 end
 
+local function ShowCodeFrame(codeText, titleBarText, onSave)
+    -- create code frame
+    if AAM_config_codeFrame == nil then
+        local codeFrame = CreateFrame("FRAME", "AAM_config_codeFrame", UIParent)
+        table.insert(UISpecialFrames, codeFrame:GetName()) -- make frame close with escape
+        codeFrame:SetFrameStrata("DIALOG")
+        codeFrame:SetPoint("CENTER", 0, 0)
+        codeFrame.texture = codeFrame:CreateTexture(nil, "BACKGROUND")
+        codeFrame.texture:SetColorTexture(0.1, 0.1, 0.1, 0.95)
+        codeFrame.texture:SetAllPoints(codeFrame)
+        codeFrame:EnableMouse(true)
+        codeFrame:SetMovable(true)
+        codeFrame:RegisterForDrag("LeftButton")
+        codeFrame:SetScript("OnDragStart", function(self) self:StartMoving() end)
+        codeFrame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
+        codeFrame:SetSize(1000, 400)
+        -- title bar
+        local codeFrameTitleBar = CreateFrame("FRAME", "AAM_config_codeFrameTitleBarFrame", codeFrame)
+        codeFrameTitleBar:SetPoint("TOP", codeFrame)
+        codeFrameTitleBar:SetPoint("LEFT", codeFrame)
+        codeFrameTitleBar:SetPoint("RIGHT", codeFrame)
+        codeFrameTitleBar:SetHeight(titleBarHeight)
+        codeFrameTitleBar.texture = codeFrameTitleBar:CreateTexture(nil, "BACKGROUND")
+        codeFrameTitleBar.texture:SetColorTexture(0.15, 0.15, 0.3, 1.0)
+        codeFrameTitleBar.texture:SetAllPoints(codeFrameTitleBar)
+        local titleBarLabel = NewLabel(codeFrameTitleBar, 20, "Field Code"):SetAllPoints(codeFrameTitleBar)
+        -- close button
+        local codeFrameCloseButton = CreateFrame("BUTTON", "AAM_config_codeFrameCloseButton", codeFrameTitleBar, "UIPanelCloseButton")
+        codeFrameCloseButton:SetPoint("TOPRIGHT", 0, 0)
+        codeFrameCloseButton:SetWidth(titleBarHeight)
+        codeFrameCloseButton:SetHeight(titleBarHeight)
+        codeFrameCloseButton:SetScript("OnClick", function()
+            codeFrame:Hide()
+        end)
+        -- save button
+        local btnSave = CreateFrame("BUTTON", "AAM_config_codeFrameSaveButton", codeFrame, "UIGoldBorderButtonTemplate")
+        btnSave:SetSize(100, 30)
+        btnSave:SetText("Save")
+        btnSave:SetPoint("BOTTOM", codeFrame, "BOTTOM")
+        -- edit box
+        local codeEditBoxScrollFrame = CreateFrame("EditBox", "AAM_config_codeFrameEditBoxScrollFrame", codeFrame)
+        codeEditBoxScrollFrame:SetPoint("TOP", codeFrameTitleBar, "BOTTOM")
+        codeEditBoxScrollFrame:SetPoint("BOTTOM", btnSave, "TOP")
+        codeEditBoxScrollFrame:SetPoint("LEFT", codeFrame, "LEFT")
+        codeEditBoxScrollFrame:SetPoint("RIGHT", codeFrame, "RIGHT")
+        codeEditBoxScrollFrame:SetFont("Interface/AddOns/ArwicAltManager/fonts/FiraMono-Regular.ttf", fontHeight)
+        codeEditBoxScrollFrame:SetMultiLine(true)
+    end
+    print("showing code text: " .. codeText)
+    AAM_config_codeFrameEditBoxScrollFrame:SetText(codeText)
+    AAM_config_codeFrameSaveButton:SetScript("OnClick", function()
+        print("saving code: " .. AAM_config_codeFrameEditBoxScrollFrame:GetText())
+        onSave(AAM_config_codeFrameEditBoxScrollFrame:GetText())
+    end)
+    AAM_config_codeFrame:Show()
+
+end
+
 local function BuildCharacterFieldDisplayOrder()
     local ITEM_WIDTH = 300
     local ITEM_HEIGHT = 24
@@ -139,7 +197,7 @@ local function BuildCharacterFieldDisplayOrder()
 
     -- create the main frame
     local frame = CreateFrame("FRAME", "AAM_config_fieldFrame", ARWIC_AAM_configFrame)
-
+    
     -- create label above the frame
     local frameLabel = NewLabel(frame, fontHeight * 1.25, "Character Data Fields"):SetPoint("TOPLEFT", frame, "TOPLEFT", LABEL_OFFSET_X, LABEL_OFFSET_Y)
 
@@ -161,9 +219,28 @@ local function BuildCharacterFieldDisplayOrder()
         frame.list[i].Order:SetMaxLetters(4)
         frame.list[i].Order:SetAutoFocus(false)
         frame.list[i].Order:SetPoint("TOPLEFT", frame, "TOPLEFT", 8, (i - 1) * -ITEM_HEIGHT - 8)
+        
         frame.list[i].Display = CreateFrame("CHECKBUTTON", frame:GetName() .. "_list_display_" .. i, frame, "ChatConfigCheckButtonTemplate")
         frame.list[i].Display:SetSize(CHECKBOX_WIDTH, ITEM_HEIGHT)
         frame.list[i].Display:SetPoint("TOPLEFT", frame.list[i].Order, "TOPRIGHT")
+
+        frame.list[i].EditUpdate = CreateFrame("BUTTON", frame:GetName() .. "_list_editUpdate_" .. i, frame, "UIGoldBorderButtonTemplate")
+        frame.list[i].EditUpdate:SetSize(25, 25)
+        frame.list[i].EditUpdate:SetText("U")
+        frame.list[i].EditUpdate:SetPoint("TOP", frame.list[i].Order, "TOP")
+        frame.list[i].EditUpdate:SetPoint("RIGHT", frame, "RIGHT", -25, 0)
+
+        frame.list[i].EditTooltip = CreateFrame("BUTTON", frame:GetName() .. "_list_editTooltip_" .. i, frame, "UIGoldBorderButtonTemplate")
+        frame.list[i].EditTooltip:SetSize(25, 25)
+        frame.list[i].EditTooltip:SetText("T")
+        frame.list[i].EditTooltip:SetPoint("TOP", frame.list[i].Order, "TOP")
+        frame.list[i].EditTooltip:SetPoint("RIGHT", frame.list[i].EditUpdate, "LEFT")
+        
+        frame.list[i].EditValue = CreateFrame("BUTTON", frame:GetName() .. "_list_editValue_" .. i, frame, "UIGoldBorderButtonTemplate")
+        frame.list[i].EditValue:SetSize(25, 25)
+        frame.list[i].EditValue:SetText("V")
+        frame.list[i].EditValue:SetPoint("TOP", frame.list[i].Order, "TOP")
+        frame.list[i].EditValue:SetPoint("RIGHT", frame.list[i].EditTooltip, "LEFT")
     end
     -- create scrollframe
     frame.scrollFrame = CreateFrame("ScrollFrame", frame:GetName() .. "ScrollFrame", frame, "FauxScrollFrameTemplate")
@@ -176,7 +253,7 @@ local function BuildCharacterFieldDisplayOrder()
 
     local function GetFieldListItem(index)
         local counter = 0
-        for fk, fv in spairs(ArwicAltManagerDB.Config.Fields.Character, function(t, a, b)
+        for fk, fv in spairs(ArwicAltManagerDB.Fields.Character, function(t, a, b)
             return t[a].Order < t[b].Order
         end) do
             if not fv.Internal then
@@ -195,27 +272,44 @@ local function BuildCharacterFieldDisplayOrder()
             local idx = offset + i
             if idx <= NUM_ITEMS then
                 local name, checked, order = GetFieldListItem(idx)
+                
                 local ebOrder = frame.list[i].Order
                 ebOrder:SetPoint("LEFT", frame, "LEFT")
                 ebOrder:SetText(order)
                 ebOrder:SetScript("OnTextChanged", function(sender)
-                    local text = ebOrder:GetText()
-                    if text == "" then text = "0" end
-                    ArwicAltManagerDB.Config.Fields.Character[name].Order = tonumber(text)
+                    ArwicAltManagerDB.Fields.Character[name].Order = ebOrder:GetNumber()
                 end)
                 ebOrder:Show()
+
                 local cbDisplay = frame.list[i].Display
                 cbDisplay:SetChecked(checked)
                 cbDisplay:SetPoint("LEFT", eb, "RIGHT")
                 cbDisplay:SetSize(ITEM_HEIGHT, ITEM_HEIGHT)
                 _G[cbDisplay:GetName() .. "Text"]:SetText(name)
                 cbDisplay:SetScript("OnClick", function(sender)
-                    ArwicAltManagerDB.Config.Fields.Character[name].Display = cbDisplay:GetChecked()
+                    ArwicAltManagerDB.Fields.Character[name].Display = cbDisplay:GetChecked()
                 end)
                 cbDisplay:Show()
+
+                local btnEditUpdate = frame.list[i].EditUpdate
+                btnEditUpdate:SetScript("OnClick", function(...)
+                    ShowCodeFrame(ArwicAltManagerDB.Fields.Character[name].FuncStr.Update, format("AAM: %s Update Function", name), function(newCode)
+                        ArwicAltManagerDB.Fields.Character[name].FuncStr.Update = newCode
+                    end)
+                end)
+                btnEditUpdate:Show()
+
+                local btnEditTooltip= frame.list[i].EditTooltip
+                btnEditTooltip:Show()
+
+                local btnEditValue = frame.list[i].EditValue
+                btnEditValue:Show()
             else
                 frame.list[i].Display:Hide()
                 frame.list[i].Order:Hide()
+                frame.list[i].EditUpdate:Hide()
+                frame.list[i].EditTooltip:Hide()
+                frame.list[i].EditValue:Hide()
             end
         end
     end
