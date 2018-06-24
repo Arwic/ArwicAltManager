@@ -134,7 +134,7 @@ local function ShowCodeFrame(codeText, titleBarText, onSave)
         codeFrame:RegisterForDrag("LeftButton")
         codeFrame:SetScript("OnDragStart", function(self) self:StartMoving() end)
         codeFrame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
-        codeFrame:SetSize(1000, 400)
+        codeFrame:SetSize(1000, 800)
         -- title bar
         local codeFrameTitleBar = CreateFrame("FRAME", "AAM_config_codeFrameTitleBarFrame", codeFrame)
         codeFrameTitleBar:SetPoint("TOP", codeFrame)
@@ -293,16 +293,32 @@ local function BuildCharacterFieldDisplayOrder()
 
                 local btnEditUpdate = frame.list[i].EditUpdate
                 btnEditUpdate:SetScript("OnClick", function(...)
-                    ShowCodeFrame(ArwicAltManagerDB.Fields.Character[name].FuncStr.Update, format("AAM: %s Update Function", name), function(newCode)
-                        ArwicAltManagerDB.Fields.Character[name].FuncStr.Update = newCode
-                    end)
+                    if ArwicAltManagerDB.Fields.Character[name].FuncStr.Update ~= nil then
+                        ShowCodeFrame(ArwicAltManagerDB.Fields.Character[name].FuncStr.Update, format("AAM: %s Update Function", name), function(newCode)
+                            ArwicAltManagerDB.Fields.Character[name].FuncStr.Update = newCode
+                        end)
+                    end
                 end)
                 btnEditUpdate:Show()
 
                 local btnEditTooltip= frame.list[i].EditTooltip
+                btnEditTooltip:SetScript("OnClick", function(...)
+                    if ArwicAltManagerDB.Fields.Character[name].FuncStr.Tooltip ~= nil then
+                        ShowCodeFrame(ArwicAltManagerDB.Fields.Character[name].FuncStr.Tooltip, format("AAM: %s Tooltip Function", name), function(newCode)
+                            ArwicAltManagerDB.Fields.Character[name].FuncStr.Tooltip = newCode
+                        end)
+                    end
+                end)
                 btnEditTooltip:Show()
 
                 local btnEditValue = frame.list[i].EditValue
+                btnEditValue:SetScript("OnClick", function(...)
+                    if ArwicAltManagerDB.Fields.Character[name].FuncStr.Value ~= nil then
+                        ShowCodeFrame(ArwicAltManagerDB.Fields.Character[name].FuncStr.Value, format("AAM: %s Value Function", name), function(newCode)
+                            ArwicAltManagerDB.Fields.Character[name].FuncStr.Value = newCode
+                        end)
+                    end
+                end)
                 btnEditValue:Show()
             else
                 frame.list[i].Display:Hide()
