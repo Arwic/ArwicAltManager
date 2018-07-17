@@ -123,7 +123,7 @@ ArwicAltManager.Fields.Character = {
         Update = function()
             local char = CurrentChar()
             char.Professions = {}
-            local prof1, prof2, archaeology, fishing, cooking, firstAid = GetProfessions()
+            local prof1, prof2, archaeology, fishing, cooking = GetProfessions()
             if prof1 ~= nil then
                 char.Professions.Primary1 = {}
                 char.Professions.Primary1.Name, 
@@ -158,13 +158,6 @@ ArwicAltManager.Fields.Character = {
                 char.Professions.Cooking.Icon, 
                 char.Professions.Cooking.SkillLevel, 
                 char.Professions.Cooking.MaxSkillLevel = GetProfessionInfo(cooking)
-            end
-            if firstAid ~= nil then
-                char.Professions.FirstAid = {}
-                char.Professions.FirstAid.Name, 
-                char.Professions.FirstAid.Icon, 
-                char.Professions.FirstAid.SkillLevel, 
-                char.Professions.FirstAid.MaxSkillLevel = GetProfessionInfo(firstAid)
             end
         end,
     },
@@ -1380,29 +1373,6 @@ ArwicAltManager.Fields.Character = {
         Value = function(char)
             if char.Professions ~= nil and char.Professions.Cooking ~= nil and char.Professions.Cooking.Icon ~= nil then
                 return format("|T%s:0|t %d/%d", char.Professions.Cooking.Icon, char.Professions.Cooking.SkillLevel, char.Professions.Cooking.MaxSkillLevel)
-            end
-            return "?"
-        end,
-        Color = function(char)
-            return AAM.DefaultColor()
-        end,
-        Update = function()
-        end,
-    },
-    ["Prof_FirstAid"] = {
-        Label = "First Aid",
-        Order = 103,
-        Display = true,
-        Tooltip = function(char)
-            if char.Professions ~= nil and char.Professions.FirstAid ~= nil and char.Professions.FirstAid.Icon ~= nil then
-                AddTooltipHeader(char, char.Professions.FirstAid.Name)
-                GameTooltip:AddLine(format("|T%s:0|t %d/%d", char.Professions.FirstAid.Icon, char.Professions.FirstAid.SkillLevel, char.Professions.FirstAid.MaxSkillLevel), AAM.DefaultColor())
-                GameTooltip:Show()
-            end
-        end,
-        Value = function(char)
-            if char.Professions ~= nil and char.Professions.FirstAid ~= nil and char.Professions.FirstAid.Icon ~= nil then
-                return format("|T%s:0|t %d/%d", char.Professions.FirstAid.Icon, char.Professions.FirstAid.SkillLevel, char.Professions.FirstAid.MaxSkillLevel)
             end
             return "?"
         end,
