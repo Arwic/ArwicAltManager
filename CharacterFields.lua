@@ -1,7 +1,6 @@
 local AAM = ArwicAltManager
 
 local function GetCovenantDetails(covenantId)
-    covenantId = 3
     local iconMap = {
         [0] = "134400", -- inv_misc_questionmark
         [1] = "3257748", -- Ui_sigil_kyrian 
