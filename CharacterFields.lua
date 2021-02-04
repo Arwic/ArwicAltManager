@@ -56,9 +56,12 @@ ArwicAltManager.Fields.Character = {
                 384, -- Dwarf Archaeology Fragment
                 385, -- Troll Archaeology Fragment
                 390, -- Conquest Points
+                391, -- Tol Barad Commendation
                 392, -- Honor Points
                 393, -- Fossil Archaeology Fragment
                 394, -- Night Elf Archaeology Fragment
+                395, -- Justice Points
+                396, -- Valor Points
                 397, -- Orc Archaeology Fragment
                 398, -- Draenei Archaeology Fragment
                 399, -- Vrykul Archaeology Fragment
@@ -102,11 +105,31 @@ ArwicAltManager.Fields.Character = {
                 1173, -- Highmountain Tauren Archaeology Fragment
                 1174, -- Demonic Archaeology Fragment
                 1191, -- Valor
+                1220, -- Order Resources
+                1226, -- Nethershard
+                1268, -- Timeworn Artifact
+                1273, -- Seal of Broken Fate
+                1275, -- Curious Coin
+                1299, -- Brawler's Gold
+                1314, -- Lingering Soul Fragment
+                1324, -- Horde Qiraji Commendation
+                1325, -- Alliance Qiraji Commendation
+                1342, -- Legionfall War Supplies
+                1347, -- Legionfall Building - Personal Tracker - Mage Tower (Hidden)
+                1349, -- Legionfall Building - Personal Tracker - Command Tower (Hidden)
+                1350, -- Legionfall Building - Personal Tracker - Nether Tower (Hidden)
+                1355, -- Felessence
+                1356, -- Echoes of Battle
+                1357, -- Echoes of Domination
                 1379, -- Trial of Style Token
+                1416, -- Coins of Air
+                1506, -- Argus Waystone
+                1508, -- Veiled Argunite
+                1533, -- Wakening Essence
                 1767, -- Stygia
                 1813, -- Reservoir Anima
                 1822, -- Renown
-                1828, -- Soul Ash
+                1828, -- Soul Ash		
             }
             local char = CurrentChar()
             char.Currencies = {}
@@ -524,6 +547,43 @@ ArwicAltManager.Fields.Character = {
             CurrentChar().ClassMount = C_QuestLog.IsQuestFlaggedCompleted(quests[class])
         end,
     },
+    ["BreachingTheTomb"] = {
+        Label = "Breaching The Tomb",
+        Order = 121,
+        Display = false,
+        Tooltip = function(char)
+            if char.BreachingTheTomb and type(char.BreachingTheTomb) ~= "boolean" then
+                GameTooltip:SetHyperlink(char.BreachingTheTomb.Link)
+                GameTooltip:Show()
+            end
+        end,
+        Value = function(char)
+            if not char.BreachingTheTomb then
+                return "?"
+            end
+            if type(char.BreachingTheTomb) == "boolean" then
+                return AAM.FormatBool(char.BreachingTheTomb)
+            end
+            return AAM.FormatBool(char.BreachingTheTomb.Completed)
+        end,
+        Color = function(char)
+            if not char.BreachingTheTomb then
+                return AAM.ErrorColor()
+            end
+            if type(char.BreachingTheTomb) == "boolean" and char.BreachingTheTomb then
+                return AAM.DefaultColor()
+            end
+            if char.BreachingTheTomb.Completed then
+                return AAM.DefaultColor()
+            end
+            return AAM.ErrorColor()
+        end,
+        Update = function()
+            CurrentChar().BreachingTheTomb = {}
+            CurrentChar().BreachingTheTomb.Completed = select(13, GetAchievementInfo(11546))
+            CurrentChar().BreachingTheTomb.Link = GetAchievementLink(11546)
+        end,
+    },
     ["Level"] = {
         Label = "Level",
         Order = 50,
@@ -577,6 +637,58 @@ ArwicAltManager.Fields.Character = {
             end
         end,
     },
+    ["OrderHallUpgrades"] = {
+        Label = "All Order Hall Upgrades",
+        Order = 130,
+        Display = false,
+        Tooltip = function(char)
+            AddTooltipHeader(char, "All Order Hall Upgrades")
+            if not char.OrderHallUpgrades then
+                GameTooltip:AddLine(AAM.FormatBool(char.OrderHallUpgrades), AAM.ErrorColor())
+            else
+                GameTooltip:AddLine(AAM.FormatBool(char.OrderHallUpgrades), AAM.DefaultColor())
+            end
+            GameTooltip:Show()
+        end,
+        Value = function(char)
+            return AAM.FormatBool(char.OrderHallUpgrades)
+        end,
+        Color = function(char)
+            if not char.OrderHallUpgrades then
+                return AAM.ErrorColor()
+            end
+            return AAM.DefaultColor()
+        end,
+        Update = function()
+            CurrentChar().OrderHallUpgrades = select(13, GetAchievementInfo(11223))
+        end,
+    },
+    ["BalanceOfPower"] = {
+        Label = "Balance of Power",
+        Order = 150,
+        Display = false,
+        Tooltip = function(char)
+            AddTooltipHeader(char, "Balance of Power")
+            if not char.BalanceOfPower then
+                GameTooltip:AddLine(AAM.FormatBool(char.BalanceOfPower), AAM.ErrorColor())
+            else
+                GameTooltip:AddLine(AAM.FormatBool(char.BalanceOfPower), AAM.DefaultColor())
+            end
+            GameTooltip:Show()
+        end,
+        Value = function(char)
+            return AAM.FormatBool(char.BalanceOfPower)
+        end,
+        Color = function(char)
+            if not char.BalanceOfPower then
+                return AAM.ErrorColor()
+            end
+            return AAM.DefaultColor()
+        end,
+        Update = function()
+            CurrentChar().BalanceOfPower = select(13, GetAchievementInfo(10459))
+        end,
+    },
     ["KeystoneMaster"] = {
         Label = "Keystone Master",
         Order = 135,
@@ -601,6 +713,260 @@ ArwicAltManager.Fields.Character = {
         end,
         Update = function()
             CurrentChar().KeystoneMaster = select(13, GetAchievementInfo(11162))
+        end,
+    },
+    ["MageTowerPrereq"] = {
+        Label = "Mage Tower Unlocked",
+        Order = 139,
+        Display = false,
+        Tooltip = function(char)
+            local ids = {
+                ["DEATHKNIGHT"] = {
+                    ["Frost"] = 45865, -- Closing the Eye
+                    ["Unholy"] = 45861, -- An Impossible Foe
+                    ["Blood"] = 45863, -- The Highlord's Return
+                },
+                ["DEMONHUNTER"] = {
+                    ["Havoc"] = 45865, -- Closing the Eye
+                    ["Vengeance"] = 45863, -- The Highlord's Return
+                },
+                ["DRUID"] = {
+                    ["Balance"] = 45866, -- Thwarting the Twins
+                    ["Guardian"] = 45863, -- The Highlord's Return
+                    ["Feral"] = 45861, -- An Impossible Foe
+                    ["Restoration"] = 45864, -- End of the Risen Threat
+                },
+                ["HUNTER"] = {
+                    ["Marksmanship"] = 45866, -- Thwarting the Twins
+                    ["Beast Mastery"] = 45842, -- Feltotem's Fall
+                    ["Survival"] = 45865, -- Closing the Eye
+                },
+                ["MAGE"] = {
+                    ["Fire"] = 45861, -- An Impossible Foe
+                    ["Frost"] = 45866, -- Thwarting the Twins
+                    ["Arcane"] = 45862, -- The God-Queen's Fury
+                },
+                ["MONK"] = {
+                    ["Windwalker"] = 45842, -- Feltotem's Fall
+                    ["Mistweaver"] = 45864, -- End of the Risen Threat
+                    ["Brewmaster"] = 45863, -- The Highlord's Return
+                },
+                ["PALADIN"] = {
+                    ["Retribution"] = 45862, -- The God-Queen's Fury
+                    ["Holy"] = 45864, -- End of the Risen Threat
+                    ["Protection"] = 45863, -- The Highlord's Return
+                },
+                ["PRIEST"] = {
+                    ["Shadow"] = 45866, -- Thwarting the Twins
+                    ["Holy"] = 45864, -- End of the Risen Threat
+                    ["Discipline"] = 45842, -- Feltotem's Fall
+                },
+                ["ROGUE"] = {
+                    ["Assassination"] = 45862, -- The God-Queen's Fury
+                    ["Outlaw"] = 45861, -- An Impossible Foe
+                    ["Subtlety"] = 45865, -- Closing the Eye
+                },
+                ["SHAMAN"] = {
+                    ["Enhancement"] = 45862, -- The God-Queen's Fury
+                    ["Elemental"] = 45861, -- An Impossible Foe
+                    ["Restoration"] = 45864, -- End of the Risen Threat
+                },
+                ["WARLOCK"] = {
+                    ["Affliction"] = 45866, -- Thwarting the Twins
+                    ["Destruction"] = 45842, -- Feltotem's Fall
+                    ["Demonology"] = 45862, -- The God-Queen's Fury
+                },
+                ["WARRIOR"] = {
+                    ["Arms"] = 45865, -- Closing the Eye
+                    ["Fury"] = 45861, -- An Impossible Foe
+                    ["Protection"] = 45863, -- The Highlord's Return
+                },
+            }
+            AddTooltipHeader(char, "Mage Tower Unlocked")
+            for k, v in pairs(ids[char.Class]) do
+                local r, g, b = AAM.DefaultColor()
+                local unlocked = char.MageTowerPrereq[v]
+                if not unlocked then
+                    GameTooltip:AddDoubleLine(k, AAM.FormatBool(unlocked), r, g, b, AAM.ErrorColor())
+                else
+                    GameTooltip:AddDoubleLine(k, AAM.FormatBool(unlocked), r, g, b, AAM.DefaultColor())
+                end
+            end
+            GameTooltip:Show()
+        end,
+        Value = function(char)
+            if char.MageTowerPrereq then
+                local count = 0
+                for k, v in pairs(char.MageTowerPrereq) do
+                    if v then
+                        count = count + 1
+                    end
+                end
+                local maxCount = 3
+                if char.Class == "DEMONHUNTER" then maxCount = 2 end
+                if char.Class == "DRUID" then maxCount = 4 end
+                local str = format("%d/%d", count, maxCount)
+                return str
+            end
+            return ""
+        end,
+        Color = function(char)
+            if char.MageTowerPrereq then
+                local count = 0
+                for k, v in pairs(char.MageTowerPrereq) do
+                    if v then
+                        count = count + 1
+                    end
+                end
+                local maxCount = 3
+                if char.Class == "DEMONHUNTER" then maxCount = 2 end
+                if char.Class == "DRUID" then maxCount = 4 end
+                if count ~= maxCount then
+                    return AAM.ErrorColor()
+                end
+                return AAM.DefaultColor()
+            end
+            return AAM.ErrorColor()
+        end,
+        Update = function()
+            local quests = {
+                45864,
+                45842,
+                45861,
+                45862,
+                45865,
+                45866,
+                45863,
+            }
+            local char = CurrentChar()
+            char.MageTowerPrereq = {}
+            for k, v in pairs(quests) do
+                char.MageTowerPrereq[v] = C_QuestLog.IsQuestFlaggedCompleted(v)
+            end
+        end,
+    },
+    ["MageTower"] = {
+        Label = "Mage Tower Completed",
+        Order = 140,
+        Display = true,
+        Tooltip = function(char)
+            local ids = {
+                ["DEATHKNIGHT"] = {
+                    ["Frost"] = 44925, -- Closing the Eye
+                    ["Unholy"] = 46065, -- An Impossible Foe
+                    ["Blood"] = 45416, -- The Highlord's Return
+                },
+                ["DEMONHUNTER"] = {
+                    ["Havoc"] = 44925, -- Closing the Eye
+                    ["Vengeance"] = 45416, -- The Highlord's Return
+                },
+                ["DRUID"] = {
+                    ["Balance"] = 46127, -- Thwarting the Twins
+                    ["Guardian"] = 45416, -- The Highlord's Return
+                    ["Feral"] = 46065, -- An Impossible Foe
+                    ["Restoration"] = 46035, -- End of the Risen Threat
+                },
+                ["HUNTER"] = {
+                    ["Marksmanship"] = 46127, -- Thwarting the Twins
+                    ["Beast Mastery"] = 45627, -- Feltotem's Fall
+                    ["Survival"] = 44925, -- Closing the Eye
+                },
+                ["MAGE"] = {
+                    ["Fire"] = 46065, -- An Impossible Foe
+                    ["Frost"] = 46127, -- Thwarting the Twins
+                    ["Arcane"] = 45526, -- The God-Queen's Fury
+                },
+                ["MONK"] = {
+                    ["Windwalker"] = 45627, -- Feltotem's Fall
+                    ["Mistweaver"] = 46035, -- End of the Risen Threat
+                    ["Brewmaster"] = 45416, -- The Highlord's Return
+                },
+                ["PALADIN"] = {
+                    ["Retribution"] = 45526, -- The God-Queen's Fury
+                    ["Holy"] = 46035, -- End of the Risen Threat
+                    ["Protection"] = 45416, -- The Highlord's Return
+                },
+                ["PRIEST"] = {
+                    ["Shadow"] = 46127, -- Thwarting the Twins
+                    ["Holy"] = 46035, -- End of the Risen Threat
+                    ["Discipline"] = 45627, -- Feltotem's Fall
+                },
+                ["ROGUE"] = {
+                    ["Assassination"] = 45526, -- The God-Queen's Fury
+                    ["Outlaw"] = 46065, -- An Impossible Foe
+                    ["Subtlety"] = 44925, -- Closing the Eye
+                },
+                ["SHAMAN"] = {
+                    ["Enhancement"] = 45526, -- The God-Queen's Fury
+                    ["Elemental"] = 46065, -- An Impossible Foe
+                    ["Restoration"] = 46035, -- End of the Risen Threat
+                },
+                ["WARLOCK"] = {
+                    ["Affliction"] = 46127, -- Thwarting the Twins
+                    ["Destruction"] = 45627, -- Feltotem's Fall
+                    ["Demonology"] = 45526, -- The God-Queen's Fury
+                },
+                ["WARRIOR"] = {
+                    ["Arms"] = 44925, -- Closing the Eye
+                    ["Fury"] = 46065, -- An Impossible Foe
+                    ["Protection"] = 45416, -- The Highlord's Return
+                },
+            }
+            AddTooltipHeader(char, "Mage Tower Completed")
+            for k, v in pairs(ids[char.Class]) do
+                local r, g, b = AAM.DefaultColor()
+                local completed = char.MageTower[v]
+                if not completed then
+                    GameTooltip:AddDoubleLine(k, AAM.FormatBool(completed), r, g, b, AAM.ErrorColor())
+                else
+                    GameTooltip:AddDoubleLine(k, AAM.FormatBool(completed), r, g, b, AAM.DefaultColor())
+                end
+            end
+            GameTooltip:Show()
+        end,
+        Value = function(char)
+            local count = 0
+            for k, v in pairs(char.MageTower) do
+                if v then
+                    count = count + 1
+                end
+            end
+            local maxCount = 3
+            if char.Class == "DEMONHUNTER" then maxCount = 2 end
+            if char.Class == "DRUID" then maxCount = 4 end
+            local str = format("%d/%d", count, maxCount)
+            return str
+        end,
+        Color = function(char)
+            local count = 0
+            for k, v in pairs(char.MageTower) do
+                if v then
+                    count = count + 1
+                end
+            end
+            local maxCount = 3
+            if char.Class == "DEMONHUNTER" then maxCount = 2 end
+            if char.Class == "DRUID" then maxCount = 4 end
+            if count ~= maxCount then
+                return AAM.ErrorColor()
+            end
+            return AAM.DefaultColor()
+        end,
+        Update = function()
+            local quests = {
+                46065, -- An Impossible Foe
+                44925, -- Closing the Eye
+                46035, -- End of the Risen Threat
+                45627, -- Feltotem's Fall
+                45526, -- The God-Queen's Fury
+                45416, -- The Highlord's Return
+                46127, -- Thwarting the Twins
+            }
+            local char = CurrentChar()
+            char.MageTower = {}
+            for k, v in pairs(quests) do
+                char.MageTower[v] = C_QuestLog.IsQuestFlaggedCompleted(v)
+            end
         end,
     },
     ["TimePlayed"] = {
@@ -633,6 +999,102 @@ ArwicAltManager.Fields.Character = {
                 char.TimePlayed.Level = thisLevel
             end
         },
+    },
+    ["Artifacts"] = {
+        Label = "Artifact Levels",
+        Order = 100,
+        Display = false,
+        Tooltip = function(char)
+            AddTooltipHeader(char, "Artifact Levels")
+            for k, v in pairs(char.Artifacts) do
+                if k ~= 133755 then -- dont show fishing artifact
+                    if v.Name == nil then v.Name = "UNKNOWN" end
+                    local r, g, b = AAM.DefaultColor()
+                    GameTooltip:AddDoubleLine(format("%s", v.Name), format("%d", v.Ranks), r, g, b, AAM.DefaultColor())
+                end
+            end
+            GameTooltip:Show()
+        end,
+        Value = function(char)
+            local str = ""
+            for k, v in pairs(char.Artifacts) do
+                if k ~= 133755 then -- ignore fishing artifact
+                    str = format("%s, %d", str, v.Ranks) 
+                end
+            end
+            return str:sub(3) -- remove the first 2 characters ", "
+        end,
+        Color = function(char)
+            return AAM.DefaultColor()
+        end,
+        Update = function()
+            local char = CurrentChar()
+            if not char.Artifacts then 
+                char.Artifacts = {} 
+            end
+        end,
+        EventUpdates = {
+            ["ARTIFACT_UPDATE"] = function()
+                local char = CurrentChar()
+                if not char.Artifacts then 
+                    char.Artifacts = {} 
+                end
+                local id, _, name, _, power, ranks = C_ArtifactUI.GetArtifactInfo()
+                char.Artifacts[id] = {}
+                char.Artifacts[id].Name = name
+                char.Artifacts[id].Power = power
+                char.Artifacts[id].Ranks = ranks
+            end
+        },
+    },
+    ["OrderHallResouces"] = {
+        Label = "|T1397630:0|t Order Resouces",
+        Order = 90,
+        Display = false,
+        Tooltip = function(char)
+            if char.Currencies ~= nil then
+                AddTooltipHeader(char, "Order Resouces")
+                AddCurrencyLine(char, 1220, "|T1397630:0|t")
+                GameTooltip:Show()
+            end
+        end,
+        Value = function(char)
+            if not char.Currencies or not char.Currencies[1220] or not char.Currencies[1220].CurrentAmount then
+                return ""
+            end
+            return AAM.FormatInt(char.Currencies[1220].CurrentAmount)
+        end,
+        Color = function(char)
+            return AAM.DefaultColor()
+        end,
+    },
+    ["WakeningEssence"] = {
+        Label = "|T236521:0|t Wakening Essence",
+        Order = 91,
+        Display = false,
+        Tooltip = function(char)
+            if char.Currencies ~= nil then
+                AddTooltipHeader(char, "Wakening Essence")
+                AddCurrencyLine(char, 1533, "|T236521:0|t")
+                GameTooltip:Show()
+            end
+        end,
+        Value = function(char)
+            if not char.Currencies or not char.Currencies[1533] then
+                return ""
+            end
+            return AAM.FormatInt(char.Currencies[1533].CurrentAmount)
+        end,
+        Color = function(char)
+            if not char.Currencies or not char.Currencies[1533] then
+                return AAM.ErrorColor()
+            end
+            local cur = char.Currencies[1533].CurrentAmount
+            if cur > 1000 then
+                return AAM.SuccessColor()
+            end
+            return AAM.DefaultColor()
+        end,
     },
     ["Gear"] = {
         Label = "Gear",
@@ -734,6 +1196,88 @@ ArwicAltManager.Fields.Character = {
                 CurrentChar().GuildName = GetGuildInfo("player")
             end,
         },
+    },
+    ["Champions"] = {
+        Label = "Orderhall Champions",
+        Order = 22,
+        Display = false,
+        Tooltip = function(char)
+            if char.Followers ~= nil then
+                AddTooltipHeader(char, "Orderhall Champions")
+                for k, v in pairs(char.Followers) do
+                    -- get equipment links
+                    local n1 = C_Garrison.GetFollowerAbilityLink(v.Equipment[1].ID)
+                    local n2 = C_Garrison.GetFollowerAbilityLink(v.Equipment[2].ID)
+                    local n3 = C_Garrison.GetFollowerAbilityLink(v.Equipment[3].ID)
+                    -- lock slots if the champ quality is too low
+                    if v.Quality < 5 then n3 = "|cff9d9d9d[Locked]|r" end
+                    if v.Quality < 4 then n2 = "|cff9d9d9d[Locked]|r" end
+                    if v.Quality < 3 then n1 = "|cff9d9d9d[Locked]|r" end
+                    -- shorten empty slot links
+                    if v.Equipment[1].ID == 415 or v.Equipment[1].ID == 855 or v.Equipment[1].ID == 414 then
+                        n1 = "|cffff0000[Empty]|r"
+                    end
+                    if v.Equipment[2].ID == 415 or v.Equipment[2].ID == 855 or v.Equipment[2].ID == 414 then
+                        n2 = "|cffff0000[Empty]|r"
+                    end
+                    if v.Equipment[3].ID == 415 or v.Equipment[3].ID == 855 or v.Equipment[3].ID == 414 then
+                        n3 = "|cffff0000[Empty]|r"
+                    end
+                    -- add lines to the tooltip
+                    local qualityColors = {
+                        [1] = "ffffffff",
+                        [2] = "ffffffff",
+                        [3] = "ff1eff00",
+                        [4] = "ff0070dd",
+                        [5] = "ffa335ee",
+                        [6] = "ffe6cc80",
+                    }
+                    GameTooltip:AddLine(format("|T%s:24|t |c%s%s|r", v.PortraitIconID, qualityColors[v.Quality], v.Name))
+                    GameTooltip:AddLine(format("       iLvl %d %s", v.ItemLevel, v.ClassName))
+                    GameTooltip:AddLine(format("       %s", n1))
+                    GameTooltip:AddLine(format("       %s", n2))
+                    GameTooltip:AddLine(format("       %s", n3))
+                end
+                GameTooltip:Show()
+            end
+        end,
+        Value = function(char)
+            return "View Champions"
+        end,
+        Color = function(char)
+            return AAM.DefaultColor()
+        end,
+        Update = function()
+            local followers = C_Garrison.GetFollowers(LE_FOLLOWER_TYPE_GARRISON_7_0)
+            if followers ~= nil then
+                CurrentChar().Followers = {}
+                for _, v in pairs(followers) do
+                    if not v.isTroop and v.isCollected then
+                        local follower = {}
+                        follower.ItemLevel = v.iLevel
+                        follower.Level = v.Level
+                        follower.Quality = v.quality
+                        follower.PortraitIconID = v.portraitIconID
+                        follower.SoundKitID = v.slotSoundKitID
+                        follower.XP = v.xp
+                        follower.ClassName = v.className
+                        follower.ClassSpec = v.classSpec
+                        follower.IsMaxLevel = v.IsMaxLevel
+                        follower.Name = v.name
+                        follower.GUID = v.followerID
+                        follower.GarrisonFollowerID = v.garrFollowerID
+                        follower.Equipment = {}
+                        follower.Equipment[1] = {}
+                        follower.Equipment[1].ID = C_Garrison.GetFollowerTraitAtIndex(follower.GUID, 1)
+                        follower.Equipment[2] = {}
+                        follower.Equipment[2].ID = C_Garrison.GetFollowerTraitAtIndex(follower.GUID, 2)
+                        follower.Equipment[3] = {}
+                        follower.Equipment[3].ID = C_Garrison.GetFollowerTraitAtIndex(follower.GUID, 3)
+                        table.insert(CurrentChar().Followers, follower)
+                    end
+                end
+            end
+        end,
     },
     ["Title"] = {
         Label = "Title",
@@ -874,121 +1418,9 @@ ArwicAltManager.Fields.Character = {
         Update = function()
         end,
     },
-    ["Renown"] = {
-        Label = "|T3726261:0|t Renown",
-        Order = 91,
-        Display = true,
-        Tooltip = function(char)
-            if char.Currencies ~= nil then
-                AddTooltipHeader(char, "Renown")
-                AddCurrencyLine(char, 1822, "|T3726261:0|t")
-                GameTooltip:Show()
-            end
-        end,
-        Value = function(char)
-            if not char.Currencies or not char.Currencies[1822] or not char.Currencies[1822].CurrentAmount then
-                return ""
-            end
-            return AAM.FormatInt(char.Currencies[1822].CurrentAmount)
-        end,
-        Color = function(char)
-            if not char.Currencies or not char.Currencies[1822] then
-                return AAM.ErrorColor()
-            end
-            local cur = char.Currencies[1822].CurrentAmount
-            if cur == 40 then
-                return AAM.SuccessColor()
-            end
-            return AAM.DefaultColor()
-        end,
-    },
-    ["SoulAsh"] = {
-        Label = "|T3743738:0|t soul ash",
-        Order = 92,
-        Display = true,
-        Tooltip = function(char)
-            if char.Currencies ~= nil then
-                AddTooltipHeader(char, "soul ash")
-                AddCurrencyLine(char, 1828, "|T3743738:0|t")
-                GameTooltip:Show()
-            end
-        end,
-        Value = function(char)
-            if not char.Currencies or not char.Currencies[1828] or not char.Currencies[1828].CurrentAmount then
-                return ""
-            end
-            return AAM.FormatInt(char.Currencies[1828].CurrentAmount)
-        end,
-        Color = function(char)
-            if not char.Currencies or not char.Currencies[1828] then
-                return AAM.ErrorColor()
-            end
-            local cur = char.Currencies[1828].CurrentAmount
-            if cur == char.Currencies[1828].WeeklyMax then
-                return AAM.SuccessColor()
-            end
-            return AAM.DefaultColor()
-        end,
-    },
-    ["Stygia"] = {
-        Label = "|T3743739:0|t Stygia",
-        Order = 93,
-        Display = true,
-        Tooltip = function(char)
-            if char.Currencies ~= nil then
-                AddTooltipHeader(char, "stygia")
-                AddCurrencyLine(char, 1767, "|T3743739:0|t")
-                GameTooltip:Show()
-            end
-        end,
-        Value = function(char)
-            if not char.Currencies or not char.Currencies[1767] or not char.Currencies[1767].CurrentAmount then
-                return ""
-            end
-            return AAM.FormatInt(char.Currencies[1767].CurrentAmount)
-        end,
-        Color = function(char)
-            if not char.Currencies or not char.Currencies[1767] then
-                return AAM.ErrorColor()
-            end
-            local cur = char.Currencies[1767].CurrentAmount
-            if cur == char.Currencies[1767].WeeklyMax then
-                return AAM.SuccessColor()
-            end
-            return AAM.DefaultColor()
-        end,
-    },
-    ["ReservoirAnima"] = {
-        Label = "|T3528288:0|t Reservoir Anima",
-        Order = 94,
-        Display = true,
-        Tooltip = function(char)
-            if char.Currencies ~= nil then
-                AddTooltipHeader(char, "Reservoir Anima")
-                AddCurrencyLine(char, 1813, "|T3528288:0|t")
-                GameTooltip:Show()
-            end
-        end,
-        Value = function(char)
-            if not char.Currencies or not char.Currencies[1813] or not char.Currencies[1813].CurrentAmount then
-                return ""
-            end
-            return AAM.FormatInt(char.Currencies[1813].CurrentAmount)
-        end,
-        Color = function(char)
-            if not char.Currencies or not char.Currencies[1813] then
-                return AAM.ErrorColor()
-            end
-            local cur = char.Currencies[1813].CurrentAmount
-            if cur == char.Currencies[1813].WeeklyMax then
-                return AAM.SuccessColor()
-            end
-            return AAM.DefaultColor()
-        end,
-    },
-    ["Covenant"] = {
+["Covenant"] = {
         Label = "Covenant",
-        Order = 90,
+        Order = 92,
         Display = true,
         Tooltip = function(char)
             AddTooltipHeader(char, "Covenant")
@@ -1029,7 +1461,119 @@ ArwicAltManager.Fields.Character = {
 			end			
             CurrentChar().Covenant = covenantname
         end,
-    },	
+    },		
+    ["Renown"] = {
+        Label = "|T3726261:0|t Renown",
+        Order = 93,
+        Display = true,
+        Tooltip = function(char)
+            if char.Currencies ~= nil then
+                AddTooltipHeader(char, "Renown")
+                AddCurrencyLine(char, 1822, "|T3726261:0|t")
+                GameTooltip:Show()
+            end
+        end,
+        Value = function(char)
+            if not char.Currencies or not char.Currencies[1822] or not char.Currencies[1822].CurrentAmount then
+                return ""
+            end
+            return AAM.FormatInt(char.Currencies[1822].CurrentAmount)
+        end,
+        Color = function(char)
+            if not char.Currencies or not char.Currencies[1822] then
+                return AAM.ErrorColor()
+            end
+            local cur = char.Currencies[1822].CurrentAmount
+            if cur == 40 then
+                return AAM.SuccessColor()
+            end
+            return AAM.DefaultColor()
+        end,
+    },
+    ["SoulAsh"] = {
+        Label = "|T3743738:0|t soul ash",
+        Order = 94,
+        Display = true,
+        Tooltip = function(char)
+            if char.Currencies ~= nil then
+                AddTooltipHeader(char, "soul ash")
+                AddCurrencyLine(char, 1828, "|T3743738:0|t")
+                GameTooltip:Show()
+            end
+        end,
+        Value = function(char)
+            if not char.Currencies or not char.Currencies[1828] or not char.Currencies[1828].CurrentAmount then
+                return ""
+            end
+            return AAM.FormatInt(char.Currencies[1828].CurrentAmount)
+        end,
+        Color = function(char)
+            if not char.Currencies or not char.Currencies[1828] then
+                return AAM.ErrorColor()
+            end
+            local cur = char.Currencies[1828].CurrentAmount
+            if cur == char.Currencies[1828].WeeklyMax then
+                return AAM.SuccessColor()
+            end
+            return AAM.DefaultColor()
+        end,
+    },
+    ["Stygia"] = {
+        Label = "|T3743739:0|t Stygia",
+        Order = 95,
+        Display = true,
+        Tooltip = function(char)
+            if char.Currencies ~= nil then
+                AddTooltipHeader(char, "stygia")
+                AddCurrencyLine(char, 1767, "|T3743739:0|t")
+                GameTooltip:Show()
+            end
+        end,
+        Value = function(char)
+            if not char.Currencies or not char.Currencies[1767] or not char.Currencies[1767].CurrentAmount then
+                return ""
+            end
+            return AAM.FormatInt(char.Currencies[1767].CurrentAmount)
+        end,
+        Color = function(char)
+            if not char.Currencies or not char.Currencies[1767] then
+                return AAM.ErrorColor()
+            end
+            local cur = char.Currencies[1767].CurrentAmount
+            if cur == char.Currencies[1767].WeeklyMax then
+                return AAM.SuccessColor()
+            end
+            return AAM.DefaultColor()
+        end,
+    },
+    ["ReservoirAnima"] = {
+        Label = "|T3528288:0|t Reservoir Anima",
+        Order = 96,
+        Display = true,
+        Tooltip = function(char)
+            if char.Currencies ~= nil then
+                AddTooltipHeader(char, "Reservoir Anima")
+                AddCurrencyLine(char, 1813, "|T3528288:0|t")
+                GameTooltip:Show()
+            end
+        end,
+        Value = function(char)
+            if not char.Currencies or not char.Currencies[1813] or not char.Currencies[1813].CurrentAmount then
+                return ""
+            end
+            return AAM.FormatInt(char.Currencies[1813].CurrentAmount)
+        end,
+        Color = function(char)
+            if not char.Currencies or not char.Currencies[1813] then
+                return AAM.ErrorColor()
+            end
+            local cur = char.Currencies[1813].CurrentAmount
+            if cur == char.Currencies[1813].WeeklyMax then
+                return AAM.SuccessColor()
+            end
+            return AAM.DefaultColor()
+        end,
+    },
 }
 
 function ArwicAltManager.UpdateCharacterData()
