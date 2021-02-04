@@ -76,6 +76,10 @@ ArwicAltManager.Fields.Character = {
                 1174, -- Demonic Archaeology Fragment
                 1191, -- Valor
                 1379, -- Trial of Style Token
+                1767, -- Stygia
+                1813, -- Reservoir Anima
+                1822, -- Renown
+                1828, -- Soul Ash
             }
             local char = CurrentChar()
             char.Currencies = {}
