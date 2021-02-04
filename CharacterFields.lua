@@ -11,7 +11,9 @@ local function AddTooltipHeader(char, label)
 end
 
 local function AddCurrencyLine(char, cID, icon)
-    GameTooltip:AddLine(format("%s %s", icon, AAM.FormatInt(char.Currencies[cID].CurrentAmount)), AAM.DefaultColor())
+	if char.Currencies[cID] ~= nil then
+		GameTooltip:AddLine(format("%s %s", icon, AAM.FormatInt(char.Currencies[cID].CurrentAmount)), AAM.DefaultColor())
+	end
 end
 
 if ArwicAltManager.Fields == nil then ArwicAltManager.Fields = {} end
@@ -86,14 +88,19 @@ ArwicAltManager.Fields.Character = {
             for _, cid in pairs(curIDs) do
                 if not char.Currencies[cid] then 
                     char.Currencies[cid] = {} 
+					char.Currencies[cid].IsDiscovered = false
+					char.Currencies[cid].CurrentAmount = 0
+					char.Currencies[cid].Name = ""
                 end
-                char.Currencies[cid].Name, 
-                char.Currencies[cid].CurrentAmount, 
-                _, 
-                char.Currencies[cid].EarnedThisWeek, 
-                char.Currencies[cid].WeeklyMax,
-                char.Currencies[cid].TotalMax,
-                char.Currencies[cid].IsDiscovered = C_CurrencyInfo.GetCurrencyInfo(cid)
+                local currencyInfo = C_CurrencyInfo.GetCurrencyInfo(cid)
+				if currencyInfo ~= nil then
+					char.Currencies[cid].Name = currencyInfo.name
+					char.Currencies[cid].CurrentAmount = currencyInfo.quantity
+					char.Currencies[cid].EarnedThisWeek = currencyInfo.quantityEarnedThisWeek
+					char.Currencies[cid].WeeklyMax = currencyInfo.maxWeeklyQuantity
+					char.Currencies[cid].TotalMax = currencyInfo.maxQuantity
+					char.Currencies[cid].IsDiscovered = currencyInfo.isDiscovered
+				end
             end
         end,
     },
@@ -842,7 +849,7 @@ ArwicAltManager.Fields.Character = {
         Update = function()
         end,
     },
-	["Renown"] = {
+    ["Renown"] = {
         Label = "|T3726261:0|t Renown",
         Order = 91,
         Display = true,
@@ -854,7 +861,7 @@ ArwicAltManager.Fields.Character = {
             end
         end,
         Value = function(char)
-            if not char.Currencies or not char.Currencies[1822] then
+            if not char.Currencies or not char.Currencies[1822] or not char.Currencies[1822].CurrentAmount then
                 return ""
             end
             return AAM.FormatInt(char.Currencies[1822].CurrentAmount)
@@ -865,6 +872,90 @@ ArwicAltManager.Fields.Character = {
             end
             local cur = char.Currencies[1822].CurrentAmount
             if cur == 40 then
+                return AAM.SuccessColor()
+            end
+            return AAM.DefaultColor()
+        end,
+    },
+    ["SoulAsh"] = {
+        Label = "|T3743738:0|t soul ash",
+        Order = 91,
+        Display = true,
+        Tooltip = function(char)
+            if char.Currencies ~= nil then
+                AddTooltipHeader(char, "soul ash")
+                AddCurrencyLine(char, 1828, "|T3743738:0|t")
+                GameTooltip:Show()
+            end
+        end,
+        Value = function(char)
+            if not char.Currencies or not char.Currencies[1828] or not char.Currencies[1828].CurrentAmount then
+                return ""
+            end
+            return AAM.FormatInt(char.Currencies[1828].CurrentAmount)
+        end,
+        Color = function(char)
+            if not char.Currencies or not char.Currencies[1828] then
+                return AAM.ErrorColor()
+            end
+            local cur = char.Currencies[1828].CurrentAmount
+            if cur == char.Currencies[1828].WeeklyMax then
+                return AAM.SuccessColor()
+            end
+            return AAM.DefaultColor()
+        end,
+    },
+    ["Stygia"] = {
+        Label = "|T3743739:0|t Stygia",
+        Order = 91,
+        Display = true,
+        Tooltip = function(char)
+            if char.Currencies ~= nil then
+                AddTooltipHeader(char, "stygia")
+                AddCurrencyLine(char, 1767, "|T3743739:0|t")
+                GameTooltip:Show()
+            end
+        end,
+        Value = function(char)
+            if not char.Currencies or not char.Currencies[1767] or not char.Currencies[1767].CurrentAmount then
+                return ""
+            end
+            return AAM.FormatInt(char.Currencies[1767].CurrentAmount)
+        end,
+        Color = function(char)
+            if not char.Currencies or not char.Currencies[1767] then
+                return AAM.ErrorColor()
+            end
+            local cur = char.Currencies[1767].CurrentAmount
+            if cur == char.Currencies[1767].WeeklyMax then
+                return AAM.SuccessColor()
+            end
+            return AAM.DefaultColor()
+        end,
+    },
+    ["ReservoirAnima"] = {
+        Label = "|T3528288:0|t Reservoir Anima",
+        Order = 91,
+        Display = true,
+        Tooltip = function(char)
+            if char.Currencies ~= nil then
+                AddTooltipHeader(char, "Reservoir Anima")
+                AddCurrencyLine(char, 1813, "|T3528288:0|t")
+                GameTooltip:Show()
+            end
+        end,
+        Value = function(char)
+            if not char.Currencies or not char.Currencies[1813] or not char.Currencies[1813].CurrentAmount then
+                return ""
+            end
+            return AAM.FormatInt(char.Currencies[1813].CurrentAmount)
+        end,
+        Color = function(char)
+            if not char.Currencies or not char.Currencies[1813] then
+                return AAM.ErrorColor()
+            end
+            local cur = char.Currencies[1813].CurrentAmount
+            if cur == char.Currencies[1813].WeeklyMax then
                 return AAM.SuccessColor()
             end
             return AAM.DefaultColor()
