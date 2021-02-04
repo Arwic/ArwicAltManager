@@ -841,7 +841,35 @@ ArwicAltManager.Fields.Character = {
         end,
         Update = function()
         end,
-    },    
+    },
+	["Renown"] = {
+        Label = "|T3726261:0|t Renown",
+        Order = 91,
+        Display = true,
+        Tooltip = function(char)
+            if char.Currencies ~= nil then
+                AddTooltipHeader(char, "Renown")
+                AddCurrencyLine(char, 1822, "|T3726261:0|t")
+                GameTooltip:Show()
+            end
+        end,
+        Value = function(char)
+            if not char.Currencies or not char.Currencies[1822] then
+                return ""
+            end
+            return AAM.FormatInt(char.Currencies[1822].CurrentAmount)
+        end,
+        Color = function(char)
+            if not char.Currencies or not char.Currencies[1822] then
+                return AAM.ErrorColor()
+            end
+            local cur = char.Currencies[1822].CurrentAmount
+            if cur == 40 then
+                return AAM.SuccessColor()
+            end
+            return AAM.DefaultColor()
+        end,
+    },
 }
 
 function ArwicAltManager.UpdateCharacterData()
