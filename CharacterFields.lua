@@ -1,28 +1,23 @@
 local AAM = ArwicAltManager
 
-local function getCovenantIcon(covenantName)
-	DCovenant = {
-		["iconSize"] = 16,
-	}
-	if covenantName ~= nil then
-		local iconName = ""
-		if covenantName == "Kyrian" then
-			iconName = "kyrian"
-		end
-		if covenantName == "Venthyr" then
-			iconName = "venthyr"
-		end
-		if covenantName == "NightFae" then
-			iconName = "night_fae"
-		end
-		if covenantName == "Necrolord" then
-			iconName = "necrolord"
-		end
-		if iconName ~= "" then
-			return "|T".."Interface\\AddOns\\ArwicAltManager\\resources\\"..iconName..".tga:"..DCovenant["iconSize"]..":"..DCovenant["iconSize"].."|t"		
-		end
-	end
-    return ""
+local function GetCovenantDetails(covenantId)
+    covenantId = 3
+    local iconMap = {
+        [0] = "134400", -- inv_misc_questionmark
+        [1] = "3257748", -- Ui_sigil_kyrian 
+        [2] = "3257751", -- Ui_sigil_venthyr
+        [3] = "3257750", -- Ui_sigil_nightfae
+        [4] = "3257749", -- Ui_sigil_necrolord
+    }
+    local nameMap = {
+        [0] = "Not Selected",
+        [1] = "Kyrian",
+        [2] = "Venthyr",
+        [3] = "Night Fae",
+        [4] = "Necrolord",
+    }
+    if covenantId == nil then return nameMap[0], iconMap[0] end
+    return nameMap[covenantId], iconMap[covenantId]
 end
 
 local function CurrentChar()
@@ -136,19 +131,19 @@ ArwicAltManager.Fields.Character = {
             for _, cid in pairs(curIDs) do
                 if not char.Currencies[cid] then 
                     char.Currencies[cid] = {} 
-					char.Currencies[cid].IsDiscovered = false
-					char.Currencies[cid].CurrentAmount = 0
-					char.Currencies[cid].Name = ""
+                    char.Currencies[cid].IsDiscovered = false
+                    char.Currencies[cid].CurrentAmount = 0
+                    char.Currencies[cid].Name = ""
                 end
                 local currencyInfo = C_CurrencyInfo.GetCurrencyInfo(cid)
-				if currencyInfo ~= nil then
-					char.Currencies[cid].Name = currencyInfo.name
-					char.Currencies[cid].CurrentAmount = currencyInfo.quantity
-					char.Currencies[cid].EarnedThisWeek = currencyInfo.quantityEarnedThisWeek
-					char.Currencies[cid].WeeklyMax = currencyInfo.maxWeeklyQuantity
-					char.Currencies[cid].TotalMax = currencyInfo.maxQuantity
-					char.Currencies[cid].IsDiscovered = currencyInfo.isDiscovered
-				end
+                if currencyInfo ~= nil then
+                    char.Currencies[cid].Name = currencyInfo.name
+                    char.Currencies[cid].CurrentAmount = currencyInfo.quantity
+                    char.Currencies[cid].EarnedThisWeek = currencyInfo.quantityEarnedThisWeek
+                    char.Currencies[cid].WeeklyMax = currencyInfo.maxWeeklyQuantity
+                    char.Currencies[cid].TotalMax = currencyInfo.maxQuantity
+                    char.Currencies[cid].IsDiscovered = currencyInfo.isDiscovered
+                end
             end
         end,
     },
@@ -1059,7 +1054,7 @@ ArwicAltManager.Fields.Character = {
             end
         end,
         Value = function(char)
-            if not char.Currencies or not char.Currencies[1220] or not char.Currencies[1220].CurrentAmount then
+            if not char.Currencies or not char.Currencies[1220] then
                 return ""
             end
             return AAM.FormatInt(char.Currencies[1220].CurrentAmount)
@@ -1418,48 +1413,26 @@ ArwicAltManager.Fields.Character = {
         Update = function()
         end,
     },
-["Covenant"] = {
+    ["Covenant"] = {
         Label = "Covenant",
         Order = 92,
         Display = true,
         Tooltip = function(char)
             AddTooltipHeader(char, "Covenant")
-			if char.Covenant ~= nil then
-				GameTooltip:AddLine(format("%s %s", getCovenantIcon(char.CovenantId), char.Covenant), AAM.DefaultColor())
-			end
+            name, icon = GetCovenantDetails(char.CovenantID)
+            GameTooltip:AddLine(format("|T%s:0|t %s", icon, name, AAM.DefaultColor()))
             GameTooltip:Show()
         end,
         Value = function(char)
-			if char.Covenant == "none" then
-				return char.Covenant
-			end
-			if char.Covenant ~= nil then
-				return format("%s %s", getCovenantIcon(char.Covenant), char.Covenant)
-			end
-			return "none"
+            name, icon = GetCovenantDetails(char.CovenantID)
+            return format("|T%s:0|t %s", icon, name)
         end,
         Color = function(char)
-			if char.Covenant == nil or char.Covenant == "none" then
-				return AAM.ErrorColor()
-			end			
-            return AAM.SuccessColor()
+            if char.CovenantID == 0 and char.Level >= 60 then return AAM.ErrorColor() end
+            return AAM.DefaultColor()
         end,
         Update = function()
-			covenantID = C_Covenants.GetActiveCovenantID()
-			covenantname = "none"
-			if covenantID == 1 then
-			   covenantname = "Kyrian"
-			end
-			if covenantID == 2 then
-			   covenantname = "Venthyr"
-			end
-			if covenantID == 3 then
-			   covenantname = "NightFae"
-			end
-			if covenantID == 4 then
-			   covenantname = "Necrolord"
-			end			
-            CurrentChar().Covenant = covenantname
+            CurrentChar().CovenantID = C_Covenants.GetActiveCovenantID()
         end,
     },		
     ["Renown"] = {
@@ -1491,12 +1464,12 @@ ArwicAltManager.Fields.Character = {
         end,
     },
     ["SoulAsh"] = {
-        Label = "|T3743738:0|t soul ash",
+        Label = "|T3743738:0|t Soul Ash",
         Order = 94,
         Display = true,
         Tooltip = function(char)
             if char.Currencies ~= nil then
-                AddTooltipHeader(char, "soul ash")
+                AddTooltipHeader(char, "Soul Ash")
                 AddCurrencyLine(char, 1828, "|T3743738:0|t")
                 GameTooltip:Show()
             end
@@ -1511,8 +1484,8 @@ ArwicAltManager.Fields.Character = {
             if not char.Currencies or not char.Currencies[1828] then
                 return AAM.ErrorColor()
             end
-            local cur = char.Currencies[1828].CurrentAmount
-            if cur == char.Currencies[1828].WeeklyMax then
+            local currency = char.Currencies[1828]
+            if currency.CurrentAmount >= currency.WeeklyMax and currency.WeeklyMax ~= 0 then
                 return AAM.SuccessColor()
             end
             return AAM.DefaultColor()
@@ -1524,7 +1497,7 @@ ArwicAltManager.Fields.Character = {
         Display = true,
         Tooltip = function(char)
             if char.Currencies ~= nil then
-                AddTooltipHeader(char, "stygia")
+                AddTooltipHeader(char, "Stygia")
                 AddCurrencyLine(char, 1767, "|T3743739:0|t")
                 GameTooltip:Show()
             end
@@ -1539,8 +1512,8 @@ ArwicAltManager.Fields.Character = {
             if not char.Currencies or not char.Currencies[1767] then
                 return AAM.ErrorColor()
             end
-            local cur = char.Currencies[1767].CurrentAmount
-            if cur == char.Currencies[1767].WeeklyMax then
+            local currency = char.Currencies[1767]
+            if currency.CurrentAmount >= currency.WeeklyMax and currency.WeeklyMax ~= 0 then
                 return AAM.SuccessColor()
             end
             return AAM.DefaultColor()
@@ -1567,8 +1540,8 @@ ArwicAltManager.Fields.Character = {
             if not char.Currencies or not char.Currencies[1813] then
                 return AAM.ErrorColor()
             end
-            local cur = char.Currencies[1813].CurrentAmount
-            if cur == char.Currencies[1813].WeeklyMax then
+            local currency = char.Currencies[1813]
+            if currency.CurrentAmount >= currency.WeeklyMax and currency.WeeklyMax ~= 0 then
                 return AAM.SuccessColor()
             end
             return AAM.DefaultColor()
