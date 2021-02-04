@@ -1,5 +1,30 @@
 local AAM = ArwicAltManager
 
+local function getCovenantIcon(covenantName)
+	DCovenant = {
+		["iconSize"] = 16,
+	}
+	if covenantName ~= nil then
+		local iconName = ""
+		if covenantName == "Kyrian" then
+			iconName = "kyrian"
+		end
+		if covenantName == "Venthyr" then
+			iconName = "venthyr"
+		end
+		if covenantName == "NightFae" then
+			iconName = "night_fae"
+		end
+		if covenantName == "Necrolord" then
+			iconName = "necrolord"
+		end
+		if iconName ~= "" then
+			return "|T".."Interface\\AddOns\\ArwicAltManager\\resources\\"..iconName..".tga:"..DCovenant["iconSize"]..":"..DCovenant["iconSize"].."|t"		
+		end
+	end
+    return ""
+end
+
 local function CurrentChar()
     return ArwicAltManagerDB.Realms[GetRealmName()].Characters[UnitName("player")]
 end
@@ -879,7 +904,7 @@ ArwicAltManager.Fields.Character = {
     },
     ["SoulAsh"] = {
         Label = "|T3743738:0|t soul ash",
-        Order = 91,
+        Order = 92,
         Display = true,
         Tooltip = function(char)
             if char.Currencies ~= nil then
@@ -907,7 +932,7 @@ ArwicAltManager.Fields.Character = {
     },
     ["Stygia"] = {
         Label = "|T3743739:0|t Stygia",
-        Order = 91,
+        Order = 93,
         Display = true,
         Tooltip = function(char)
             if char.Currencies ~= nil then
@@ -935,7 +960,7 @@ ArwicAltManager.Fields.Character = {
     },
     ["ReservoirAnima"] = {
         Label = "|T3528288:0|t Reservoir Anima",
-        Order = 91,
+        Order = 94,
         Display = true,
         Tooltip = function(char)
             if char.Currencies ~= nil then
@@ -961,6 +986,50 @@ ArwicAltManager.Fields.Character = {
             return AAM.DefaultColor()
         end,
     },
+    ["Covenant"] = {
+        Label = "Covenant",
+        Order = 90,
+        Display = true,
+        Tooltip = function(char)
+            AddTooltipHeader(char, "Covenant")
+			if char.Covenant ~= nil then
+				GameTooltip:AddLine(format("%s %s", getCovenantIcon(char.CovenantId), char.Covenant), AAM.DefaultColor())
+			end
+            GameTooltip:Show()
+        end,
+        Value = function(char)
+			if char.Covenant == "none" then
+				return char.Covenant
+			end
+			if char.Covenant ~= nil then
+				return format("%s %s", getCovenantIcon(char.Covenant), char.Covenant)
+			end
+			return "none"
+        end,
+        Color = function(char)
+			if char.Covenant == nil or char.Covenant == "none" then
+				return AAM.ErrorColor()
+			end			
+            return AAM.SuccessColor()
+        end,
+        Update = function()
+			covenantID = C_Covenants.GetActiveCovenantID()
+			covenantname = "none"
+			if covenantID == 1 then
+			   covenantname = "Kyrian"
+			end
+			if covenantID == 2 then
+			   covenantname = "Venthyr"
+			end
+			if covenantID == 3 then
+			   covenantname = "NightFae"
+			end
+			if covenantID == 4 then
+			   covenantname = "Necrolord"
+			end			
+            CurrentChar().Covenant = covenantname
+        end,
+    },	
 }
 
 function ArwicAltManager.UpdateCharacterData()
@@ -1019,3 +1088,4 @@ local function RegisterEventUpdates()
     end
 end
 RegisterEventUpdates()
+
